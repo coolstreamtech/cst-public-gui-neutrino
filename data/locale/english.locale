@@ -282,7 +282,7 @@ colorstatusbar.text Infobar
 colorthememenu.head Select theme
 colorthememenu.head2 Load themes
 colorthememenu.name Theme name
-colorthememenu.neutrino_theme Neutrino Theme
+colorthememenu.neutrino_theme Reset Colors
 colorthememenu.question Use selected theme?
 colorthememenu.save Save current theme
 colorthememenu.select1 User Theme
