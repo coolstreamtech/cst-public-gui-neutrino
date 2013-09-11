@@ -66,6 +66,7 @@ class CThemes : public CMenuTarget, CChangeObserver
 		void saveTheme();
 		void readFile(const std::string& themename);
 		void saveFile(const std::string& themename);
+		void handleNotify();
 		
 		void rememberOldTheme(bool remember);
 

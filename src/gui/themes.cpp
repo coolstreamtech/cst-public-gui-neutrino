@@ -72,14 +72,10 @@ int CThemes::exec(CMenuTarget* parent, const std::string & actionKey)
 
 	if( !actionKey.empty() )
 	{
-		if (actionKey=="theme_neutrino")
+		if (actionKey=="reset_colors")
 		{
 			setupDefaultColors();
-			if (notifier == NULL)
-				notifier = new CColorSetupNotifier();
-			notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
-			delete notifier;
-			notifier = NULL;
+			handleNotify();
 		}
 		else
 		{
@@ -185,8 +181,8 @@ int CThemes::initMenu()
 	
 	themes.addIntroItems(LOCALE_COLORTHEMEMENU_HEAD2);
 	
-	//set default theme
-	themes.addItem(new CMenuForwarder(LOCALE_COLORTHEMEMENU_NEUTRINO_THEME, true, NULL, this, "theme_neutrino", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+	//reset to default colors
+	themes.addItem(new CMenuForwarder(LOCALE_COLORTHEMEMENU_NEUTRINO_THEME, true, NULL, this, "reset_colors", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
 
 	//set name for new theme
 	if (nameInput == NULL)
@@ -321,12 +317,7 @@ void CThemes::rememberOldTheme(bool remember)
 		g_settings.colored_events_green 		= oldThemeValues[42];
 		g_settings.colored_events_blue 			= oldThemeValues[43];
 
-		if (notifier == NULL)
-			notifier = new CColorSetupNotifier;
-		notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
-		hasThemeChanged = false;
-		delete notifier;
-		notifier = NULL;
+		handleNotify();
 	}
 }
 
@@ -392,13 +383,7 @@ void CThemes::readFile(const std::string& themename)
 		g_settings.colored_events_green = themefile.getInt32( "colored_events_green", 70 );
 		g_settings.colored_events_blue = themefile.getInt32( "colored_events_blue", 0 );
 
-		
-		if (notifier == NULL)
-			notifier = new CColorSetupNotifier;
-		notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
-		hasThemeChanged = true;
-		delete notifier;
-		notifier = NULL;
+		handleNotify();
 	}
 	else
 		printf("[neutrino theme] %s not found\n", themename.c_str());
@@ -516,5 +501,13 @@ void CThemes::setupDefaultColors()
 	g_settings.colored_events_blue = 0;
 }
 
-
+void CThemes::handleNotify()
+{
+	if (notifier == NULL)
+		notifier = new CColorSetupNotifier;
+	notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
+	hasThemeChanged = false;
+	delete notifier;
+	notifier = NULL;
+}
 
