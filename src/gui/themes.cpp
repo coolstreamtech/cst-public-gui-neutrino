@@ -49,6 +49,8 @@
 #define USERDIR "/var" THEMEDIR
 #define COLORCONF "color.conf"
 #define INFOFILE "theme.info"
+#define DEFAULT_THEMEDIR THEMEDIR "default"
+#define DEFAULT_THEME_FILE DEFAULT_THEMEDIR "/" COLORCONF
 
 CThemes::CThemes()
 : themefile('\t')
@@ -74,20 +76,14 @@ int CThemes::exec(CMenuTarget* parent, const std::string & actionKey)
 	{
 		if (actionKey=="reset_colors")
 		{
-			setupDefaultColors();
-			handleNotify();
+			if (!applyColors(DEFAULT_THEME_FILE)){
+				setupDefaultColors();
+				handleNotify();
+			}
 		}
 		else
-		{
-			std::string theme_path = actionKey;
-			if ( strstr(theme_path.c_str(), "{U}") != 0 ) 
-			{
-				theme_path.erase(0, 3);
-				readFile(theme_path);
-			} 
-			else
-				readFile(theme_path);
-		}
+			applyColors(actionKey);
+
 		return res;
 	}
 
@@ -334,9 +330,9 @@ std::string CThemes::getName(const std::string& info_file_path)
 	return ret;
 }
 
-void CThemes::readFile(const std::string& themename)
+bool CThemes::readFile(const std::string& themepath)
 {
-	if(themefile.loadConfig(themename))
+	if(themefile.loadConfig(themepath))
 	{
 		g_settings.menu_Head_alpha = themefile.getInt32( "menu_Head_alpha", 0x00 );
 		g_settings.menu_Head_red = themefile.getInt32( "menu_Head_red", 0x00 );
@@ -384,12 +380,15 @@ void CThemes::readFile(const std::string& themename)
 		g_settings.colored_events_blue = themefile.getInt32( "colored_events_blue", 0 );
 
 		handleNotify();
+		return true;
 	}
 	else
-		printf("[neutrino theme] %s not found\n", themename.c_str());
+		printf("[neutrino theme] %s not found\n", themepath.c_str());
+	
+	return false;
 }
 
-void CThemes::saveFile(const std::string& themename)
+bool CThemes::saveFile(const std::string& themepath)
 {
 	themefile.setInt32( "menu_Head_alpha", g_settings.menu_Head_alpha );
 	themefile.setInt32( "menu_Head_red", g_settings.menu_Head_red );
@@ -436,8 +435,9 @@ void CThemes::saveFile(const std::string& themename)
 	themefile.setInt32( "colored_events_green", g_settings.colored_events_green );
 	themefile.setInt32( "colored_events_blue", g_settings.colored_events_blue );
 
-	if (!themefile.saveConfig(themename.c_str()))
-		printf("[neutrino theme] %s write error\n", themename.c_str());
+	bool ret = themefile.saveConfig(themepath.c_str());
+	
+	return ret;
 }
 
 
@@ -509,5 +509,18 @@ void CThemes::handleNotify()
 	hasThemeChanged = false;
 	delete notifier;
 	notifier = NULL;
+}
+
+bool CThemes::applyColors(const std::string& themepath)
+{
+	std::string theme_path = themepath;
+	bool ret = false;
+
+	if ( strstr(theme_path.c_str(), "{U}") != 0 ) 
+		theme_path.erase(0, 3);
+
+	ret = readFile(theme_path);
+
+	return ret;
 }
 

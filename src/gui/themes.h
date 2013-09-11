@@ -64,10 +64,11 @@ class CThemes : public CMenuTarget, CChangeObserver
 		int initMenu();
 		void initMenuThemes(CMenuWidget &);
 		void saveTheme();
-		void readFile(const std::string& themename);
-		void saveFile(const std::string& themename);
+		bool readFile(const std::string& themepath);
+		bool saveFile(const std::string& themepath);
+		bool applyColors(const std::string& themepath);
 		void handleNotify();
-		
+
 		void rememberOldTheme(bool remember);
 
 	public:
