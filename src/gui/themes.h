@@ -27,26 +27,51 @@
 #include <string>
 #include <configfile.h>
 #include <system/setting_helpers.h>
+#include <gui/widget/stringinput.h>
+#include <gui/widget/stringinput_ext.h>
+#include <vector>
+
+//required typedefs
+typedef struct theme_data_t
+{
+	std::string name;
+	std::string dirname;
+	
+	bool operator< (const theme_data_t& a) const
+	{
+		return this->name < a.name ;
+	}
+} theme_data_struct_t;
+
+typedef std::vector<theme_data_t> themes_t;
+
 
 class CThemes : public CMenuTarget, CChangeObserver
 {
 	private:
 		CConfigFile themefile;
 		CColorSetupNotifier *notifier;
+		CStringInputSMS *nameInput;
 
 		int width;
 		int oldThemeValues[44];
 
 		bool hasThemeChanged;
+		std::string theme_name;
+		themes_t getThemeMetaData();
+		std::string getName(const std::string& info_file_path);
 
-		int Show();
-		void readFile(char* themename);
-		void saveFile(char* themename);
-		void readThemes(CMenuWidget &);
+		int initMenu();
+		void initMenuThemes(CMenuWidget &);
+		void saveTheme();
+		void readFile(const std::string& themename);
+		void saveFile(const std::string& themename);
+		
 		void rememberOldTheme(bool remember);
 
 	public:
 		CThemes();
+		~CThemes();
 		void setupDefaultColors();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 };

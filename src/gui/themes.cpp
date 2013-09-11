@@ -37,19 +37,18 @@
 #include <neutrino.h>
 #include "widget/menue.h"
 #include <system/setting_helpers.h>
-#include <gui/widget/stringinput.h>
-#include <gui/widget/stringinput_ext.h>
 #include <gui/widget/messagebox.h>
 #include <driver/screen_max.h>
-
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-
+#include <algorithm>
 #include "themes.h"
 
 #define THEMEDIR DATADIR "/neutrino/themes/"
 #define USERDIR "/var" THEMEDIR
-#define FILE_PREFIX ".theme"
+#define COLORCONF "color.conf"
+#define INFOFILE "theme.info"
 
 CThemes::CThemes()
 : themefile('\t')
@@ -57,7 +56,15 @@ CThemes::CThemes()
 	width 	= w_max (40, 10);
 	notifier = NULL;
 	hasThemeChanged = false;
+	nameInput = NULL;
+	theme_name = "";
 }
+CThemes::~CThemes()
+{
+	delete notifier;
+	delete nameInput;
+}
+
 
 int CThemes::exec(CMenuTarget* parent, const std::string & actionKey)
 {
@@ -68,20 +75,22 @@ int CThemes::exec(CMenuTarget* parent, const std::string & actionKey)
 		if (actionKey=="theme_neutrino")
 		{
 			setupDefaultColors();
-			notifier = new CColorSetupNotifier();
+			if (notifier == NULL)
+				notifier = new CColorSetupNotifier();
 			notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
 			delete notifier;
+			notifier = NULL;
 		}
 		else
 		{
-			std::string themeFile = actionKey;
-			if ( strstr(themeFile.c_str(), "{U}") != 0 ) 
+			std::string theme_path = actionKey;
+			if ( strstr(theme_path.c_str(), "{U}") != 0 ) 
 			{
-				themeFile.erase(0, 3);
-				readFile((char*)((std::string)USERDIR + themeFile + FILE_PREFIX).c_str());
+				theme_path.erase(0, 3);
+				readFile(theme_path);
 			} 
 			else
-				readFile((char*)((std::string)THEMEDIR + themeFile + FILE_PREFIX).c_str());
+				readFile(theme_path);
 		}
 		return res;
 	}
@@ -93,91 +102,107 @@ int CThemes::exec(CMenuTarget* parent, const std::string & actionKey)
 	if ( !hasThemeChanged )
 		rememberOldTheme( true );
 
-	return Show();
+	return initMenu();
 }
 
-void CThemes::readThemes(CMenuWidget &themes)
-{
-	struct dirent **themelist;
-	int n;
-	const char *pfade[] = {THEMEDIR, USERDIR};
-	bool hasCVSThemes, hasUserThemes;
-	hasCVSThemes = hasUserThemes = false;
-	std::string userThemeFile = "";
-	CMenuForwarder* oj;
 
-	for(int p = 0;p < 2;p++)
-	{
-		n = scandir(pfade[p], &themelist, 0, alphasort);
-		if(n < 0)
-			perror("loading themes: scandir");
-		else
-		{
-			for(int count=0;count<n;count++)
-			{
-				char *file = themelist[count]->d_name;
-				char *pos = strstr(file, ".theme");
-				if(pos != NULL)
-				{
-					if ( p == 0 && hasCVSThemes == false ) {
-						themes.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_COLORTHEMEMENU_SELECT2));
-						hasCVSThemes = true;
-					} else if ( p == 1 && hasUserThemes == false ) {
-						themes.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_COLORTHEMEMENU_SELECT1));
-						hasUserThemes = true;
+themes_t CThemes::getThemeMetaData()
+{
+	DIR *theme_dir;
+	struct dirent *entry;
+	theme_data_t data;
+	themes_t res;
+	res.clear();
+
+	std::string theme_dirs[] = {THEMEDIR, USERDIR};
+
+	for(uint i=0; i<2;i++){
+		theme_dir = opendir(theme_dirs[i].c_str());
+		if(theme_dir){
+			do {
+				entry = readdir(theme_dir);
+				if (entry)
+				{ 
+					std::string theme_path = theme_dirs[i];
+					theme_path += entry->d_name;
+					std::string config_file 	= theme_path + "/" + COLORCONF;
+					std::string info_file		= theme_path + "/" + INFOFILE;
+
+					if (access(config_file.c_str(), F_OK) == 0 ){
+						data.dirname = entry->d_name;
+						data.name = getName(info_file);
+						if (data.name == "unknown"){ //avoid unnamed entries, use dir name
+							data.name = data.dirname;
+							data.name[0] = (char)toupper(data.name[0]); //capitalize first letter
+						}
+
+						res.push_back(data);
 					}
-					*pos = '\0';
-					if ( p == 1 ) {
-						userThemeFile = "{U}" + (std::string)file;
-						oj = new CMenuForwarderNonLocalized((char*)file, true, "", this, userThemeFile.c_str());
-					} else
-						oj = new CMenuForwarderNonLocalized((char*)file, true, "", this, file);
+				}
+			} while (entry);
+			closedir(theme_dir);
+		}
+		else
+			printf("[CThemes] %s... error while loading theme from %s: %s\n", __FUNCTION__, theme_dirs[i].c_str(), strerror(errno));
+	}
+
+	sort(res.begin(), res.end());
+	return res;
+}
+
+void CThemes::initMenuThemes(CMenuWidget &themes)
+{
+	themes_t v_th_data = getThemeMetaData();
+	
+	size_t th_count = v_th_data.size();
+	bool has_themes = th_count == 0 ? false : true;
+	CMenuForwarder* oj = NULL;
+	
+	if (!has_themes)
+		return;
+
+	for(size_t i=0; i<th_count;i++) {	
+		std::string 	file = v_th_data[i].dirname + "/";
+				file += COLORCONF;
+		std::string 	path[2] = {THEMEDIR + file, USERDIR + file};
+		
+		for(int j=0; j<2; j++){
+			if (access(path[j].c_str(), F_OK) == 0 ){
+				//convert first letter to large
+				std::string s_name =  v_th_data[i].name;
+				if(!s_name.empty()){
+					oj = new CMenuForwarderNonLocalized(s_name.c_str(), true, "", this, path[j].c_str());
 					themes.addItem( oj );
 				}
-				free(themelist[count]);
 			}
-			free(themelist);
 		}
 	}
 }
 
-int CThemes::Show()
+int CThemes::initMenu()
 {
-	std::string file_name = "";
-
 	CMenuWidget themes (LOCALE_COLORMENU_MENUCOLORS, NEUTRINO_ICON_SETTINGS, width);
 	
 	themes.addIntroItems(LOCALE_COLORTHEMEMENU_HEAD2);
 	
 	//set default theme
 	themes.addItem(new CMenuForwarder(LOCALE_COLORTHEMEMENU_NEUTRINO_THEME, true, NULL, this, "theme_neutrino", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+
+	//set name for new theme
+	if (nameInput == NULL)
+		nameInput = new CStringInputSMS(LOCALE_COLORTHEMEMENU_NAME, &theme_name, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789- ");
+	//open sms box
+	themes.addItem(new CMenuForwarder(LOCALE_COLORTHEMEMENU_SAVE, true , NULL, nameInput, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
+	themes.addItem(GenericMenuSeparatorLine);
 	
-	readThemes(themes);
-
-	CStringInputSMS nameInput(LOCALE_COLORTHEMEMENU_NAME, &file_name, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789- ");
-	CMenuForwarder *m1 = new CMenuForwarder(LOCALE_COLORTHEMEMENU_SAVE, true , NULL, &nameInput, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
-
-	// Don't show SAVE if UserDir does'nt exist
-	if ( access(USERDIR, F_OK) != 0 ) { // check for existance
-	// mkdir must be called for each subdir which does not exist 
-	//	mkdir (USERDIR, S_IRUSR | S_IREAD | S_IWUSR | S_IWRITE | S_IXUSR | S_IEXEC) == 0) {
-		if (system (((std::string)"mkdir -p " + USERDIR).c_str()) != 0) {
-			printf("[neutrino theme] error creating %s\n", USERDIR);
-		}
-	}
-	if (access(USERDIR, F_OK) == 0 ) {
-		themes.addItem(GenericMenuSeparatorLine);
-		themes.addItem(m1);
-	} else {
-		delete m1;
-		printf("[neutrino theme] error accessing %s\n", USERDIR);
-	}
+	//read available themes from filesystem and add theme names to menue
+	initMenuThemes(themes);
 
 	int res = themes.exec(NULL, "");
 
-	if (file_name.length() > 1) {
-		saveFile((char*)((std::string)USERDIR + file_name + FILE_PREFIX).c_str());
-	}
+	//save a new theme
+	if (!theme_name.empty())
+		saveTheme();
 
 	if (hasThemeChanged) {
 		if (ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, LOCALE_COLORTHEMEMENU_QUESTION, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_SETTINGS) != CMessageBox::mbrYes)
@@ -186,6 +211,21 @@ int CThemes::Show()
 			hasThemeChanged = false;
 	}
 	return res;
+}
+
+void CThemes::saveTheme()
+{
+	std::string new_dir = USERDIR + theme_name;
+	std::string new_theme_file = new_dir + "/" + COLORCONF;
+
+	// Don't show SAVE if UserDir does'nt exist
+	// mkdir must be called for each subdir which does not exist 
+	if ( access(new_dir.c_str(), F_OK) != 0 ) { // check for existance
+	//	mkdir (USERDIR, S_IRUSR | S_IREAD | S_IWUSR | S_IWRITE | S_IXUSR | S_IEXEC) == 0) {
+		if (system (((std::string)"mkdir -p " + new_dir).c_str()) != 0)
+			printf("[CThemes] %s... error while creating theme dir %s: %s\n", __FUNCTION__, new_dir.c_str(), strerror(errno));
+	}	
+	saveFile(new_theme_file);
 }
 
 void CThemes::rememberOldTheme(bool remember)
@@ -281,14 +321,29 @@ void CThemes::rememberOldTheme(bool remember)
 		g_settings.colored_events_green 		= oldThemeValues[42];
 		g_settings.colored_events_blue 			= oldThemeValues[43];
 
-		notifier = new CColorSetupNotifier;
+		if (notifier == NULL)
+			notifier = new CColorSetupNotifier;
 		notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
 		hasThemeChanged = false;
 		delete notifier;
+		notifier = NULL;
 	}
 }
 
-void CThemes::readFile(char* themename)
+//get theme name from optional info file
+std::string CThemes::getName(const std::string& info_file_path)
+{
+	std::string ret = "unknown";
+
+	if(themefile.loadConfig(info_file_path))
+		ret = themefile.getString( "name", ret );
+	else
+		printf("[neutrino theme] %s not found\n", info_file_path.c_str());
+
+	return ret;
+}
+
+void CThemes::readFile(const std::string& themename)
 {
 	if(themefile.loadConfig(themename))
 	{
@@ -337,16 +392,19 @@ void CThemes::readFile(char* themename)
 		g_settings.colored_events_green = themefile.getInt32( "colored_events_green", 70 );
 		g_settings.colored_events_blue = themefile.getInt32( "colored_events_blue", 0 );
 
-		notifier = new CColorSetupNotifier;
+		
+		if (notifier == NULL)
+			notifier = new CColorSetupNotifier;
 		notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
 		hasThemeChanged = true;
 		delete notifier;
+		notifier = NULL;
 	}
 	else
-		printf("[neutrino theme] %s not found\n", themename);
+		printf("[neutrino theme] %s not found\n", themename.c_str());
 }
 
-void CThemes::saveFile(char * themename)
+void CThemes::saveFile(const std::string& themename)
 {
 	themefile.setInt32( "menu_Head_alpha", g_settings.menu_Head_alpha );
 	themefile.setInt32( "menu_Head_red", g_settings.menu_Head_red );
@@ -393,8 +451,8 @@ void CThemes::saveFile(char * themename)
 	themefile.setInt32( "colored_events_green", g_settings.colored_events_green );
 	themefile.setInt32( "colored_events_blue", g_settings.colored_events_blue );
 
-	if (!themefile.saveConfig(themename))
-		printf("[neutrino theme] %s write error\n", themename);
+	if (!themefile.saveConfig(themename.c_str()))
+		printf("[neutrino theme] %s write error\n", themename.c_str());
 }
 
 
