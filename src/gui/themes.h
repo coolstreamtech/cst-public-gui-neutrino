@@ -68,13 +68,14 @@ class CThemes : public CMenuTarget, CChangeObserver
 		bool saveFile(const std::string& themepath);
 		bool applyColors(const std::string& themepath);
 		void handleNotify();
-
+		std::string getThemePath(const std::string& themename);
 		void rememberOldTheme(bool remember);
 
 	public:
 		CThemes();
 		~CThemes();
-		void setupDefaultColors();
+		void loadColorConfig(const std::string& themename);
+		void saveColorConfig(const std::string& themename);
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 };
 

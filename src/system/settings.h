@@ -263,6 +263,7 @@ struct SNeutrinoSettings
 	int widget_fade;
 
 	//colors
+	std::string theme_name;
 	unsigned char menu_Head_alpha;
 	unsigned char menu_Head_red;
 	unsigned char menu_Head_green;

@@ -27,12 +27,7 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/wait.h>
+#include "themes.h"
 #include <global.h>
 #include <neutrino.h>
 #include "widget/menue.h"
@@ -40,10 +35,10 @@
 #include <gui/widget/messagebox.h>
 #include <driver/screen_max.h>
 #include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
 #include <algorithm>
-#include "themes.h"
+#include <unistd.h>
+#include <dirent.h>
+
 
 #define THEMEDIR DATADIR "/neutrino/themes/"
 #define USERDIR "/var" THEMEDIR
@@ -59,7 +54,7 @@ CThemes::CThemes()
 	notifier = NULL;
 	hasThemeChanged = false;
 	nameInput = NULL;
-	theme_name = "";
+	theme_name = g_settings.theme_name;
 }
 CThemes::~CThemes()
 {
@@ -72,17 +67,19 @@ int CThemes::exec(CMenuTarget* parent, const std::string & actionKey)
 {
 	int res = menu_return::RETURN_REPAINT;
 
-	if( !actionKey.empty() )
-	{
-		if (actionKey=="reset_colors")
-		{
+	if( !actionKey.empty() ){
+		if (actionKey=="reset_colors"){
 			if (!applyColors(DEFAULT_THEME_FILE)){
-				setupDefaultColors();
-				handleNotify();
+				g_settings.theme_name = "default";
+// 				handleNotify();
+			}
+		}else{
+			std::string th_path = getThemePath(actionKey);
+			if (applyColors(th_path)){
+				g_settings.theme_name = theme_name = actionKey;
+				printf("[CThemes] %s: g_settings.theme_name = %s\n", __FUNCTION__, g_settings.theme_name.c_str());
 			}
 		}
-		else
-			applyColors(actionKey);
 
 		return res;
 	}
@@ -125,7 +122,6 @@ themes_t CThemes::getThemeMetaData()
 						data.name = getName(info_file);
 						if (data.name == "unknown"){ //avoid unnamed entries, use dir name
 							data.name = data.dirname;
-							data.name[0] = (char)toupper(data.name[0]); //capitalize first letter
 						}
 
 						res.push_back(data);
@@ -160,10 +156,10 @@ void CThemes::initMenuThemes(CMenuWidget &themes)
 		
 		for(int j=0; j<2; j++){
 			if (access(path[j].c_str(), F_OK) == 0 ){
-				//convert first letter to large
 				std::string s_name =  v_th_data[i].name;
 				if(!s_name.empty()){
-					oj = new CMenuForwarderNonLocalized(s_name.c_str(), true, "", this, path[j].c_str());
+					s_name[0] = (char)toupper(s_name[0]); //capitalize first letter
+					oj = new CMenuForwarderNonLocalized(s_name.c_str(), true, "", this, v_th_data[i].dirname.c_str());
 					themes.addItem( oj );
 				}
 			}
@@ -217,7 +213,8 @@ void CThemes::saveTheme()
 		if (system (((std::string)"mkdir -p " + new_dir).c_str()) != 0)
 			printf("[CThemes] %s... error while creating theme dir %s: %s\n", __FUNCTION__, new_dir.c_str(), strerror(errno));
 	}	
-	saveFile(new_theme_file);
+	if (saveFile(new_theme_file))
+		g_settings.theme_name = theme_name;
 }
 
 void CThemes::rememberOldTheme(bool remember)
@@ -441,66 +438,6 @@ bool CThemes::saveFile(const std::string& themepath)
 }
 
 
-
-// setup default Colors
-void CThemes::setupDefaultColors()
-{
-	g_settings.menu_Head_alpha = 0x00;
-	g_settings.menu_Head_red   = 0x00;
-	g_settings.menu_Head_green = 0x0A;
-	g_settings.menu_Head_blue  = 0x19;
-
-	g_settings.menu_Head_Text_alpha = 0x00;
-	g_settings.menu_Head_Text_red   = 0x5f;
-	g_settings.menu_Head_Text_green = 0x46;
-	g_settings.menu_Head_Text_blue  = 0x00;
-
-	g_settings.menu_Content_alpha = 0x14;
-	g_settings.menu_Content_red   = 0x00;
-	g_settings.menu_Content_green = 0x0f;
-	g_settings.menu_Content_blue  = 0x23;
-
-	g_settings.menu_Content_Text_alpha = 0x00;
-	g_settings.menu_Content_Text_red   = 0x64;
-	g_settings.menu_Content_Text_green = 0x64;
-	g_settings.menu_Content_Text_blue  = 0x64;
-
-	g_settings.menu_Content_Selected_alpha = 0x14;
-	g_settings.menu_Content_Selected_red   = 0x19;
-	g_settings.menu_Content_Selected_green = 0x37;
-	g_settings.menu_Content_Selected_blue  = 0x64;
-
-	g_settings.menu_Content_Selected_Text_alpha  = 0x00;
-	g_settings.menu_Content_Selected_Text_red    = 0x00;
-	g_settings.menu_Content_Selected_Text_green  = 0x00;
-	g_settings.menu_Content_Selected_Text_blue   = 0x00;
-
-	g_settings.menu_Content_inactive_alpha = 0x14;
-	g_settings.menu_Content_inactive_red   = 0x00;
-	g_settings.menu_Content_inactive_green = 0x0f;
-	g_settings.menu_Content_inactive_blue  = 0x23;
-
-	g_settings.menu_Content_inactive_Text_alpha  = 0x00;
-	g_settings.menu_Content_inactive_Text_red    = 55;
-	g_settings.menu_Content_inactive_Text_green  = 70;
-	g_settings.menu_Content_inactive_Text_blue   = 85;
-
-	g_settings.infobar_alpha = 0x14;
-	g_settings.infobar_red   = 0x00;
-	g_settings.infobar_green = 0x0e;
-	g_settings.infobar_blue  = 0x23;
-
-	g_settings.infobar_Text_alpha = 0x00;
-	g_settings.infobar_Text_red   = 0x64;
-	g_settings.infobar_Text_green = 0x64;
-	g_settings.infobar_Text_blue  = 0x64;
-
-	g_settings.colored_events_alpha = 0x00;
-	g_settings.colored_events_red = 95;
-	g_settings.colored_events_green = 70;
-	g_settings.colored_events_blue = 0;
-}
-
 void CThemes::handleNotify()
 {
 	if (notifier == NULL)
@@ -524,3 +461,36 @@ bool CThemes::applyColors(const std::string& themepath)
 	return ret;
 }
 
+void CThemes::loadColorConfig(const std::string& themename)
+{
+	std::string themepath = getThemePath(themename);
+	
+	if (!readFile(themepath))
+		printf("[CThemes] %s: can't load %s\n", __FUNCTION__, themepath.c_str());
+}
+
+void CThemes::saveColorConfig(const std::string& themename)
+{
+	std::string themepath = getThemePath(themename);
+		
+	if (!saveFile(themepath))
+		printf("[CThemes] %s: can't save %s\n", __FUNCTION__, themepath.c_str());
+}
+
+std::string CThemes::getThemePath(const std::string& themename)
+{
+	std::string 	file = themename + "/";
+			file += COLORCONF;
+	std::string 	path[2] = {THEMEDIR + file, USERDIR + file};
+	
+	std::string themepath = path[1];
+	
+	for(int i=0; i<2; i++){
+		if (access(path[i].c_str(), F_OK) == 0 ){
+			themepath = path[i];
+			break;
+		}
+	}
+	
+	return themepath;
+}
