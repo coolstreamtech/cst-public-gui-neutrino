@@ -45,6 +45,15 @@ typedef struct theme_data_t
 
 typedef std::vector<theme_data_t> themes_t;
 
+typedef struct th_settings_t
+{
+	uint8_t* 	p_curVal;
+	uint8_t 	oldVal;
+	const char * 	key;
+	uint8_t 	defaultVal;	
+} th_settings_struct_t;
+
+#define COLOR_COUNT 44
 
 class CThemes : public CMenuTarget, CChangeObserver
 {
@@ -54,13 +63,13 @@ class CThemes : public CMenuTarget, CChangeObserver
 		CStringInputSMS *nameInput;
 
 		int width;
-		int oldThemeValues[44];
 
-		bool hasThemeChanged;
+
 		std::string theme_name;
 		themes_t getThemeMetaData();
 		std::string getName(const std::string& info_file_path);
 
+		void initColorVars();
 		int initMenu();
 		void initMenuThemes(CMenuWidget &);
 		void saveTheme();
@@ -70,6 +79,9 @@ class CThemes : public CMenuTarget, CChangeObserver
 		void handleNotify();
 		std::string getThemePath(const std::string& themename);
 		void rememberOldTheme(bool remember);
+		bool isChanged();
+				
+		th_settings_t colors[COLOR_COUNT];
 
 	public:
 		CThemes();
