@@ -904,7 +904,10 @@ void CMenuWidget::paint()
 {
 	calcSize();
 	CVFD::getInstance()->setMode(CVFD::MODE_MENU_UTF8 /*, nameString.c_str()*/);
-
+	
+	//callback before paint
+	BeforePaint(NULL);
+	
 	// paint head
 	CComponentsHeader header(x, y, width + sb_width, hheight, nameString, iconfile.c_str());
 	header.setShadowOnOff(CC_SHADOW_ON);

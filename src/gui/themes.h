@@ -27,9 +27,13 @@
 #include <string>
 #include <configfile.h>
 #include <system/setting_helpers.h>
+#include <gui/widget/menue.h>
 #include <gui/widget/stringinput.h>
 #include <gui/widget/stringinput_ext.h>
 #include <vector>
+#include <sigc++/sigc++.h>
+
+class CThemes;
 
 //required typedefs
 typedef struct theme_data_t
@@ -53,9 +57,15 @@ typedef struct th_settings_t
 	uint8_t 	defaultVal;	
 } th_settings_struct_t;
 
+typedef struct callback_data_t
+{
+	CThemes *themes;
+	std::string datastr;
+}callback_data_struct_t;
+
 #define COLOR_COUNT 44
 
-class CThemes : public CMenuTarget, CChangeObserver
+class CThemes : public sigc::trackable, public CMenuTarget, CChangeObserver
 {
 	private:
 		CConfigFile themefile;
@@ -65,23 +75,29 @@ class CThemes : public CMenuTarget, CChangeObserver
 		int width;
 
 
-		std::string theme_name;
+		std::string cur_theme;
+		std::string old_theme;
+
 		themes_t getThemeMetaData();
 		std::string getName(const std::string& info_file_path);
 
 		void initColorVars();
 		int initMenu();
-		void initMenuThemes(CMenuWidget &);
-		void saveTheme();
-		bool readFile(const std::string& themepath);
-		bool saveFile(const std::string& themepath);
-		bool applyColors(const std::string& themepath);
+		void initMenuThemes(CMenuWidget &themes);
+		void initMenuThemeColors(CMenuWidget *menu_colors, const std::string &themeDir);
+		bool saveTheme(bool isCustom, std::string themeName);
+		bool readColors(const std::string& themePath);
+		bool saveColors(const std::string& themePath);
+		bool loadTheme(const std::string& themePath);
 		void handleNotify();
-		std::string getThemePath(const std::string& themename);
-		void rememberOldTheme(bool remember);
-		bool isChanged();
+		std::string getThemePath(const std::string& themeName);
+		void applyThemeColors(bool restore);
+		void initThemeNameEdit();
 				
 		th_settings_t colors[COLOR_COUNT];
+		
+		std::vector<callback_data_t*> v_cbdata;
+		void cleanUpCallBackBeforePaint();
 
 	public:
 		CThemes();
@@ -89,6 +105,11 @@ class CThemes : public CMenuTarget, CChangeObserver
 		void loadColorConfig(const std::string& themename);
 		void saveColorConfig(const std::string& themename);
 		int exec(CMenuTarget* parent, const std::string & actionKey);
+		bool isChangedColors();
+		bool isChangedThemeName();
+		void CallBackBeforePaint(void* arg, void*);
 };
+
+
 
 #endif

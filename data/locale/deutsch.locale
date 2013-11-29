@@ -279,12 +279,13 @@ colormenusetup.menucontent_inactive Fensterinhalt deaktiviert
 colormenusetup.menucontent_selected Fensterinhalt selektiert
 colormenusetup.menuhead Titelleiste
 colorstatusbar.text Infobar
+colorthememenu.edit Theme bearbeiten
 colorthememenu.head Theme auswählen
 colorthememenu.head2 Themes laden
 colorthememenu.name Themename
-colorthememenu.neutrino_theme Farben zurücksetzen
-colorthememenu.question Aktuelles Theme beibehalten?
-colorthememenu.save aktuelles Theme speichern
+colorthememenu.neutrino_theme Zurücksetzen
+colorthememenu.question Aktuelles Theme übernehmen?
+colorthememenu.save Speichern unter...
 colorthememenu.select1 Benutzer Theme
 colorthememenu.select2 Standard Theme
 cpu.freq CPU Frequenz

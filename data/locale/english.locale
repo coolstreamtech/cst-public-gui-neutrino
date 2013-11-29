@@ -279,12 +279,13 @@ colormenusetup.menucontent_inactive Content inactive
 colormenusetup.menucontent_selected Content selected
 colormenusetup.menuhead Header
 colorstatusbar.text Infobar
+colorthememenu.edit Edit theme
 colorthememenu.head Select theme
 colorthememenu.head2 Load themes
 colorthememenu.name Theme name
 colorthememenu.neutrino_theme Reset Colors
 colorthememenu.question Use selected theme?
-colorthememenu.save Save current theme
+colorthememenu.save Save as...
 colorthememenu.select1 User Theme
 colorthememenu.select2 Standard Theme
 cpu.freq CPU frequency

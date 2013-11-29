@@ -44,7 +44,7 @@
 #include <gui/components/cc.h>
 #include <string>
 #include <vector>
-
+#include <sigc++/sigc++.h>
 #define NO_WIDGET_ID -1
 
 typedef int mn_widget_id_t;
@@ -420,7 +420,7 @@ class CMenuGlobal
 		static CMenuGlobal* getInstance();
 };
 
-class CMenuWidget : public CMenuTarget
+class CMenuWidget : public CMenuTarget, public sigc::trackable
 {
 	private: 
 		mn_widget_id_t 		widget_index;
@@ -480,7 +480,7 @@ class CMenuWidget : public CMenuTarget
 		~CMenuWidget();
 		
 		virtual void addItem(CMenuItem* menuItem, const bool defaultselected = false);
-		
+
 		enum 
 		{
 			BTN_TYPE_BACK =		0,
@@ -517,6 +517,7 @@ class CMenuWidget : public CMenuTarget
 			MENU_POS_BOTTOM_RIGHT
 		};
 		void addKey(neutrino_msg_t key, CMenuTarget *menue, const std::string &action);
+		sigc::signal1<void, void*>BeforePaint;
 };
 
 class CPINProtection
