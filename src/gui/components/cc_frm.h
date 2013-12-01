@@ -37,9 +37,10 @@
 
 class CComponentsForm : public CComponentsItem
 {
+	private:
+		void initVarForm();
 	protected:
 		std::vector<CComponentsItem*>	v_cc_items;			
-		void initVarForm();
 		void paintForm(bool do_save_bg);
 		///generates next possible index for an item, see also cc_item_index, getIndex(), setIndex()
 		int genIndex();
@@ -112,6 +113,8 @@ class CComponentsIconForm : public CComponentsForm
 
 class CComponentsHeader : public CComponentsForm
 {
+	private:
+		void initVarHeader();
 	protected:
 		CComponentsPicture * cch_icon_obj;
 		CComponentsText * cch_text_obj;
@@ -130,8 +133,6 @@ class CComponentsHeader : public CComponentsForm
 		void initButtons();
 		void initDefaultButtons();
 		void initButtonFormSize();
-
-		void initVarHeader();
 
 	public:
 		enum

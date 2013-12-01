@@ -194,7 +194,7 @@ void CInfoViewer::start ()
 
 	if ( g_settings.infobar_show_channellogo != 3 && g_settings.infobar_show_channellogo != 5  && g_settings.infobar_show_channellogo != 6) /* 3 & 5 & 6 is "default" with sigscales etc. */
 	{
-		ChanWidth = 4 * g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_NUMBER]->getRenderWidth(widest_number) + 10;
+		ChanWidth = 4 * g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_NUMBER]->getMaxDigitWidth() + 10;
 		ChanHeight = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_NUMBER]->getHeight() * 9 / 8;
 	}
 	else
@@ -256,13 +256,16 @@ void CInfoViewer::paintTime (bool show_dot)
 
 	if (clock == NULL){
 		clock = new CComponentsFrmClock();
-		clock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
 		clock->doPaintBg(false);
 	}
+
+	clock->setColorBody(COL_INFOBAR_PLUS_0);
+	clock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
 	clock->setDimensionsAll(clock_x, clock_y, clock_w, clock_h);
-	clock->setClockFont(g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME]);
+	clock->setClockFont(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
 	clock->setClockFormat(show_dot ? "%H:%M" : "%H.%M");
-	
+	clock->setTextColor(COL_INFOBAR_TEXT);
+
 	clock->paint(CC_SAVE_SCREEN_NO);
 }
 

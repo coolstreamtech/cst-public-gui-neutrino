@@ -777,6 +777,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.pip_width = configfile.getInt32("pip_width", 365);
 	g_settings.pip_height = configfile.getInt32("pip_height", 200);
 #endif
+
+	g_settings.infoClockFontSize = configfile.getInt32("infoClockFontSize", 34);
+
 	if(erg)
 		configfile.setModifiedFlag(true);
 	return erg;
@@ -1147,6 +1150,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("pip_width", g_settings.pip_width);
 	configfile.setInt32("pip_height", g_settings.pip_height);
 #endif
+	configfile.setInt32("infoClockFontSize", g_settings.infoClockFontSize);
 	configfile.setInt32("easymenu", g_settings.easymenu);
 	if(strcmp(fname, NEUTRINO_SETTINGS_FILE))
 		configfile.saveConfig(fname);
@@ -1849,9 +1853,7 @@ TIMER_START();
 
 	dprintf( DEBUG_NORMAL, "registering as event client\n");
 
-#ifndef DISABLE_SECTIONSD
 	InitSectiondClient();
-#endif
 
 	InitTimerdClient();
 
@@ -2145,9 +2147,11 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				// eventlist
 				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_RED_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// EventList Menu - Personalization Check
 				{
+					InfoClock->enableInfoClock(false);
 					StopSubtitles();
 					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_RED);
 					StartSubtitles();
+					InfoClock->enableInfoClock(true);
 				}
 					else
 						ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
@@ -2770,9 +2774,9 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			}
 		}
 		if(g_settings.shutdown_real)
-			ExitRun(true, (cs_get_revision() > 7));
-		else if(mode != mode_standby)
-			standbyMode( true );
+			g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
+		else
+			g_RCInput->postMsg(NeutrinoMessages::STANDBY_ON, 0);
 		return messages_return::handled;
 	}
 	else if( msg == NeutrinoMessages::RELOAD_SETUP ) {
