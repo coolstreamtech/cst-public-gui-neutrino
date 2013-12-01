@@ -27,6 +27,7 @@
 #define __COMPONENTS__
 
 #include "cc_types.h"
+#include "cc_signals.h"
 #include <gui/widget/textbox.h>
 #include <vector>
 #include <string>
@@ -34,13 +35,12 @@
 #include <gui/widget/icons.h>
 
 
-
 /// Basic component class.
 /*!
 Basic attributes and member functions for component sub classes
 */
 
-class CComponents
+class CComponents : public CComponentsSignals
 {
 	private:
 		///pixel buffer handling, returns pixel buffer depends of given parameters

@@ -17,10 +17,8 @@
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 	General Public License for more details.
 
-	You should have received a copy of the GNU General Public
-	License along with this program; if not, write to the
-	Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
-	Boston, MA  02110-1301, USA.
+	You should have received a copy of the GNU General Public License
+	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 /// Basic CComponent class header.
@@ -46,7 +44,5 @@ Basic attributes and member functions for component sub classes
 #include "cc_frm_button.h"
 #include "cc_frm_clock.h"
 #include "cc_frm_signalbars.h"
-
-
 
 #endif /*__N_COMPONENTS__*/
