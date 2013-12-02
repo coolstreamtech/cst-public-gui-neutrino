@@ -454,9 +454,8 @@ void CThemes::initMenuThemes(CMenuWidget &themes)
 					void* ptr = static_cast<void*>(v_cbdata[v_cbdata.size()-1]);
 
 					//finally creating a slot to CMenuWidget *th_colors widget
-// 					th_colors->setEventBeforePaint(&CallBackBeforePaint, ptr);
 					sigc::slot0<void> sl = sigc::bind<0>(sigc::mem_fun1(*this, &CThemes::CallBackBeforePaint), ptr);
-					th_colors->BeforePaint.connect(sl);
+					th_colors->OnBeforePaint.connect(sl);
 
 					CMenuForwarderNonLocalized *osd_colors = new CMenuForwarderNonLocalized(s_name.c_str(), true, NULL, th_colors, v_th_data[i].dirname.c_str());
 					themes.addItem(osd_colors);
