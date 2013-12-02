@@ -322,7 +322,7 @@ int CThemes::exec(CMenuTarget* parent, const string & actionKey)
 			string th_path = getThemePath(actionKey);
 			if (loadTheme(th_path)){
 				cur_theme = actionKey;
-				printf("[CThemes] %s: error: cur_theme = %s\n", __FUNCTION__, cur_theme.c_str());
+				printf("[CThemes] %s: cur_theme = %s\n", __FUNCTION__, cur_theme.c_str());
 			}
 		}
 
