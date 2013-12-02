@@ -107,7 +107,7 @@ class CThemes : public sigc::trackable, public CMenuTarget, CChangeObserver
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 		bool isChangedColors();
 		bool isChangedThemeName();
-		void CallBackBeforePaint(void* arg, void*);
+		void CallBackBeforePaint(void* arg);
 };
 
 

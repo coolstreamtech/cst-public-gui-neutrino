@@ -525,7 +525,7 @@ class CMenuWidget : public CMenuTarget, public sigc::trackable
 			MENU_POS_BOTTOM_RIGHT
 		};
 		void addKey(neutrino_msg_t key, CMenuTarget *menue, const std::string &action);
-		sigc::signal1<void, void*>BeforePaint;
+		sigc::signal0<void>BeforePaint;
 };
 
 class CPINProtection

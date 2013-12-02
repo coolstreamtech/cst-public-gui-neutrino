@@ -383,7 +383,7 @@ void CThemes::initThemeNameEdit()
 
 //callback function to apply current themes to current CMenuWidget
 //this function assigns selected color settings befor the CMenuWidget object will paint its menue items
-void CThemes::CallBackBeforePaint(void* arg, void*)
+void CThemes::CallBackBeforePaint(void* arg)
 {
 	printf("[CThemes]    [%s]  Callback: void arg: %p\n", __FUNCTION__, arg);
 	callback_data_t *event = static_cast<callback_data_t*>(arg);
@@ -455,7 +455,7 @@ void CThemes::initMenuThemes(CMenuWidget &themes)
 
 					//finally creating a slot to CMenuWidget *th_colors widget
 // 					th_colors->setEventBeforePaint(&CallBackBeforePaint, ptr);
-					sigc::slot1<void, void*> sl = sigc::bind<0>(sigc::mem_fun2(*this, &CThemes::CallBackBeforePaint), ptr);
+					sigc::slot0<void> sl = sigc::bind<0>(sigc::mem_fun1(*this, &CThemes::CallBackBeforePaint), ptr);
 					th_colors->BeforePaint.connect(sl);
 
 					CMenuForwarderNonLocalized *osd_colors = new CMenuForwarderNonLocalized(s_name.c_str(), true, NULL, th_colors, v_th_data[i].dirname.c_str());

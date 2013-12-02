@@ -894,7 +894,7 @@ void CMenuWidget::paint()
 	CVFD::getInstance()->setMode(CVFD::MODE_MENU_UTF8 /*, nameString.c_str()*/);
 	
 	//callback before paint
-	BeforePaint(NULL);
+	BeforePaint();
 	
 	// paint head
 	CComponentsHeader header(x, y, width + sb_width, hheight, nameString, iconfile.c_str());
