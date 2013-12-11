@@ -108,7 +108,7 @@ void CComponentsHeader::initVarHeader()
 	cch_text		= "";
 	cch_col_text		= COL_MENUHEAD_TEXT;
 	cch_caption_align	= CTextBox::NO_AUTO_LINEBREAK;
-	cch_items_y 		= 0;
+	cch_items_y 		= 1;
 	cch_offset		= 8;
 	cch_icon_x 		= cch_offset;
 	cch_icon_w		= 0;
@@ -361,6 +361,7 @@ void CComponentsHeader::initCCItems()
 {
 	//set size
 	cch_font = (cch_size_mode == CC_HEADER_SIZE_LARGE? g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE] : g_Font[SNeutrinoSettings::FONT_TYPE_MENU]);
+	height = cch_font->getHeight();
 	
 	//init icon
 	initIcon();
