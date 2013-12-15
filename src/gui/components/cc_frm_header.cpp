@@ -51,7 +51,10 @@ CComponentsHeader::CComponentsHeader(	const int x_pos, const int y_pos, const in
 	x 		= x_pos;
 	y 		= y_pos;
 	width 		= w;
-	height 		= h > 0 ? h : height;
+	if (h > 0) {
+		userHeight = true;
+		height = h;
+	}
 	shadow		= has_shadow;
 	col_frame	= color_frame;
 	col_body	= color_body;
@@ -74,7 +77,10 @@ CComponentsHeader::CComponentsHeader(	const int x_pos, const int y_pos, const in
 	x 		= x_pos;
 	y 		= y_pos;
 	width 		= w;
-	height 		= h > 0 ? h : height;
+	if (h > 0) {
+		userHeight = true;
+		height = h;
+	}
 	shadow		= has_shadow;
 	col_frame	= color_frame;
 	col_body	= color_body;
@@ -99,6 +105,7 @@ void CComponentsHeader::initVarHeader()
 	cch_size_mode		= CC_HEADER_SIZE_LARGE;
 	cch_font 		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE];
 	height 			= cch_font->getHeight();
+	userHeight		= false;
 	
 	//CComponentsHeader
 	cch_icon_obj		= NULL;
@@ -108,7 +115,7 @@ void CComponentsHeader::initVarHeader()
 	cch_text		= "";
 	cch_col_text		= COL_MENUHEAD_TEXT;
 	cch_caption_align	= CTextBox::NO_AUTO_LINEBREAK;
-	cch_items_y 		= 1;
+	cch_items_y 		= 0;
 	cch_offset		= 8;
 	cch_icon_x 		= cch_offset;
 	cch_icon_w		= 0;
@@ -360,8 +367,10 @@ void CComponentsHeader::initCaption()
 void CComponentsHeader::initCCItems()
 {
 	//set size
-	cch_font = (cch_size_mode == CC_HEADER_SIZE_LARGE? g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE] : g_Font[SNeutrinoSettings::FONT_TYPE_MENU]);
-	height = cch_font->getHeight();
+	if (!userHeight) {
+		cch_font = (cch_size_mode == CC_HEADER_SIZE_LARGE? g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE] : g_Font[SNeutrinoSettings::FONT_TYPE_MENU]);
+		height = cch_font->getHeight();
+	}
 	
 	//init icon
 	initIcon();
