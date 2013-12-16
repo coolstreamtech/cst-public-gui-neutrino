@@ -82,6 +82,7 @@ class CComponentsSignals : public sigc::trackable
 		CComponentsSignals(){};
 
 		sigc::signal<void> OnBeforePaint;
+		sigc::signal<void> OnAfterPaint;
 };
 
 
