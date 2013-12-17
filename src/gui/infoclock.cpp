@@ -69,10 +69,8 @@ void CInfoClock::Init()
 
 	if (g_settings.infoClockSeconds)
 		setClockFormat("%H:%M:%S");
-	else {
-		setClockFormat("%H:%M");
-		setClockBlink("%H %M");
-	}
+	else
+		setClockFormat("%H:%M", "%H %M");
 
 	int x_old = x, y_old = y, width_old = width, height_old = height;
 	CVolumeHelper::getInstance()->refresh(cl_font);
@@ -94,13 +92,13 @@ void CInfoClock::ClearDisplay()
 	Init();
 }
 
-bool CInfoClock::StartClock()
+bool CInfoClock::StartInfoClock()
 {
 	Init();
 	return Start();
 }
 
-bool CInfoClock::StopClock()
+bool CInfoClock::StopInfoClock()
 {
 	bool ret = Stop();
 	kill();
@@ -114,11 +112,11 @@ bool CInfoClock::enableInfoClock(bool enable)
 	if (g_settings.mode_clock) {
 		if (enable) {
 			if (!paintClock)
-				ret = StartClock();
+				ret = StartInfoClock();
 		}
 		else {
 			if (paintClock)
-				ret = StopClock();
+				ret = StopInfoClock();
 		}
 	}
 	return ret;

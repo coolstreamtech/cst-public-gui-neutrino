@@ -133,8 +133,8 @@ CChannelList::~CChannelList()
 		headerClock->Stop();
 		if (headerClock->isPainted())
 			headerClock->hide();
-		if (headerClock->isClockRun())
-			headerClock->stopThread();
+// 		if (headerClock->isClockRun())
+// 			headerClock->stopThread();
 		delete headerClock;
 		headerClock = NULL;
 	}
@@ -2122,7 +2122,7 @@ void CChannelList::paintHead()
 	if (g_Sectionsd->getIsTimeSet()) {
 		if (headerClock == NULL) {
 			headerClock = new CComponentsFrmClock(0, 0, 0, 0, "%H:%M");
-			headerClock->setClockBlink("%H %M");
+			headerClock->setClockFormat("%H:%M", "%H %M");
 			headerClock->setClockIntervall(1);
 
 		}

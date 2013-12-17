@@ -43,8 +43,8 @@ class CInfoClock : public CComponentsFrmClock
 	// 	~CInfoClock(); // inherited from CComponentsFrmClock
 		static		CInfoClock* getInstance();
 
-		bool 		StartClock();
-		bool 		StopClock();
+		bool 		StartInfoClock();
+		bool 		StopInfoClock();
 		bool		enableInfoClock(bool enable);
 		void		ClearDisplay();
 };

@@ -1965,7 +1965,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 
 	InfoClock = CInfoClock::getInstance();
 	if(g_settings.mode_clock)
-		g_settings.mode_clock = InfoClock->StartClock();
+		g_settings.mode_clock = InfoClock->StartInfoClock();
 
 	//cCA::GetInstance()->Ready(true);
 

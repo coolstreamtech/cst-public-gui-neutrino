@@ -62,11 +62,10 @@ CComponentsFrmClock::CComponentsFrmClock( const int x_pos, const int y_pos, cons
 	col_body	= color_body;
 	col_shadow	= color_shadow;
 
-	cl_format_str	= format_str;
+	cl_format_str	= cl_blink_str = format_str;
 	paintClock	= false;
-	activeClock	= activ;
-	if (activeClock)
-		startThread();
+	if (activ)
+		startClock();
 }
 
 void CComponentsFrmClock::initVarClock()
@@ -79,20 +78,23 @@ void CComponentsFrmClock::initVarClock()
 	dyn_font_size		= 0;
 
 	cl_col_text		= COL_MENUCONTENT_TEXT;
+
 	cl_format_str		= "%H:%M";
+	cl_format 		= cl_format_str;
+	cl_blink_str		= "%H %M";
+
 	cl_align		= CC_ALIGN_VER_CENTER | CC_ALIGN_HOR_CENTER;
 
 	cl_thread 		= 0;
 	cl_interval		= 1;
 
-	activeClock		= true;
-	cl_blink_str		= "";
+	cl_timer 		= NULL;
 }
 
 CComponentsFrmClock::~CComponentsFrmClock()
 {
-	if (activeClock)
-		stopThread();
+	if (cl_timer)
+		delete cl_timer;
 }
 
 void CComponentsFrmClock::initTimeString()
@@ -100,7 +102,29 @@ void CComponentsFrmClock::initTimeString()
 	struct tm t;
 	time_t ltime;
 	ltime=time(&ltime);
-	strftime((char*) &cl_timestr, sizeof(cl_timestr), cl_format_str.c_str(), localtime_r(&ltime, &t));
+
+	//formating time string with possible blink string
+	if (cl_format_str.length() != cl_blink_str.length())
+		hide();
+	
+	if (cl_format == cl_blink_str)
+		cl_format = cl_format_str;
+	else
+		cl_format = cl_blink_str;
+
+	strftime((char*) &cl_timestr, sizeof(cl_timestr), cl_format.c_str(), localtime_r(&ltime, &t));
+}
+
+
+//set current time format string
+void CComponentsFrmClock::setClockFormat(const char* prformat_str, const char* secformat_str)
+{
+	cl_format_str = prformat_str;
+
+	if (secformat_str == NULL)
+		cl_blink_str = cl_format_str;
+	else
+		cl_blink_str = secformat_str;
 }
 
 // How does it works?
@@ -257,95 +281,72 @@ void CComponentsFrmClock::initSegmentAlign(int* segment_width, int* segment_heig
 	}
 }
 
-//thread handle
-void* CComponentsFrmClock::initClockThread(void *arg)
+//this member is provided for slot with timer event "OnTimer"
+void CComponentsFrmClock::ShowTime()
 {
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,0);
- 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS,0);
-
-	CComponentsFrmClock *clock = static_cast<CComponentsFrmClock*>(arg);
-	time_t count = time(0);
-	std::string format_str_save = clock->cl_format_str;
-	//start loop for paint
-	while(1) {
-		if (clock->paintClock) {
-			// Blinking depending on the blink format string
-			if (!clock->cl_blink_str.empty() && (clock->cl_format_str.length() == clock->cl_blink_str.length())) {
-				if (clock->cl_format_str == clock->cl_blink_str.c_str())
-					clock->cl_format_str = format_str_save;
-				else {
-					format_str_save = clock->cl_format_str;
-					clock->cl_format_str = clock->cl_blink_str;
-				}
-			}
-			//paint segements, but wihtout saved backgrounds
-			clock->paint(CC_SAVE_SCREEN_NO);
-			count = time(0);
-		}
-		if (time(0) >= count+30) {
-			clock->cl_thread = 0;
-			break;
-		}
-		sleep(clock->cl_interval);
+	if (paintClock) {
+		//paint segements, but wihtout saved backgrounds
+		paint(CC_SAVE_SCREEN_NO);
 	}
-	return 0;
 }
 
-//start up ticking clock with own thread, return true on succses
-bool CComponentsFrmClock::startThread()
+//start up ticking clock controled by timer with signal/slot, return true on succses
+bool CComponentsFrmClock::startClock()
 {
-	void *ptr = static_cast<void*>(this);
+	if (cl_timer == NULL){
+		cl_timer = new CComponentsTimer();
+		sigc::slot0<void> sl = sigc::mem_fun0(*this, &CComponentsFrmClock::ShowTime);
+		cl_timer->OnTimer.connect(sl);
+#if DEBUG_CC
+		printf("[CComponentsFrmClock]    [%s]  init slot...\n", __func__);
+#endif
+	}
 	
-	if(!cl_thread) {
-		int res = pthread_create (&cl_thread, NULL, initClockThread, ptr) ;
-		if (res != 0){
-			printf("[CComponentsFrmClock]    [%s]  pthread_create  %s\n", __FUNCTION__, strerror(errno));
-			return false;
-		}
-	}
-	return  true;
+	cl_timer->setTimerIntervall(cl_interval);
+
+	if (cl_timer->isRun())
+		return true;
+	
+	return  false;
 }
 
-//stop ticking clock and kill thread, return true on succses
-bool CComponentsFrmClock::stopThread()
+//stop ticking clock and internal timer, return true on succses
+bool CComponentsFrmClock::stopClock()
 {
-	if(cl_thread) {
-		int res = pthread_cancel(cl_thread);
-		if (res != 0){
-			printf("[CComponentsFrmClock]    [%s] pthread_cancel  %s\n", __FUNCTION__, strerror(errno));
-			return false;
-		}
-
-		res = pthread_join(cl_thread, NULL);
-		if (res != 0){
-			printf("[CComponentsFrmClock]    [%s] pthread_join  %s\n", __FUNCTION__, strerror(errno));
-			return false;
-		}
+	if (cl_timer){
+#if DEBUG_CC
+		printf("[CComponentsFrmClock]    [%s]  stopping timer...\n", __func__);
+#endif
+		if (cl_timer->stopTimer())
+			delete cl_timer;
+		cl_timer = NULL;
+		return true;
 	}
-	cl_thread = 0;
-	return true;
+#if DEBUG_CC	
+	printf("[CComponentsFrmClock]    [%s]  stopping timer failed...\n", __func__);
+#endif
+	return false;
 }
 
 bool CComponentsFrmClock::Start()
 {
-	if (!activeClock)
-		return false;
-	if (!cl_thread)
-		startThread();
-	if (cl_thread) {
+	if (startClock()) {
 		//ensure paint of segements on first paint
 		paint();
 		paintClock = true;
+		return true;
 	}
-	return cl_thread == 0 ? false : true;
+	return false;
 }
 
 bool CComponentsFrmClock::Stop()
 {
-	if (!activeClock)
-		return false;
-	paintClock = false;
-	return cl_thread == 0 ? false : true;
+	if (stopClock()){
+		paintClock = false;
+		return true;
+	}
+
+	return false;
 }
 
 void CComponentsFrmClock::paint(bool do_save_bg)
@@ -375,5 +376,4 @@ Font** CComponentsFrmClock::getClockFont()
 	if (dyn_font_size == 0)
 		cl_font = &g_Font[cl_font_type];
 	return cl_font;
-
 }

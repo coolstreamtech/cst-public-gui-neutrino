@@ -33,7 +33,7 @@
 
 #include "cc_base.h"
 #include "cc_frm.h"
-
+#include "cc_timer.h"
 
 //! Sub class of CComponents. Show clock with digits on screen. 
 /*!
@@ -43,23 +43,22 @@ Usable as simple fixed display or as ticking clock.
 class CComponentsFrmClock : public CComponentsForm
 {
 	private:
-		
-// 		bool cl_force_segment_paint;
+		CComponentsTimer *cl_timer;
+		void ShowTime();
+		///current time format
+		std::string cl_format;
 	
 	protected:
 		///thread
 		pthread_t  cl_thread;
 		///refresh interval in seconds
 		int cl_interval;
-		///init function to start clock in own thread
-		static void* initClockThread(void *arg);
 
 		///raw time chars
 		char cl_timestr[20];
 
 		//TODO: please add comments!
 		bool paintClock;
-		bool activeClock;
 
 		///object: font render object
 		Font **cl_font;
@@ -69,9 +68,9 @@ class CComponentsFrmClock : public CComponentsForm
 
 		///text color
 		int cl_col_text;
-		///time format
+		///primary time format
 		std::string cl_format_str;
-		///time format for blink
+		///secondary time format for blink
 		std::string cl_blink_str;
 		///time string align, default allign is ver and hor centered
 		int cl_align;
@@ -85,6 +84,11 @@ class CComponentsFrmClock : public CComponentsForm
 		void initTimeString();
 		///initialize of general alignment of timestring segments within form area
 		void initSegmentAlign(int* segment_width, int* segment_height);
+		
+		///start ticking clock, returns true on success, if false causes log output
+		bool startClock();
+		///stop ticking clock, returns true on success, if false causes log output
+		bool stopClock();
 
 		///return pointer of font object
 		inline Font** getClockFont();
@@ -107,21 +111,16 @@ class CComponentsFrmClock : public CComponentsForm
 		virtual void setClockAlignment(int align_type){cl_align = align_type;};
 
 		///use string expession: "%H:%M" = 12:22, "%H:%M:%S" = 12:22:12
-		virtual void setClockFormat(const char* format_str){cl_format_str = format_str;};
+		///set current time format string, 1st parameter set the default format, 2nd parameter sets an alternatively format for use as blink effect
+		virtual void setClockFormat(const char* prformat_str, const char* secformat_str = NULL);
 
-		///time format for blink ("%H %M", "%H:%M %S" etc.)
-		virtual void setClockBlink(const char* format_str){cl_blink_str = format_str;};
-
-		///start ticking clock thread, returns true on success, if false causes log output
-		virtual bool startThread();
-		///stop ticking clock thread, returns true on success, if false causes log output
-		virtual bool stopThread();
-
+		///start and paint ticking clock
 		virtual bool Start();
+		///stop ticking clock, but don't hide, use kill() or hide() to remove from screen
 		virtual bool Stop();
 
-		///returns true, if clock is running in thread
-		virtual bool isClockRun() const {return cl_thread == 0 ? false:true;};
+		///returns true, if clock is running
+		virtual bool isRun() const {return cl_thread == 0 ? false:true;};
 		///set refresh interval in seconds, default value=1 (=1 sec)
 		virtual void setClockIntervall(const int& seconds){cl_interval = seconds;};
 
@@ -132,7 +131,7 @@ class CComponentsFrmClock : public CComponentsForm
 		virtual void refresh() { initCCLockItems(); }
 
 		///set clock activ/inactiv
-		virtual void setClockActiv(bool activ = true){activeClock = activ;};
+// 		virtual void setClockActiv(bool activ = true){activeClock = activ;};
 };
 
 #endif
