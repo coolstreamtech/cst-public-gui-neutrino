@@ -107,7 +107,6 @@ void CTimeOSD::updatePos(int position, int duration)
 	timescale.setBlink();
 	timescale.setRgb(0, 100, 70);
 	timescale.paint();
-	frameBuffer->blit();
 }
 
 void CTimeOSD::update(int position, int duration)
@@ -141,7 +140,6 @@ void CTimeOSD::switchMode(int position, int duration)
 			m_mode = MODE_HIDE;
 			timescale.kill();
 			timescale.reset();
-			frameBuffer->blit();
 			return;
 		default:
 			m_mode = MODE_ASC;
@@ -157,6 +155,5 @@ void CTimeOSD::hide(void)
 		timescale.kill();
 		timescale.reset();
 		kill();
-		frameBuffer->blit();
 	}
 }
