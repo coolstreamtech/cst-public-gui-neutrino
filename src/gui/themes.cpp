@@ -316,13 +316,13 @@ int CThemes::exec(CMenuTarget* parent, const string & actionKey)
 		if(actionKey=="reset_colors"){
 			if (loadTheme(DEFAULT_THEME_FILE)){
 				cur_theme = "default";
-				printf("[CThemes] %s: cur_theme = %s\n", __FUNCTION__, cur_theme.c_str());
+				printf("[CThemes] %s: cur_theme = %s\n", __func__, cur_theme.c_str());
 			}
 		}else{
 			string th_path = getThemePath(actionKey);
 			if (loadTheme(th_path)){
 				cur_theme = actionKey;
-				printf("[CThemes] %s: cur_theme = %s\n", __FUNCTION__, cur_theme.c_str());
+				printf("[CThemes] %s: cur_theme = %s\n", __func__, cur_theme.c_str());
 			}
 		}
 
@@ -385,10 +385,10 @@ void CThemes::initThemeNameEdit()
 //this function assigns selected color settings befor the CMenuWidget object will paint its menue items
 void CThemes::CallBackBeforePaint(void* arg)
 {
-	printf("[CThemes]    [%s]  Callback: void arg: %p\n", __FUNCTION__, arg);
+	printf("[CThemes]    [%s]  Callback: void arg: %p\n", __func__, arg);
 	callback_data_t *event = static_cast<callback_data_t*>(arg);
 	
-	printf("[CThemes]    [%s]  Callback: cbdata: %p, , = %s\n", __FUNCTION__, event, event->datastr.c_str());
+	printf("[CThemes]    [%s]  Callback: cbdata: %p, , = %s\n", __func__, event, event->datastr.c_str());
 	CThemes *themes = event->themes;
 	themes->exec(NULL, event->datastr);
 }
@@ -402,7 +402,7 @@ void CThemes::cleanUpCallBackBeforePaint()
 	
 	for(size_t i=0; i<v_cbdata.size();i++){
 		if (v_cbdata[i]){
-			printf("[CThemes]    [%s]  clean up v_cbdata[%d]  %p, = %s\n", __FUNCTION__, i, v_cbdata[i], v_cbdata[i]->datastr.c_str());
+			printf("[CThemes]    [%s]  clean up v_cbdata[%d]  %p, = %s\n", __func__, i, v_cbdata[i], v_cbdata[i]->datastr.c_str());
 			delete v_cbdata[i];
 		}
 		v_cbdata[i] = NULL;
@@ -601,7 +601,7 @@ themes_t CThemes::getThemeMetaData()
 			closedir(theme_dir);
 		}
 		else
-			printf("[CThemes] %s... error while loading theme from %s: %s\n", __FUNCTION__, theme_dirs[i].c_str(), strerror(errno));
+			printf("[CThemes] %s... error while loading theme from %s: %s\n", __func__, theme_dirs[i].c_str(), strerror(errno));
 	}
 
 	sort(res.begin(), res.end());
@@ -617,21 +617,21 @@ bool CThemes::saveTheme(bool isCustom, string themeName)
 	string new_dir = themedir + themeName;
 	string new_theme_file = new_dir + "/" + COLORCONF;
 	
-	printf("[CThemes] %s... saving colors to %s\n", __FUNCTION__, new_theme_file.c_str());
+	printf("[CThemes] %s... saving colors to %s\n", __func__, new_theme_file.c_str());
 
 	// Don't show SAVE if UserDir does'nt exist
 	// mkdir must be called for each subdir which does not exist 
 	if ( access(new_dir.c_str(), F_OK) != 0 ) { // check for existance
 	//	mkdir (USERDIR, S_IRUSR | S_IREAD | S_IWUSR | S_IWRITE | S_IXUSR | S_IEXEC) == 0) {
 		if (system (((string)"mkdir -p " + new_dir).c_str()) != 0){
-			printf("[CThemes] %s... error while creating theme dir %s: %s\n", __FUNCTION__, new_dir.c_str(), strerror(errno));
+			printf("[CThemes] %s... error while creating theme dir %s: %s\n", __func__, new_dir.c_str(), strerror(errno));
 			return false;
 		}
 	}
 	
 	if (isCustom){
 		if (!saveColors(new_theme_file)){
-			printf("[CThemes] %s... error while saving theme config %s\n", __FUNCTION__, new_theme_file.c_str());
+			printf("[CThemes] %s... error while saving theme config %s\n", __func__, new_theme_file.c_str());
 			return false;
 		}
 	}
@@ -669,7 +669,7 @@ bool CThemes::isChangedThemeName()
 {
 	string stmp = cur_theme;
 	bool ret = (old_theme != stmp) ? true : false;
-	printf("[CThemes]    [%s]  theme name changed = %d [old_theme = %s], [cur_theme = %s]\n", __FUNCTION__, ret, old_theme.c_str(), stmp.c_str());
+	printf("[CThemes]    [%s]  theme name changed = %d [old_theme = %s], [cur_theme = %s]\n", __func__, ret, old_theme.c_str(), stmp.c_str());
 	return ret;
 }
 
@@ -744,7 +744,7 @@ void CThemes::loadColorConfig(const string& themeName)
 	string themePath = getThemePath(themeName);
 	
 	if (!readColors(themePath))
-		printf("[CThemes] %s: can't load %s\n", __FUNCTION__, themePath.c_str());
+		printf("[CThemes] %s: can't load %s\n", __func__, themePath.c_str());
 }
 
 void CThemes::saveColorConfig(const string& themeName)
@@ -752,7 +752,7 @@ void CThemes::saveColorConfig(const string& themeName)
 	string themePath = getThemePath(themeName);
 		
 	if (!saveColors(themePath))
-		printf("[CThemes] %s: can't save %s\n", __FUNCTION__, themePath.c_str());
+		printf("[CThemes] %s: can't save %s\n", __func__, themePath.c_str());
 }
 
 string CThemes::getThemePath(const string& themeName)
