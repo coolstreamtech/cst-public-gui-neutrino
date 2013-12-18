@@ -45,19 +45,15 @@ class CComponentsFrmClock : public CComponentsForm
 	private:
 		CComponentsTimer *cl_timer;
 		void ShowTime();
-		///current time format
-		std::string cl_format;
-	
+
 	protected:
-		///thread
-		pthread_t  cl_thread;
 		///refresh interval in seconds
 		int cl_interval;
 
 		///raw time chars
 		char cl_timestr[20];
 
-		//TODO: please add comments!
+		///allow to paint clock within thread and is not similar to cc_allow_paint
 		bool paintClock;
 
 		///object: font render object
@@ -68,10 +64,14 @@ class CComponentsFrmClock : public CComponentsForm
 
 		///text color
 		int cl_col_text;
+		
+		///current time format
+		std::string cl_format;
 		///primary time format
 		std::string cl_format_str;
 		///secondary time format for blink
 		std::string cl_blink_str;
+
 		///time string align, default allign is ver and hor centered
 		int cl_align;
 
@@ -81,7 +81,7 @@ class CComponentsFrmClock : public CComponentsForm
 		///initialize clock contents  
 		void initCCLockItems();
 		///initialize timestring, called in initCCLockItems()
-		void initTimeString();
+		virtual void initTimeString();
 		///initialize of general alignment of timestring segments within form area
 		void initSegmentAlign(int* segment_width, int* segment_height);
 		
@@ -89,7 +89,8 @@ class CComponentsFrmClock : public CComponentsForm
 		bool startClock();
 		///stop ticking clock, returns true on success, if false causes log output
 		bool stopClock();
-
+		///switch between primary and secondary format
+		void toggleFormat();
 		///return pointer of font object
 		inline Font** getClockFont();
 
@@ -120,7 +121,7 @@ class CComponentsFrmClock : public CComponentsForm
 		virtual bool Stop();
 
 		///returns true, if clock is running
-		virtual bool isRun() const {return cl_thread == 0 ? false:true;};
+		virtual bool isRun() const {return cl_timer ? true : false;};
 		///set refresh interval in seconds, default value=1 (=1 sec)
 		virtual void setClockIntervall(const int& seconds){cl_interval = seconds;};
 
@@ -129,9 +130,6 @@ class CComponentsFrmClock : public CComponentsForm
 
 		///reinitialize clock contents
 		virtual void refresh() { initCCLockItems(); }
-
-		///set clock activ/inactiv
-// 		virtual void setClockActiv(bool activ = true){activeClock = activ;};
 };
 
 #endif

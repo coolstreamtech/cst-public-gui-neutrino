@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
+#include <system/helpers.h>
 
 using namespace std;
 
@@ -84,10 +85,7 @@ void CComponentsFrmClock::initVarClock()
 	cl_blink_str		= "%H %M";
 
 	cl_align		= CC_ALIGN_VER_CENTER | CC_ALIGN_HOR_CENTER;
-
-	cl_thread 		= 0;
 	cl_interval		= 1;
-
 	cl_timer 		= NULL;
 }
 
@@ -103,7 +101,14 @@ void CComponentsFrmClock::initTimeString()
 	time_t ltime;
 	ltime=time(&ltime);
 
-	//formating time string with possible blink string
+	toggleFormat();
+
+	strftime((char*) &cl_timestr, sizeof(cl_timestr), cl_format.c_str(), localtime_r(&ltime, &t));
+}
+
+//formating time string with possible blink string
+void CComponentsFrmClock::toggleFormat()
+{
 	if (cl_format_str.length() != cl_blink_str.length())
 		hide();
 	
@@ -111,10 +116,7 @@ void CComponentsFrmClock::initTimeString()
 		cl_format = cl_format_str;
 	else
 		cl_format = cl_blink_str;
-
-	strftime((char*) &cl_timestr, sizeof(cl_timestr), cl_format.c_str(), localtime_r(&ltime, &t));
 }
-
 
 //set current time format string
 void CComponentsFrmClock::setClockFormat(const char* prformat_str, const char* secformat_str)
