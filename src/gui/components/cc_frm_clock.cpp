@@ -299,7 +299,7 @@ bool CComponentsFrmClock::startClock()
 		cl_timer = new CComponentsTimer();
 		sigc::slot0<void> sl = sigc::mem_fun0(*this, &CComponentsFrmClock::ShowTime);
 		cl_timer->OnTimer.connect(sl);
-#if DEBUG_CC
+#ifdef DEBUG_CC
 		printf("[CComponentsFrmClock]    [%s]  init slot...\n", __func__);
 #endif
 	}
@@ -316,7 +316,7 @@ bool CComponentsFrmClock::startClock()
 bool CComponentsFrmClock::stopClock()
 {
 	if (cl_timer){
-#if DEBUG_CC
+#ifdef DEBUG_CC
 		printf("[CComponentsFrmClock]    [%s]  stopping timer...\n", __func__);
 #endif
 		if (cl_timer->stopTimer())
@@ -324,7 +324,7 @@ bool CComponentsFrmClock::stopClock()
 		cl_timer = NULL;
 		return true;
 	}
-#if DEBUG_CC	
+#ifdef DEBUG_CC	
 	printf("[CComponentsFrmClock]    [%s]  stopping timer failed...\n", __func__);
 #endif
 	return false;
