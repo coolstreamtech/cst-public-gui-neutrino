@@ -71,8 +71,8 @@ struct SNeutrinoSettings
 	char shutdown_count[4];
 	char shutdown_min[4];
 	int sleeptimer_min;
-	char record_safety_time_before[3];
-	char record_safety_time_after[3];
+	int record_safety_time_before;
+	int record_safety_time_after;
 	int zapto_pre_time;
 	int infobar_sat_display;
 	int infobar_show_channeldesc;
@@ -100,7 +100,6 @@ struct SNeutrinoSettings
 	int audio_DolbyDigital;
 	int auto_lang;
 	int auto_subs;
-	char audio_PCMOffset[3];
 	int srs_enable;
 	int srs_algo;
 	int srs_ref_volume;
@@ -257,8 +256,7 @@ struct SNeutrinoSettings
 		TIMING_SETTING_COUNT
 	};
 
-	int  timing       [TIMING_SETTING_COUNT]   ;
-	char timing_string[TIMING_SETTING_COUNT][4];
+	int timing [TIMING_SETTING_COUNT];
 
 	//widget settings
 	int widget_fade;
@@ -459,8 +457,8 @@ struct SNeutrinoSettings
 	int channellist_new_zap_mode;
 	int channellist_sort_mode;
 	int channellist_numeric_adjust;
-	char repeat_blocker[4];
-	char repeat_genericblocker[4];
+	int repeat_blocker;
+	int repeat_genericblocker;
 	int remote_control_hardware;
 	int audiochannel_up_down_enable;
 
@@ -578,15 +576,15 @@ struct SNeutrinoSettings
 #define FILESYSTEM_ENCODING_TO_UTF8_STRING(a) (isUTF8(a) ? (a) : ZapitTools::Latin1_to_UTF8(a))
 
 	// pictureviewer
-	char   picviewer_slide_time[3];
-	int    picviewer_scaling;
+	int picviewer_slide_time;
+	int picviewer_scaling;
 	std::string picviewer_decode_server_ip;
 	char    picviewer_decode_server_port[6];
 
 	//audioplayer
 	int   audioplayer_display;
 	int   audioplayer_follow;
-	char  audioplayer_screensaver[3];
+	int   audioplayer_screensaver;
 	int   audioplayer_highprio;
 	int   audioplayer_select_title_by_name;
 	int   audioplayer_repeat_on;

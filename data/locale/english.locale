@@ -167,7 +167,7 @@ audioplayer.receiving_list Receiving list, please wait
 audioplayer.repeat_on enable repeat mode
 audioplayer.rewind rewind
 audioplayer.save_playlist save play list
-audioplayer.screensaver_timeout screensaver timeout (min, 0=off)
+audioplayer.screensaver_timeout screensaver timeout
 audioplayer.select_title_by_name search title by name (SMS)
 audioplayer.show_playlist Show Playlist
 audioplayer.shuffle shuffle
@@ -400,7 +400,7 @@ extra.lodirection LoDirection
 extra.longitude Longitude
 extra.menu_left_exit "Left" = menu back
 extra.north North
-extra.record_time Max. recording time in hours
+extra.record_time Maximal recording time
 extra.rotor_swap Swap rotor east/west
 extra.rounded_corners Shape of corners
 extra.rounded_corners_off angular
@@ -435,10 +435,10 @@ extra.volume_pos Volumebar
 extra.volume_size Height of display
 extra.west West
 extra.zap_cycle Zap cycle
-extra.zapit_fe_timeout Tune timeout (1 = 10 msec)
+extra.zapit_fe_timeout Tune timeout
 extra.zapit_hvoltage 18V for rotor moving 
 extra.zapit_make_bouquet Make Remaining Channels list
-extra.zapit_motor_speed Motor moving speed (10 = 1deg/sec)
+extra.zapit_motor_speed Motor moving speed
 extra.zapit_scanpids Scan/Use pids
 extra.zapit_sdt_changed Channels changed, reload settings.
 fan_speed CPU Fan speed
@@ -1005,6 +1005,7 @@ menu.hint_numeric_adjust Adjust channel list mode on numeric zap
 menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
+menu.hint_osd_timing After this time the OSD will be faded out
 menu.hint_parentallock_changepin Change PIN code
 menu.hint_parentallock_lockage Select age allowed to watch
 menu.hint_parentallock_menu Lock menus with pin code
@@ -1035,7 +1036,7 @@ menu.hint_record_data Record (VideoText, subtitles) data streams
 menu.hint_record_data_dvbsub subtitle stream
 menu.hint_record_data_vtxt VideoText stream
 menu.hint_record_dir Select directory to store recordings
-menu.hint_record_end Stop direct record after max. time\nor after current event end time
+menu.hint_record_end Stop direct record after maximal time or after current event end time
 menu.hint_record_slow_warn Show warning, when record buffer is close to overflow
 menu.hint_record_tdir Select directory to save timeshift recordings\nin temporary timeshift mode
 menu.hint_record_time Record time before stop when\nusing direct record with record button
@@ -1271,7 +1272,7 @@ miscsettings.shutdown_real_rcdelay Delayed shutdown
 miscsettings.sleeptimer Inactivity shutdown timer
 miscsettings.sleeptimer_min Sleeptimer default
 miscsettings.volume Volume
-miscsettings.zapto_pre_time Zapto Start Time Correction (minutes)
+miscsettings.zapto_pre_time Zapto Start Time Correction
 motorcontrol.calc_positions (Re)-Calculate Positions
 motorcontrol.disable_limit Disable (soft) Limits
 motorcontrol.drive_mode Drive Mode
@@ -1694,8 +1695,6 @@ recordingmenu.vcr vcr
 recordingmenu.vtxt_pid record teletext
 recordingmenu.zap_on_announce zap on recording announce
 recordtimer.announce Recording starts in a few minutes
-repeatblocker.hint_1 Shortest time (in ms) to recognize 2 keystrokes
-repeatblocker.hint_2 Enter 0 to switch of the blocker (red is space)
 reset_all Factory reset and reboot
 reset_channels Delete all channels
 reset_confirm Are you sure ?
@@ -1948,6 +1947,11 @@ timing.volumebar Volume bar
 unicable.lnb Unicable Input
 unicable.qrg Unicable Frequency
 unicable.scr Unicable SCR
+unit.decimal .
+unit.short.hour h
+unit.short.millisecond ms
+unit.short.minute min
+unit.short.second s
 upnpbrowser.head UPnP Browser
 upnpbrowser.noservers No UPnP servers found
 upnpbrowser.rescan Scan again

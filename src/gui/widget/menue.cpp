@@ -1006,6 +1006,7 @@ void CMenuWidget::addIntroItems(neutrino_locale_t subhead_text, neutrino_locale_
 {
 	if (subhead_text != NONEXISTANT_LOCALE)
 		addItem(new CMenuSeparator(CMenuSeparator::ALIGN_LEFT | CMenuSeparator::SUB_HEAD | CMenuSeparator::STRING, subhead_text));
+
 	addItem(GenericMenuSeparator);
 	
 	if (buttontype != BTN_TYPE_NO)
@@ -1027,7 +1028,7 @@ void CMenuWidget::addIntroItems(neutrino_locale_t subhead_text, neutrino_locale_
 	
 	if (section_text != NONEXISTANT_LOCALE)
 		addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, section_text));
-	else
+	else if (buttontype != BTN_TYPE_NO)
 		addItem(GenericMenuSeparatorLine);
 }
 
@@ -1160,6 +1161,8 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t name,
 	localized_value_name = special_value_name;
 	
 	optionString         = non_localized_name;
+	numberFormat         = "%d";
+	numberFormatFunction = NULL;
 	observ = Observ;
 	slider_on = sliderOn;
 }
@@ -1188,11 +1191,15 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 int CMenuOptionNumberChooser::paint(bool selected)
 {
 	const char * l_option;
-	char option_value[11];
+	char option_value[40];
 
 	if ((localized_value_name == NONEXISTANT_LOCALE) || ((*optionValue) != localized_value))
 	{
-		sprintf(option_value, "%d", ((*optionValue) + display_offset));
+		if (numberFormatFunction) {
+			std::string s = numberFormatFunction(*optionValue + display_offset);
+			strncpy(option_value, s.c_str(), s.length());
+		} else
+			sprintf(option_value, numberFormat.c_str(), *optionValue + display_offset);
 		l_option = option_value;
 	}
 	else
@@ -1243,6 +1250,15 @@ int CMenuOptionNumberChooser::getWidth(void)
 	}
 
 	width += (w1 > w2) ? w1 : w2;
+
+	if (numberFormatFunction) {
+		std::string s = numberFormatFunction(0);
+		width += g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(s.c_str(), true) - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("0", true); // arbitrary
+	} else if (numberFormat != "%d") {
+		char format[numberFormat.length()];
+		snprintf(format, numberFormat.length(), numberFormat.c_str(), 0);
+		width += g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(format, true) - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("0", true);
+	}
 
 	return width + 10; /* min 10 pixels between option name and value. enough? */
 }

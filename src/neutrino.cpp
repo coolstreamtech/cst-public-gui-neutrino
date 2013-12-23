@@ -134,7 +134,7 @@ char zapit_lat[20]="#";
 char zapit_long[20]="#";
 bool autoshift = false;
 uint32_t scrambled_timer;
-t_channel_id standby_channel_id;
+t_channel_id standby_channel_id = 0;
 
 //NEW
 static pthread_t timer_thread;
@@ -431,7 +431,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		strncpy(g_settings.pref_subs[i], configfile.getString(cfg_key, "none").c_str(), 30);
 	}
 	g_settings.zap_cycle = configfile.getInt32( "zap_cycle", 0 );
-	strcpy( g_settings.audio_PCMOffset, configfile.getString( "audio_PCMOffset", "0" ).c_str() );
 
 	//vcr
 	g_settings.vcr_AutoSwitch = configfile.getBool("vcr_AutoSwitch"       , true );
@@ -667,14 +666,14 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.lcd_info_line = configfile.getInt32("lcd_info_line", 0);//channel name or clock
 
 	//Picture-Viewer
-	strcpy( g_settings.picviewer_slide_time, configfile.getString( "picviewer_slide_time", "10" ).c_str() );
+	g_settings.picviewer_slide_time = configfile.getInt32( "picviewer_slide_time", 10);
 	g_settings.picviewer_scaling = configfile.getInt32("picviewer_scaling", 1 /*(int)CPictureViewer::SIMPLE*/);
 	g_settings.picviewer_decode_server_ip = configfile.getString("picviewer_decode_server_ip", "");
 
 	//Audio-Player
 	g_settings.audioplayer_display = configfile.getInt32("audioplayer_display",(int)CAudioPlayerGui::ARTIST_TITLE);
 	g_settings.audioplayer_follow  = configfile.getInt32("audioplayer_follow",0);
-	strcpy( g_settings.audioplayer_screensaver, configfile.getString( "audioplayer_screensaver", "1" ).c_str() );
+	g_settings.audioplayer_screensaver = configfile.getInt32("audioplayer_screensaver", 1);
 	g_settings.audioplayer_highprio  = configfile.getInt32("audioplayer_highprio",0);
 	g_settings.audioplayer_select_title_by_name = configfile.getInt32("audioplayer_select_title_by_name",0);
 	g_settings.audioplayer_repeat_on = configfile.getInt32("audioplayer_repeat_on",0);
@@ -894,7 +893,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		sprintf(cfg_key, "pref_subs_%d", i);
 		configfile.setString(cfg_key, g_settings.pref_subs[i]);
 	}
-	configfile.setString( "audio_PCMOffset", g_settings.audio_PCMOffset );
 
 	//vcr
 	configfile.setBool("vcr_AutoSwitch"       , g_settings.vcr_AutoSwitch       );
@@ -1079,7 +1077,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("lcd_info_line", g_settings.lcd_info_line);//channel name or clock
 
 	//Picture-Viewer
-	configfile.setString( "picviewer_slide_time", g_settings.picviewer_slide_time );
+	configfile.setInt32( "picviewer_slide_time", g_settings.picviewer_slide_time);
 	configfile.setInt32( "picviewer_scaling", g_settings.picviewer_scaling );
 	configfile.setString( "picviewer_decode_server_ip", g_settings.picviewer_decode_server_ip );
 	configfile.setString( "picviewer_decode_server_port", g_settings.picviewer_decode_server_port);
@@ -1087,7 +1085,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	//Audio-Player
 	configfile.setInt32( "audioplayer_display", g_settings.audioplayer_display );
 	configfile.setInt32( "audioplayer_follow", g_settings.audioplayer_follow );
-	configfile.setString( "audioplayer_screensaver", g_settings.audioplayer_screensaver );
+	configfile.setInt32( "audioplayer_screensaver", g_settings.audioplayer_screensaver );
 	configfile.setInt32( "audioplayer_highprio", g_settings.audioplayer_highprio );
 	configfile.setInt32( "audioplayer_select_title_by_name", g_settings.audioplayer_select_title_by_name );
 	configfile.setInt32( "audioplayer_repeat_on", g_settings.audioplayer_repeat_on );
@@ -1520,12 +1518,6 @@ void CNeutrinoApp::SetupFonts(int fmode)
 /**************************************************************************************
 *          CNeutrinoApp -  setup the menu timouts                                     *
 **************************************************************************************/
-void CNeutrinoApp::SetupTiming()
-{
-	for (int i = 0; i < SNeutrinoSettings::TIMING_SETTING_COUNT; i++)
-		sprintf(g_settings.timing_string[i], "%d", g_settings.timing[i]);
-}
-
 
 #define LCD_UPDATE_TIME_RADIO_MODE (6 * 1000 * 1000)
 #define LCD_UPDATE_TIME_TV_MODE (60 * 1000 * 1000)
@@ -1719,7 +1711,6 @@ TIMER_START();
 	/* setup GUI */
 	neutrinoFonts = CNeutrinoFonts::getInstance();
 	SetupFonts();
-	SetupTiming();
 	g_PicViewer = new CPictureViewer();
 	CColorSetupNotifier::setPalette();
 
@@ -1960,12 +1951,13 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 		ShowMsgUTF(LOCALE_PLUGINS_RESULT, g_PluginList->getScriptOutput(), CMessageBox::mbrBack,CMessageBox::mbBack,NEUTRINO_ICON_SHELL);
 	}
 	g_RCInput->clearRCMsg();
-	if(g_settings.power_standby || init_cec_setting)
-		standbyMode(true, true);
 
 	InfoClock = CInfoClock::getInstance();
 	if(g_settings.mode_clock)
 		g_settings.mode_clock = InfoClock->StartInfoClock();
+
+	if(g_settings.power_standby || init_cec_setting)
+		standbyMode(true, true);
 
 	//cCA::GetInstance()->Ready(true);
 
@@ -2014,12 +2006,17 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					StopSubtitles();
 					InfoClock->enableInfoClock(false);
 					int old_ttx = g_settings.cacheTXT;
+					int old_epg = g_settings.epg_scan;
 					mainMenu.exec(NULL, "");
 					InfoClock->enableInfoClock(true);
 					StartSubtitles();
 					saveSetup(NEUTRINO_SETTINGS_FILE);
-					if (!g_settings.epg_scan)
-						CEpgScan::getInstance()->Clear();
+					if (old_epg != g_settings.epg_scan) {
+						if (g_settings.epg_scan)
+							CEpgScan::getInstance()->Start();
+						else
+							CEpgScan::getInstance()->Clear();
+					}
 					if (old_ttx != g_settings.cacheTXT) {
 						if(g_settings.cacheTXT) {
 							tuxtxt_init();
@@ -2443,11 +2440,8 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 					struct timeval      endtime;
 					time_t              seconds;
 
-					int timeout = 0;
-					int timeout1 = 0;
-
-					sscanf(g_settings.repeat_blocker, "%d", &timeout);
-					sscanf(g_settings.repeat_genericblocker, "%d", &timeout1);
+					int timeout = g_settings.repeat_blocker;
+					int timeout1 = g_settings.repeat_genericblocker;
 
 					if (timeout1 > timeout)
 						timeout = timeout1;
@@ -2604,6 +2598,12 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		if(!CRecordManager::getInstance()->RecordingStatus() && (!data))
 		{
 			if(mode == mode_standby) {
+				// zap back to pre-recording channel if necessary
+				t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+				if (standby_channel_id && (live_channel_id != standby_channel_id)) {
+					live_channel_id = standby_channel_id;
+					channelList->zapTo_ChannelID(live_channel_id);
+				}
 				/* do not put zapit to standby, if epg scan not finished */
 				if (!CEpgScan::getInstance()->Running())
 					g_Zapit->setStandby(true);
@@ -3219,8 +3219,8 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 
 		videoDecoder->Standby(true);
 
-		g_Sectionsd->setPauseScanning(!fromDeepStandby);
 		g_Sectionsd->setServiceChanged(0, false);
+		g_Sectionsd->setPauseScanning(!fromDeepStandby);
 
 		lastMode = mode;
 		mode = mode_standby;
@@ -3257,13 +3257,13 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		frameBuffer->setActive(false);
 		// Active standby on
 		powerManager->SetStandby(false, false);
-		CEpgScan::getInstance()->StartStandby();
+		CEpgScan::getInstance()->Start(true);
 	} else {
 		// Active standby off
 		powerManager->SetStandby(false, false);
 		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 		videoDecoder->Standby(false);
-		CEpgScan::getInstance()->StopStandby();
+		CEpgScan::getInstance()->Stop();
 
 		if(init_cec_setting){
 			//init cec settings
@@ -3756,8 +3756,8 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.menu_left_exit = tconfig.getInt32( "menu_left_exit", 0 );
 	g_settings.audio_run_player = tconfig.getInt32( "audio_run_player", 1 );
 	g_settings.key_click = tconfig.getInt32( "key_click", 1 );
-	strcpy(g_settings.repeat_blocker, tconfig.getString("repeat_blocker", "150").c_str());
-	strcpy(g_settings.repeat_genericblocker, tconfig.getString("repeat_genericblocker", "100").c_str());
+	g_settings.repeat_blocker = tconfig.getInt32("repeat_blocker", 150);
+	g_settings.repeat_genericblocker = tconfig.getInt32("repeat_genericblocker", 100);
 
 	g_settings.bouquetlist_mode = tconfig.getInt32( "bouquetlist_mode", 0 );
 	g_settings.sms_channel = tconfig.getInt32( "sms_channel", 0 );
@@ -3823,8 +3823,8 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "menu_left_exit", g_settings.menu_left_exit );
 	tconfig.setInt32( "audio_run_player", g_settings.audio_run_player );
 	tconfig.setInt32( "key_click", g_settings.key_click );
-	tconfig.setString( "repeat_blocker", g_settings.repeat_blocker );
-	tconfig.setString( "repeat_genericblocker", g_settings.repeat_genericblocker );
+	tconfig.setInt32( "repeat_blocker", g_settings.repeat_blocker );
+	tconfig.setInt32( "repeat_genericblocker", g_settings.repeat_genericblocker );
 
 	tconfig.setInt32( "bouquetlist_mode", g_settings.bouquetlist_mode );
 	tconfig.setInt32( "sms_channel", g_settings.sms_channel );
