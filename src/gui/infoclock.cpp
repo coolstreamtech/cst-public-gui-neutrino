@@ -66,6 +66,12 @@ void CInfoClock::Init()
 	syncSysColors();
 
 	paint_bg = g_settings.infoClockBackground;
+	
+	//set text color
+	if (paint_bg)
+		cl_col_text = COL_MENUCONTENT_TEXT;
+	else
+		cl_col_text = COL_INFOCLOCK_TEXT;
 
 	if (g_settings.infoClockSeconds)
 		setClockFormat("%H:%M:%S");

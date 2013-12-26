@@ -295,6 +295,27 @@ void CThemes::initColorVars()
 	colors[43].oldVal  	= *colors[43].p_curVal;
 	colors[43].key 		= "colored_events_blue";
 	colors[43].defaultVal 	= 0x00;
+	
+	//info clock
+	colors[44].p_curVal  	= &g_settings.clock_Digit_red;
+	colors[44].oldVal  	= *colors[44].p_curVal;
+	colors[44].key 		= "clock_Digit_red";
+	colors[44].defaultVal 	= 0x64;
+	
+	colors[45].p_curVal  	= &g_settings.clock_Digit_green;
+	colors[45].oldVal  	= *colors[45].p_curVal;
+	colors[45].key 		= "clock_Digit_green";
+	colors[45].defaultVal 	= 0x64;
+	
+	colors[46].p_curVal  	= &g_settings.clock_Digit_blue;
+	colors[46].oldVal  	= *colors[46].p_curVal;
+	colors[46].key 		= "clock_Digit_blue";
+	colors[46].defaultVal 	= 0x64;
+	
+	colors[47].p_curVal  	= &g_settings.clock_Digit_alpha;
+	colors[47].oldVal  	= *colors[47].p_curVal;
+	colors[47].key 		= "clock_Digit_alpha";
+	colors[47].defaultVal 	= 0x00;
 }
 
 CThemes::~CThemes()
@@ -673,6 +694,7 @@ bool CThemes::isChangedThemeName()
 	return ret;
 }
 
+
 //get theme name from optional info file
 string CThemes::getName(const string& info_file_path)
 {
@@ -693,7 +715,6 @@ bool CThemes::readColors(const string& themePath)
 	{
 		for(size_t i=0; i<COLOR_COUNT; i++)
 			*colors[i].p_curVal = (uint8_t)themefile.getInt32( colors[i].key, colors[i].defaultVal);
-
 		handleNotify();
 		return true;
 	}

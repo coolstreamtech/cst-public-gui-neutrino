@@ -389,11 +389,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.shutdown_real         = configfile.getBool("shutdown_real"        , false );
 	g_settings.shutdown_real_rcdelay = configfile.getBool("shutdown_real_rcdelay", false );
-	strcpy(g_settings.shutdown_count, configfile.getString("shutdown_count","0").c_str());
+	g_settings.shutdown_count = configfile.getInt32("shutdown_count", 0);
 
-	strcpy(g_settings.shutdown_min, "000");
+	g_settings.shutdown_min = 0;
 	if(cs_get_revision() > 7)
-		strcpy(g_settings.shutdown_min, configfile.getString("shutdown_min","180").c_str());
+		g_settings.shutdown_min = configfile.getInt32("shutdown_min", 180);
 	g_settings.sleeptimer_min = configfile.getInt32("sleeptimer_min", 0);
 
 	g_settings.infobar_sat_display   = configfile.getBool("infobar_sat_display"  , true );
@@ -426,9 +426,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	for(int i = 0; i < 3; i++) {
 		sprintf(cfg_key, "pref_lang_%d", i);
-		strncpy(g_settings.pref_lang[i], configfile.getString(cfg_key, "none").c_str(), 30);
+		g_settings.pref_lang[i] = configfile.getString(cfg_key, "none");
 		sprintf(cfg_key, "pref_subs_%d", i);
-		strncpy(g_settings.pref_subs[i], configfile.getString(cfg_key, "none").c_str(), 30);
+		g_settings.pref_subs[i] = configfile.getString(cfg_key, "none");
 	}
 	g_settings.zap_cycle = configfile.getInt32( "zap_cycle", 0 );
 
@@ -436,20 +436,20 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.vcr_AutoSwitch = configfile.getBool("vcr_AutoSwitch"       , true );
 
 	//language
-	strcpy(g_settings.language, configfile.getString("language", "").c_str());
-	strcpy(g_settings.timezone, configfile.getString("timezone", "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Vienna").c_str());
+	g_settings.language = configfile.getString("language", "");
+	g_settings.timezone = configfile.getString("timezone", "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Vienna");
 	//epg dir
-	g_settings.epg_cache            = configfile.getString("epg_cache_time", "14");
-	g_settings.epg_extendedcache    = configfile.getString("epg_extendedcache_time", "360");
-	g_settings.epg_old_events       = configfile.getString("epg_old_events", "1");
-	g_settings.epg_max_events       = configfile.getString("epg_max_events", "30000");
+	g_settings.epg_cache            = configfile.getInt32("epg_cache_time", 14);
+	g_settings.epg_extendedcache    = configfile.getInt32("epg_extendedcache_time", 360);
+	g_settings.epg_old_events       = configfile.getInt32("epg_old_events", 1);
+	g_settings.epg_max_events       = configfile.getInt32("epg_max_events", 30000);
 	g_settings.epg_dir              = configfile.getString("epg_dir", "/media/sda1/epg");
 	// NTP-Server for sectionsd
 	g_settings.network_ntpserver    = configfile.getString("network_ntpserver", "time.fu-berlin.de");
 	g_settings.network_ntprefresh   = configfile.getString("network_ntprefresh", "30" );
 	g_settings.network_ntpenable    = configfile.getBool("network_ntpenable", false);
 
-	snprintf(g_settings.ifname, sizeof(g_settings.ifname), "%s", configfile.getString("ifname", "eth0").c_str());;
+	g_settings.ifname = configfile.getString("ifname", "eth0");
 
 	g_settings.epg_save = configfile.getBool("epg_save", false);
 	g_settings.epg_save_standby = configfile.getBool("epg_save_standby", true);
@@ -458,11 +458,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.widget_fade = false;
 	g_settings.widget_fade           = configfile.getBool("widget_fade"          , false );
 
-	//colors (neutrino defaultcolors)
+	//theme colors (neutrino defaultcolors)
 	g_settings.theme_name = configfile.getString( "theme_name", "default" );
 	CThemes themes;
 	themes.loadColorConfig(g_settings.theme_name);
-
+	
 	//personalize
 	strcpy( g_settings.personalize_pincode, configfile.getString( "personalize_pincode", "0000" ).c_str() );
 	for (int i = 0; i < SNeutrinoSettings::P_SETTINGS_MAX; i++)//settings.h, settings.cpp
@@ -479,53 +479,46 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	//network
 	for(int i=0 ; i < NETWORK_NFS_NR_OF_ENTRIES ; i++) {
-		sprintf(cfg_key, "network_nfs_ip_%d", i);
-		g_settings.network_nfs_ip[i] = configfile.getString(cfg_key, "");
-		sprintf(cfg_key, "network_nfs_dir_%d", i);
-		strcpy( g_settings.network_nfs_dir[i], configfile.getString( cfg_key, "" ).c_str() );
-		sprintf(cfg_key, "network_nfs_local_dir_%d", i);
-		strcpy( g_settings.network_nfs_local_dir[i], configfile.getString( cfg_key, "" ).c_str() );
-		sprintf(cfg_key, "network_nfs_automount_%d", i);
-		g_settings.network_nfs_automount[i] = configfile.getInt32( cfg_key, 0);
-		sprintf(cfg_key, "network_nfs_type_%d", i);
-		g_settings.network_nfs_type[i] = configfile.getInt32( cfg_key, 0);
-		sprintf(cfg_key,"network_nfs_username_%d", i);
-		strcpy( g_settings.network_nfs_username[i], configfile.getString( cfg_key, "" ).c_str() );
-		sprintf(cfg_key, "network_nfs_password_%d", i);
-		strcpy( g_settings.network_nfs_password[i], configfile.getString( cfg_key, "" ).c_str() );
-		sprintf(cfg_key, "network_nfs_mount_options1_%d", i);
-		strcpy( g_settings.network_nfs_mount_options1[i], configfile.getString( cfg_key, "ro,soft,udp" ).c_str() );
-		sprintf(cfg_key, "network_nfs_mount_options2_%d", i);
-		strcpy( g_settings.network_nfs_mount_options2[i], configfile.getString( cfg_key, "nolock,rsize=8192,wsize=8192" ).c_str() );
-		sprintf(cfg_key, "network_nfs_mac_%d", i);
-		strcpy( g_settings.network_nfs_mac[i], configfile.getString( cfg_key, "11:22:33:44:55:66").c_str() );
+		std::string i_str(to_string(i));
+		g_settings.network_nfs[i].ip = configfile.getString("network_nfs_ip_" + i_str, "");
+		g_settings.network_nfs[i].dir = configfile.getString("network_nfs_dir_" + i_str, "");
+		g_settings.network_nfs[i].local_dir = configfile.getString("network_nfs_local_dir_" + i_str, "");
+		if (g_settings.network_nfs[i].local_dir.empty())
+			g_settings.network_nfs[i].local_dir = "/mnt/mnt" + i_str;
+		g_settings.network_nfs[i].automount = configfile.getInt32("network_nfs_automount_" + i_str, 0);
+		g_settings.network_nfs[i].type = configfile.getInt32("network_nfs_type_" + i_str, 0);
+		g_settings.network_nfs[i].username = configfile.getString("network_nfs_username_" + i_str, "" );
+		g_settings.network_nfs[i].password = configfile.getString("network_nfs_password_" + i_str, "" );
+		g_settings.network_nfs[i].mount_options1 = configfile.getString("network_nfs_mount_options1_" + i_str, "ro,soft,udp" );
+		g_settings.network_nfs[i].mount_options2 = configfile.getString("network_nfs_mount_options2_" + i_str, "nolock,rsize=8192,wsize=8192" );
+		g_settings.network_nfs[i].mac = configfile.getString("network_nfs_mac_" + i_str, "11:22:33:44:55:66");
 	}
-	strcpy( g_settings.network_nfs_audioplayerdir, configfile.getString( "network_nfs_audioplayerdir", "/media/sda1/music" ).c_str() );
-	strcpy( g_settings.network_nfs_picturedir, configfile.getString( "network_nfs_picturedir", "/media/sda1/pictures" ).c_str() );
-	strcpy( g_settings.network_nfs_moviedir, configfile.getString( "network_nfs_moviedir", "/media/sda1/movies" ).c_str() );
-	strcpy( g_settings.network_nfs_recordingdir, configfile.getString( "network_nfs_recordingdir", "/media/sda1/movies" ).c_str() );
-	strcpy( g_settings.timeshiftdir, configfile.getString( "timeshiftdir", "" ).c_str() );
+	g_settings.network_nfs_audioplayerdir = configfile.getString( "network_nfs_audioplayerdir", "/media/sda1/music" );
+	g_settings.network_nfs_picturedir = configfile.getString( "network_nfs_picturedir", "/media/sda1/pictures" );
+	g_settings.network_nfs_moviedir = configfile.getString( "network_nfs_moviedir", "/media/sda1/movies" );
+	g_settings.network_nfs_recordingdir = configfile.getString( "network_nfs_recordingdir", "/media/sda1/movies" );
+	g_settings.timeshiftdir = configfile.getString( "timeshiftdir", "" );
 
 	g_settings.temp_timeshift = configfile.getInt32( "temp_timeshift", 0 );
 	g_settings.auto_timeshift = configfile.getInt32( "auto_timeshift", 0 );
 	g_settings.auto_delete = configfile.getInt32( "auto_delete", 1 );
 
-	char timeshiftDir[255];
-	if(strlen(g_settings.timeshiftdir) == 0) {
-		sprintf(timeshiftDir, "%s/.timeshift", g_settings.network_nfs_recordingdir);
-		safe_mkdir(timeshiftDir);
+	std::string timeshiftDir;
+	if(g_settings.timeshiftdir.empty()) {
+		timeshiftDir = g_settings.network_nfs_recordingdir + "/.timeshift";
+		safe_mkdir(timeshiftDir.c_str());
 	} else {
-		if(strcmp(g_settings.timeshiftdir, g_settings.network_nfs_recordingdir))
-			strncpy(timeshiftDir, g_settings.timeshiftdir, sizeof(timeshiftDir));
+		if(g_settings.timeshiftdir != g_settings.network_nfs_recordingdir)
+			timeshiftDir = g_settings.timeshiftdir;
 		else
-			sprintf(timeshiftDir, "%s/.timeshift", g_settings.network_nfs_recordingdir);
+			timeshiftDir = g_settings.network_nfs_recordingdir + "/.timeshift";
 	}
-	printf("***************************** rec dir %s timeshift dir %s\n", g_settings.network_nfs_recordingdir, timeshiftDir);
-	CRecordManager::getInstance()->SetTimeshiftDirectory(timeshiftDir);
+	printf("***************************** rec dir %s timeshift dir %s\n", g_settings.network_nfs_recordingdir.c_str(), timeshiftDir.c_str());
+	CRecordManager::getInstance()->SetTimeshiftDirectory(timeshiftDir.c_str());
 
 	if(g_settings.auto_delete) {
-		if(strcmp(g_settings.timeshiftdir, g_settings.network_nfs_recordingdir)) {
-			DIR *d = opendir(timeshiftDir);
+		if(g_settings.timeshiftdir == g_settings.network_nfs_recordingdir) {
+			DIR *d = opendir(timeshiftDir.c_str());
 			if(d){
 				while (struct dirent *e = readdir(d))
 				{
@@ -640,10 +633,10 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	strcpy(g_settings.softupdate_proxyusername, configfile.getString("softupdate_proxyusername", "" ).c_str());
 	strcpy(g_settings.softupdate_proxypassword, configfile.getString("softupdate_proxypassword", "" ).c_str());
 	//
-	strcpy( g_settings.font_file, configfile.getString( "font_file", FONTDIR"/neutrino.ttf" ).c_str() );
-	strcpy( g_settings.ttx_font_file, configfile.getString( "ttx_font_file", FONTDIR"/DejaVuLGCSansMono-Bold.ttf" ).c_str() );
-	ttx_font_file = g_settings.ttx_font_file;
-	strcpy( g_settings.update_dir, configfile.getString( "update_dir", "/tmp" ).c_str() );
+	g_settings.font_file = configfile.getString("font_file", FONTDIR"/neutrino.ttf");
+	g_settings.ttx_font_file = configfile.getString( "ttx_font_file", FONTDIR"/DejaVuLGCSansMono-Bold.ttf");
+	ttx_font_file = g_settings.ttx_font_file.c_str();
+	g_settings.update_dir = configfile.getString("update_dir", "/tmp");
 
 	// parentallock
 	if (!parentallocked) {
@@ -858,8 +851,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "hdd_noise", g_settings.hdd_noise);
 	configfile.setBool("shutdown_real"        , g_settings.shutdown_real        );
 	configfile.setBool("shutdown_real_rcdelay", g_settings.shutdown_real_rcdelay);
-	configfile.setString("shutdown_count"           , g_settings.shutdown_count);
-	configfile.setString("shutdown_min"  , g_settings.shutdown_min  );
+	configfile.setInt32("shutdown_count"           , g_settings.shutdown_count);
+	configfile.setInt32("shutdown_min"  , g_settings.shutdown_min  );
 	configfile.setInt32("sleeptimer_min", g_settings.sleeptimer_min);
 	configfile.setBool("infobar_sat_display"  , g_settings.infobar_sat_display  );
 	configfile.setBool("infobar_show_channeldesc"  , g_settings.infobar_show_channeldesc  );
@@ -904,10 +897,10 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("epg_save", g_settings.epg_save);
 	configfile.setBool("epg_save_standby", g_settings.epg_save_standby);
 	configfile.setInt32("epg_scan", g_settings.epg_scan);
-	configfile.setString("epg_cache_time"           ,g_settings.epg_cache );
-	configfile.setString("epg_extendedcache_time"   ,g_settings.epg_extendedcache);
-	configfile.setString("epg_old_events"           ,g_settings.epg_old_events );
-	configfile.setString("epg_max_events"           ,g_settings.epg_max_events );
+	configfile.setInt32("epg_cache_time"           ,g_settings.epg_cache );
+	configfile.setInt32("epg_extendedcache_time"   ,g_settings.epg_extendedcache);
+	configfile.setInt32("epg_old_events"           ,g_settings.epg_old_events );
+	configfile.setInt32("epg_max_events"           ,g_settings.epg_max_events );
 	configfile.setString("epg_dir"                  ,g_settings.epg_dir);
 
 	// NTP-Server for sectionsd
@@ -920,7 +913,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	//widget settings
 	configfile.setBool("widget_fade"          , g_settings.widget_fade          );
 
-	//colors
+	//theme colors
 	configfile.setString("theme_name", g_settings.theme_name);
 	CThemes themes;
 	themes.saveColorConfig(g_settings.theme_name);
@@ -941,25 +934,25 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	//network
 	for(int i=0 ; i < NETWORK_NFS_NR_OF_ENTRIES ; i++) {
 		sprintf(cfg_key, "network_nfs_ip_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_ip[i] );
+		configfile.setString(cfg_key, g_settings.network_nfs[i].ip);
 		sprintf(cfg_key, "network_nfs_dir_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_dir[i] );
+		configfile.setString(cfg_key, g_settings.network_nfs[i].dir);
 		sprintf(cfg_key, "network_nfs_local_dir_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_local_dir[i] );
+		configfile.setString(cfg_key, g_settings.network_nfs[i].local_dir);
 		sprintf(cfg_key, "network_nfs_automount_%d", i);
-		configfile.setInt32( cfg_key, g_settings.network_nfs_automount[i]);
+		configfile.setInt32(cfg_key, g_settings.network_nfs[i].automount);
 		sprintf(cfg_key, "network_nfs_type_%d", i);
-		configfile.setInt32( cfg_key, g_settings.network_nfs_type[i]);
-		sprintf(cfg_key,"network_nfs_username_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_username[i] );
+		configfile.setInt32(cfg_key, g_settings.network_nfs[i].type);
+		sprintf(cfg_key, "network_nfs_username_%d", i);
+		configfile.setString(cfg_key, g_settings.network_nfs[i].username);
 		sprintf(cfg_key, "network_nfs_password_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_password[i] );
+		configfile.setString(cfg_key, g_settings.network_nfs[i].password);
 		sprintf(cfg_key, "network_nfs_mount_options1_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_mount_options1[i]);
+		configfile.setString(cfg_key, g_settings.network_nfs[i].mount_options1);
 		sprintf(cfg_key, "network_nfs_mount_options2_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_mount_options2[i]);
+		configfile.setString(cfg_key, g_settings.network_nfs[i].mount_options2);
 		sprintf(cfg_key, "network_nfs_mac_%d", i);
-		configfile.setString( cfg_key, g_settings.network_nfs_mac[i]);
+		configfile.setString(cfg_key, g_settings.network_nfs[i].mac);
 	}
 	configfile.setString( "network_nfs_audioplayerdir", g_settings.network_nfs_audioplayerdir);
 	configfile.setString( "network_nfs_picturedir", g_settings.network_nfs_picturedir);
@@ -1524,10 +1517,10 @@ void CNeutrinoApp::SetupFonts(int fmode)
 
 void CNeutrinoApp::MakeSectionsdConfig(CSectionsdClient::epg_config& config)
 {
-	config.epg_cache                = atoi(g_settings.epg_cache.c_str());
-	config.epg_old_events           = atoi(g_settings.epg_old_events.c_str());
-	config.epg_max_events           = atoi(g_settings.epg_max_events.c_str());
-	config.epg_extendedcache        = atoi(g_settings.epg_extendedcache.c_str());
+	config.epg_cache                = g_settings.epg_cache;
+	config.epg_old_events           = g_settings.epg_old_events;
+	config.epg_max_events           = g_settings.epg_max_events;
+	config.epg_extendedcache        = g_settings.epg_extendedcache;
 	config.epg_dir                  = g_settings.epg_dir;
 	config.network_ntpserver        = g_settings.network_ntpserver;
 	config.network_ntprefresh       = atoi(g_settings.network_ntprefresh.c_str());
@@ -1701,11 +1694,11 @@ TIMER_START();
 	initialize_iso639_map();
 
 	bool show_startwizard = false;
-	CLocaleManager::loadLocale_ret_t loadLocale_ret = g_Locale->loadLocale(g_settings.language);
+	CLocaleManager::loadLocale_ret_t loadLocale_ret = g_Locale->loadLocale(g_settings.language.c_str());
 	if (loadLocale_ret == CLocaleManager::NO_SUCH_LOCALE)
 	{
-		strcpy(g_settings.language, "english");
-		loadLocale_ret = g_Locale->loadLocale(g_settings.language);
+		g_settings.language = "english";
+		loadLocale_ret = g_Locale->loadLocale(g_settings.language.c_str());
 		show_startwizard = true;
 	}
 	/* setup GUI */
@@ -2718,15 +2711,15 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		if (g_settings.recording_type == RECORDING_FILE) {
 			char * recordingDir = eventinfo->recordingDir;
 			for(int i=0 ; i < NETWORK_NFS_NR_OF_ENTRIES ; i++) {
-				if (strcmp(g_settings.network_nfs_local_dir[i],recordingDir) == 0) {
-					printf("[neutrino] waking up %s (%s)\n",g_settings.network_nfs_ip[i].c_str(),recordingDir);
-					if (my_system(2, "ether-wake", g_settings.network_nfs_mac[i]) != 0)
+				if (g_settings.network_nfs[i].local_dir == recordingDir) {
+					printf("[neutrino] waking up %s (%s)\n", g_settings.network_nfs[i].ip.c_str(), recordingDir);
+					if (my_system(2, "ether-wake", g_settings.network_nfs[i].mac.c_str()) != 0)
 						perror("ether-wake failed");
 					break;
 				}
 			}
 			if(has_hdd) {
-				wakeup_hdd(g_settings.network_nfs_recordingdir);
+				wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
 			}
 		}
 
@@ -3499,7 +3492,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey == "moviedir") {
 		parent->hide();
 
-		chooserDir(g_settings.network_nfs_moviedir, false, NULL, sizeof(g_settings.network_nfs_moviedir)-1);
+		chooserDir(g_settings.network_nfs_moviedir, false, NULL);
 
 		return menu_return::RETURN_REPAINT;
 	}
@@ -3557,7 +3550,7 @@ bool CNeutrinoApp::changeNotify(const neutrino_locale_t OptionName, void * /*dat
 {
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LANGUAGESETUP_SELECT))
 	{
-		g_Locale->loadLocale(g_settings.language);
+		g_Locale->loadLocale(g_settings.language.c_str());
 		return true;
 	}
 	return false;
@@ -3868,7 +3861,7 @@ void CNeutrinoApp::SelectSubtitles()
 		return;
 
 	for(int i = 0; i < 3; i++) {
-		if(strlen(g_settings.pref_subs[i]) == 0 || !strcmp(g_settings.pref_subs[i], "none"))
+		if(g_settings.pref_subs[i].empty() || g_settings.pref_subs[i] == "none")
 			continue;
 
 		std::string temp(g_settings.pref_subs[i]);

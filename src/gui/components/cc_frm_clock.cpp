@@ -41,18 +41,19 @@
 
 using namespace std;
 
-CComponentsFrmClock::CComponentsFrmClock()
-{
-	initVarClock();
-}
 
-CComponentsFrmClock::CComponentsFrmClock( const int x_pos, const int y_pos, const int w, const int h,
+CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, const int& w, const int& h,
 						const char* format_str, bool activ, bool has_shadow,
 						fb_pixel_t color_frame, fb_pixel_t color_body, fb_pixel_t color_shadow)
 
 {
-	initVarClock();
+	initVarClock(x_pos, y_pos, w, h, format_str, activ, has_shadow, color_frame, color_body, color_shadow);
+}
 
+void CComponentsFrmClock::initVarClock(	const int& x_pos, const int& y_pos, const int& w, const int& h,
+					const char* format_str, bool activ, bool has_shadow,
+					fb_pixel_t color_frame, fb_pixel_t color_body, fb_pixel_t color_shadow)
+{
 	x 		= x_pos;
 	y 		= y_pos;
 	width 		= w;
@@ -63,30 +64,25 @@ CComponentsFrmClock::CComponentsFrmClock( const int x_pos, const int y_pos, cons
 	col_body	= color_body;
 	col_shadow	= color_shadow;
 
+
+	cc_item_type 	= CC_ITEMTYPE_FRM_CLOCK;
+	corner_rad	= RADIUS_SMALL;
+	
+	cl_font_type	= SNeutrinoSettings::FONT_TYPE_INFOBAR_INFO;
+	cl_font 	= &g_Font[cl_font_type];
+	dyn_font_size	= 0;
+
+	cl_col_text	= COL_MENUCONTENT_TEXT;
+
 	cl_format_str	= cl_blink_str = format_str;
+
+	cl_align	= CC_ALIGN_VER_CENTER | CC_ALIGN_HOR_CENTER;
+	cl_interval	= 1;
+	cl_timer 	= NULL;
+	
 	paintClock	= false;
 	if (activ)
 		startClock();
-}
-
-void CComponentsFrmClock::initVarClock()
-{
-	cc_item_type 		= CC_ITEMTYPE_FRM_CLOCK;
-	corner_rad		= RADIUS_SMALL;
-
-	cl_font_type		= SNeutrinoSettings::FONT_TYPE_INFOBAR_INFO;
-	cl_font 		= &g_Font[cl_font_type];
-	dyn_font_size		= 0;
-
-	cl_col_text		= COL_MENUCONTENT_TEXT;
-
-	cl_format_str		= "%H:%M";
-	cl_format 		= cl_format_str;
-	cl_blink_str		= "%H %M";
-
-	cl_align		= CC_ALIGN_VER_CENTER | CC_ALIGN_HOR_CENTER;
-	cl_interval		= 1;
-	cl_timer 		= NULL;
 }
 
 CComponentsFrmClock::~CComponentsFrmClock()

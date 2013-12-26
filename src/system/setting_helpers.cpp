@@ -254,6 +254,11 @@ void CColorSetupNotifier::setPalette()
 	                              convertSetupColor2RGB(g_settings.menu_Content_inactive_Text_red, g_settings.menu_Content_inactive_Text_green, g_settings.menu_Content_inactive_Text_blue),
 	                              convertSetupAlpha2Alpha(g_settings.menu_Content_inactive_alpha));
 
+	// COL_INFOCLOCK_TEXT
+	frameBuffer->paletteSetColor(COL_NEUTRINO_TEXT + 15,
+	                              convertSetupColor2RGB(g_settings.clock_Digit_red, g_settings.clock_Digit_green, g_settings.clock_Digit_blue),
+	                              convertSetupAlpha2Alpha(g_settings.clock_Digit_alpha));
+
 	frameBuffer->paletteSet();
 }
 
@@ -483,7 +488,7 @@ bool CTZChangeNotifier::changeNotify(const neutrino_locale_t, void * Data)
                 while (search) {
                         if (!strcmp(xmlGetName(search), "zone")) {
 				name = xmlGetAttribute(search, "name");
-				if(!strcmp(g_settings.timezone, name.c_str())) {
+				if(g_settings.timezone == name) {
 					zone = xmlGetAttribute(search, "zone");
 					found = true;
 					break;

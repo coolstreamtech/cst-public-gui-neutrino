@@ -63,7 +63,7 @@ typedef struct callback_data_t
 	std::string datastr;
 }callback_data_struct_t;
 
-#define COLOR_COUNT 44
+#define COLOR_COUNT 48
 
 class CThemes : public sigc::trackable, public CMenuTarget, CChangeObserver
 {
@@ -73,7 +73,7 @@ class CThemes : public sigc::trackable, public CMenuTarget, CChangeObserver
 		CStringInputSMS *nameInput;
 
 		int width;
-
+		int oldThemeValues[COLOR_COUNT];
 
 		std::string cur_theme;
 		std::string old_theme;
