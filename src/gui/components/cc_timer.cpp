@@ -29,7 +29,6 @@
 #include <neutrino.h>
 
 #include "cc_timer.h"
-#include <time.h>
 #include <pthread.h>
 #include <errno.h>
 #include <system/helpers.h>
@@ -61,7 +60,7 @@ void* CComponentsTimer::initTimerThread(void *arg)
 	//start loop
 	while(timer) {
 		timer->OnTimer();
-		sleep(timer->tm_interval);
+		mySleep(timer->tm_interval);
 	}
 
 	return 0;
