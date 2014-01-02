@@ -38,9 +38,12 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <stdarg.h>
+#include <algorithm>
 
 #include <system/helpers.h>
 #include <gui/update_ext.h>
+
+using namespace std;
 
 void mySleep(int sec) {
 	struct timeval timeout;
@@ -77,7 +80,7 @@ bool file_exists(const char *filename)
 void  wakeup_hdd(const char *hdd_dir)
 {
 	if(!check_dir(hdd_dir)){
-		std::string wakeup_file = hdd_dir;
+		string wakeup_file = hdd_dir;
 		wakeup_file += "/.wakeup";
 		remove(wakeup_file.c_str());
 		creat(wakeup_file.c_str(),S_IREAD|S_IWRITE);
@@ -290,57 +293,57 @@ bool get_mem_usage(unsigned long &kbtotal, unsigned long &kbfree)
 	return true;
 }
 
-std::string _getPathName(std::string &path, std::string sep)
+string _getPathName(string &path, string sep)
 {
 	size_t pos = path.find_last_of(sep);
-	if (pos == std::string::npos)
+	if (pos == string::npos)
 		return path;
 	return path.substr(0, pos);
 }
 
-std::string _getBaseName(std::string &path, std::string sep)
+string _getBaseName(string &path, string sep)
 {
 	size_t pos = path.find_last_of(sep);
-	if (pos == std::string::npos)
+	if (pos == string::npos)
 		return path;
 	if (path.length() == pos +1)
 		return "";
 	return path.substr(pos+1);
 }
 
-std::string getPathName(std::string &path)
+string getPathName(string &path)
 {
 	return _getPathName(path, "/");
 }
 
-std::string getBaseName(std::string &path)
+string getBaseName(string &path)
 {
 	return _getBaseName(path, "/");
 }
 
-std::string getFileName(std::string &file)
+string getFileName(string &file)
 {
 	return _getPathName(file, ".");
 }
 
-std::string getFileExt(std::string &file)
+string getFileExt(string &file)
 {
 	return _getBaseName(file, ".");
 }
 
 
-std::string getNowTimeStr(const char* format)
+string getNowTimeStr(const char* format)
 {
 	char tmpStr[256];
 	struct timeval tv;
 	gettimeofday(&tv, NULL);        
 	strftime(tmpStr, sizeof(tmpStr), format, localtime(&tv.tv_sec));
-	return (std::string)tmpStr;
+	return (string)tmpStr;
 }
 
-std::string trim(std::string &str, const std::string &trimChars /*= " \n\r\t"*/)
+string trim(string &str, const string &trimChars /*= " \n\r\t"*/)
 {
-	std::string result = str.erase(str.find_last_not_of(trimChars) + 1);
+	string result = str.erase(str.find_last_not_of(trimChars) + 1);
 	return result.erase(0, result.find_first_not_of(trimChars));
 }
 
@@ -503,7 +506,7 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 			}
 			// is file
 			else if (S_ISREG(FileInfo.st_mode)) {
-				std::string save = "";
+				string save = "";
 				if (backupMode && (CExtUpdate::getInstance()->isBlacklistEntry(srcPath)))
 					save = ".save";
 				copyFile(srcPath, (dstPath + save).c_str(), FileInfo.st_mode & 0x0FFF);
@@ -514,8 +517,34 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 	return true;
 }
 
+bool CFileHelpers::createDir(string& Dir, mode_t mode)
+{
+	struct stat st;
+	int res = 0;
+	for(string::iterator iter = Dir.begin() ; iter != Dir.end();) {
+		string::iterator newIter = find(iter, Dir.end(), '/' );
+		string newPath = string( Dir.begin(), newIter );
+
+		if( !newPath.empty() && stat(newPath.c_str(), &st) != 0) {
+			res = mkdir( newPath.c_str(), mode);
+			if(res != 0)
+				printf("[CFileHelpers %s] creating directory %s: %s\n", __func__, newPath.c_str(), strerror(errno));
+		}
+
+		iter = newIter;
+		if(newIter != Dir.end())
+			++ iter;
+	}
+
+	return res == 0 ? true:false;
+}
+
 bool CFileHelpers::createDir(const char *Dir, mode_t mode)
 {
+	string dir = static_cast<string>(Dir);
+
+	return createDir(dir, mode);
+#if 0
 	char dirPath[PATH_MAX];
 	DIR *dir;
 	if ((dir = opendir(Dir)) != NULL) {
@@ -540,6 +569,7 @@ bool CFileHelpers::createDir(const char *Dir, mode_t mode)
 	}
 	errno = 0;
 	return true;
+#endif
 }
 
 bool CFileHelpers::removeDir(const char *Dir)

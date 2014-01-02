@@ -64,6 +64,7 @@ class CFileHelpers
 		bool copyFile(const char *Src, const char *Dst, mode_t mode);
 		bool copyDir(const char *Src, const char *Dst, bool backupMode=false);
 		bool createDir(const char *Dir, mode_t mode);
+		bool createDir(std::string& path, mode_t mode);
 		bool removeDir(const char *Dir);
 };
 
