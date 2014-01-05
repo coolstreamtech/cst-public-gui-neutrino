@@ -4,14 +4,6 @@
 	Copyright (C) 2001 Steffen Hehn 'McClean'
 	Homepage: http://dbox.cyberphoria.org/
 
-	Kommentar:
-
-	Diese GUI wurde von Grund auf neu programmiert und sollte nun vom
-	Aufbau und auch den Ausbaumoeglichkeiten gut aussehen. Neutrino basiert
-	auf der Client-Server Idee, diese GUI ist also von der direkten DBox-
-	Steuerung getrennt. Diese wird dann von Daemons uebernommen.
-
-
 	License: GPL
 
 	This program is free software; you can redistribute it and/or modify
@@ -228,19 +220,14 @@ void CDBoxInfoWidget::paint()
 #define MEMINFO_RAM 0
 #define MEMINFO_SWAP 1
 #define MEMINFO_ROWS 2
-	unsigned long long memstat[MEMINFO_ROWS][MEMINFO_COLUMNS] = { { 0, 0, 0 }, { 0, 0, 0 } }; // total, used, free
+	unsigned long memstat[MEMINFO_ROWS][MEMINFO_COLUMNS] = { { 0, 0, 0 }, { 0, 0, 0 } }; // total, used, free
 	const char *memtype[MEMINFO_ROWS] = { "RAM", "Swap" };
 	FILE *procmeminfo = fopen("/proc/meminfo", "r");
 	if (procmeminfo) {
 		char buf[80], a[80];
-		long long unsigned v;
+		unsigned long v;
 		while (fgets(buf, sizeof(buf), procmeminfo)) {
-			char unit[10];
-			*unit = 0;
-			if ((3 == sscanf(buf, "%[^:]: %llu %s", a, &v, unit))
-			 || (2 == sscanf(buf, "%[^:]: %llu", a, &v))) {
-				if (*unit == 'k')
-					v <<= 10;
+			if (2 == sscanf(buf, "%[^:]: %lu", a, &v)) {
 				if (!strcasecmp(a, "MemTotal"))
 					memstat[MEMINFO_RAM][MEMINFO_TOTAL] += v;
 				else if (!strcasecmp(a, "MemFree"))
@@ -465,13 +452,13 @@ void CDBoxInfoWidget::paint()
 					tmp = memtype[row];
 					break;
 				case 1:
-					tmp = bytes2string(memstat[row][MEMINFO_TOTAL]);
+					tmp = bytes2string(memstat[row][MEMINFO_TOTAL] << 10);
 					break;
 				case 2:
-					tmp = bytes2string(memstat[row][MEMINFO_USED]);
+					tmp = bytes2string(memstat[row][MEMINFO_USED] << 10);
 					break;
 				case 3:
-					tmp = bytes2string(memstat[row][MEMINFO_FREE]);
+					tmp = bytes2string(memstat[row][MEMINFO_FREE] << 10);
 					break;
 				case 4:
 					tmp = to_string(memstat[row][MEMINFO_TOTAL] ? (memstat[row][MEMINFO_USED] * 100) / memstat[row][MEMINFO_TOTAL] : 0) + "%";
@@ -552,6 +539,7 @@ void CDBoxInfoWidget::paint()
 						int rw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(tmp, true);
 						maxWidth[column] = std::max(maxWidth[column], rw);
 						space = widths[column] - rw;
+						_w = rw;
 					}
 					if ((mpOffset + space + _w) > width)
 						_w = width - (mpOffset + space);
