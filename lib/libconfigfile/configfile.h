@@ -79,6 +79,12 @@ class CConfigFile
 	void setInt64(const char * const key, const int64_t val);
 	void setInt64(const std::string & key, const int64_t val);
 
+	// additional int8_t
+	int8_t getInt8(const char * const key, const int8_t defaultVal = 0);
+	int8_t getInt8(const std::string & key, const int8_t defaultVal = 0);
+	void setInt8(const char * const key, const int8_t val);
+	void setInt8(const std::string & key, const int8_t val);
+
 	//
 	// boolean
 	//

@@ -186,6 +186,17 @@ bool CConfigFile::getBool(const std::string & key, const bool defaultVal)
 	return !((configData[key] == "false") || (configData[key] == "0"));
 }
 
+int8_t CConfigFile::getInt8(const char * const key, const int8_t defaultVal)
+{
+	int32_t ret = getInt32(key, defaultVal);
+	return static_cast<int8_t>(ret);
+}
+
+int8_t CConfigFile::getInt8(const std::string & key, const int8_t defaultVal)
+{
+	return getInt8(key, defaultVal);
+}
+
 int32_t CConfigFile::getInt32(const char * const key, const int32_t defaultVal)
 {
 	return getInt32(std::string(key), defaultVal);
@@ -254,8 +265,8 @@ std::vector <int32_t> CConfigFile::getInt32Vector(const std::string & key)
 	std::string val = configData[key];
 	std::vector <int32_t> vec;
 	uint16_t length = 0;
-	uint16_t pos = 0;
-	uint16_t i;
+	uint32_t pos = 0;
+	std::size_t i;
 
 	for (i = 0; i < val.length(); i++)
 	{
@@ -284,8 +295,8 @@ std::vector <std::string> CConfigFile::getStringVector(const std::string & key)
 	std::string val = configData[key];
 	std::vector <std::string> vec;
 	uint16_t length = 0;
-	uint16_t pos = 0;
-	uint16_t i;
+	uint32_t pos = 0;
+	std::size_t i;
 
 	for (i = 0; i < val.length(); i++)
 	{
@@ -332,6 +343,16 @@ void CConfigFile::setBool(const std::string & key, const bool val)
 	}
 
 	unknownKeyQueryedFlag = tmpUnknownKeyQueryedFlag;
+}
+
+void CConfigFile::setInt8(const char * const key, int8_t val)
+{
+	setInt32(key, val);
+}
+
+void CConfigFile::setInt8(const std::string & key, int8_t val)
+{
+	setInt32(key, val);
 }
 
 void CConfigFile::setInt32(const char * const key, int32_t val)
