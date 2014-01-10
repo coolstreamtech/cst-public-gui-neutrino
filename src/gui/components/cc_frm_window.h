@@ -82,33 +82,21 @@ class CComponentsWindow : public CComponentsForm
 		///initialze all window objects at once
 		void initCCWItems();
 		///initialize all attributes
-		void initVarWindow();
+		void initVarWindow(	const int& x_pos = CC_CENTERED, const int& y_pos = CC_CENTERED, const int& w = 0, const int& h = 0,
+					const std::string& caption = "",
+					const char* iconname = NULL,
+					bool has_shadow = CC_SHADOW_OFF,
+					fb_pixel_t color_frame = COL_MENUCONTENT_PLUS_6,
+					fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0,
+					fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
 
 	public:
 		enum
 		{
 			CC_WINDOW_ITEM_HEADER 	= 0
 		};
-		///simple constructor for CComponentsWindow
+		///simple constructor for CComponentsWindow, this shows a window over full screen
 		CComponentsWindow();
-
-		///advanced constructor for CComponentsWindow, provides parameters for the most required properties, and caption as string
-		CComponentsWindow(	const int x_pos, const int y_pos, const int w, const int h,
-					const std::string& caption,
-					const char* iconname = NULL,
-					bool has_shadow = CC_SHADOW_OFF,
-					fb_pixel_t color_frame = COL_MENUCONTENT_PLUS_6,
-					fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0,
-					fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
-
-		///advanced constructor for CComponentsWindow, provides parameters for the most required properties, and caption from locales
-		CComponentsWindow(	const int x_pos, const int y_pos, const int w, const int h,
-					neutrino_locale_t locale_caption,
-					const char* iconname = NULL,
-					bool has_shadow = CC_SHADOW_OFF,
-					fb_pixel_t color_frame = COL_MENUCONTENT_PLUS_6,
-					fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0,
-					fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
 
 		///simple constructor for CComponentsWindow, provides parameters for caption as string and icon, position of window is general centered and bound
 		///to current screen settings, this shows a window over full screen
@@ -118,7 +106,23 @@ class CComponentsWindow : public CComponentsForm
 		///to current screen settings, this shows a window over full screen
 		CComponentsWindow(neutrino_locale_t locale_caption, const char* iconname = NULL);
 
-		~CComponentsWindow();
+		///advanced constructor for CComponentsWindow, provides parameters for the most required properties, and caption as string, x_pos or y_pos = 0 will center window
+		CComponentsWindow(	const int& x_pos, const int& y_pos, const int& w, const int& h,
+					const std::string& caption = "",
+					const char* iconname = NULL,
+					bool has_shadow = CC_SHADOW_OFF,
+					fb_pixel_t color_frame = COL_MENUCONTENT_PLUS_6,
+					fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0,
+					fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
+
+		///advanced constructor for CComponentsWindow, provides parameters for the most required properties, and caption from locales, x_pos or y_pos = 0 will center window
+		CComponentsWindow(	const int& x_pos, const int& y_pos, const int& w, const int& h,
+					neutrino_locale_t locale_text = NONEXISTANT_LOCALE,
+					const char* iconname = NULL,
+					bool has_shadow = CC_SHADOW_OFF,
+					fb_pixel_t color_frame = COL_MENUCONTENT_PLUS_6,
+					fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0,
+					fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
 
 		///add item to body object, also usable is addCCItem() to add items to the windo object
 		void addWindowItem(CComponentsItem* cc_Item);
