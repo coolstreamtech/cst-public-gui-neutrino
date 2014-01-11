@@ -311,16 +311,16 @@ bool CComponentsFrmClock::stopClock()
 {
 	if (cl_timer){
 #ifdef DEBUG_CC
-		printf("[CComponentsFrmClock]    [%s]  stopping timer...\n", __func__);
+		printf("[CComponentsFrmClock]    [%s]  stopping clock...\n", __func__);
 #endif
-		if (cl_timer->stopTimer())
+		if (cl_timer->stopTimer()){
 			delete cl_timer;
-		cl_timer = NULL;
-		return true;
+			cl_timer = NULL;
+			return true;
+		}
+		else
+			printf("[CComponentsFrmClock]    [%s]  stopping timer failed...\n", __func__);
 	}
-#ifdef DEBUG_CC	
-	printf("[CComponentsFrmClock]    [%s]  stopping timer failed...\n", __func__);
-#endif
 	return false;
 }
 

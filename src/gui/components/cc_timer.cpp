@@ -85,20 +85,21 @@ bool CComponentsTimer::startTimer()
 //stop ticking timer and kill thread, return true on succses
 bool CComponentsTimer::stopTimer()
 {
+	int thres = 0;
 	if(tm_thread) {
-		int res = pthread_cancel(tm_thread);
-		if (res != 0){
+		thres = pthread_cancel(tm_thread);
+		printf("[CComponentsTimer]    [%s] waiting for timer thread terminate ...\n", __func__);
+		if (thres != 0)
 			printf("[CComponentsTimer]    [%s] pthread_cancel  %s\n", __func__, strerror(errno));
-			return false;
-		}
-
-		res = pthread_join(tm_thread, NULL);
-		if (res != 0){
+		thres = pthread_join(tm_thread, NULL);
+		if (thres != 0)
 			printf("[CComponentsTimer]    [%s] pthread_join  %s\n", __func__, strerror(errno));
-			return false;
-		}
 	}
-	tm_thread = 0;
-	return true;
+	if (thres == 0){
+		tm_thread = 0;
+		return true;
+	}
+
+	return false;
 }
 
