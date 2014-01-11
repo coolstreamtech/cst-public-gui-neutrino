@@ -34,8 +34,6 @@
 
 class CInfoClock : public CComponentsFrmClock
 {
-	protected:
-		void initVarInfoClock();
 	private:
 		void		Init();
 	public:

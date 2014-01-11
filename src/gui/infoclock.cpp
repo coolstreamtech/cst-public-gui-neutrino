@@ -38,7 +38,7 @@
 
 CInfoClock::CInfoClock():CComponentsFrmClock( 0, 0, 0, 50, "%H:%M:%S", true, CC_SHADOW_ON, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
 {
-	initVarInfoClock();
+	Init();
 }
 
 CInfoClock* CInfoClock::getInstance()
@@ -47,11 +47,6 @@ CInfoClock* CInfoClock::getInstance()
 	if(!InfoClock)
 		InfoClock = new CInfoClock();
 	return InfoClock;
-}
-
-void CInfoClock::initVarInfoClock()
-{
-	Init();
 }
 
 void CInfoClock::Init()
