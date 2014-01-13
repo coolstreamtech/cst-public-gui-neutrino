@@ -5,6 +5,8 @@
 							 and some other guys
 	Homepage: http://dbox.cyberphoria.org/
 
+	Copyright (C) 2006-2014 Stefan Seyfried
+
 	Copyright (C) 2011 CoolStream International Ltd
 
 	License: GPL
@@ -109,7 +111,7 @@
 #include <system/helpers.h>
 #include <system/sysload.h>
 
-#include <timerdclient/timerdmsg.h>
+#include <timerdclient/timerdclient.h>
 
 #include <zapit/debug.h>
 #include <zapit/zapit.h>
@@ -554,6 +556,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.recording_epg_for_end           = configfile.getBool("recording_epg_for_end"              , true);
 	g_settings.recording_save_in_channeldir    = configfile.getBool("recording_save_in_channeldir"         , false);
 	g_settings.recording_slow_warning	   = configfile.getBool("recording_slow_warning"     , true);
+	g_settings.recording_startstop_msg	   = configfile.getBool("recording_startstop_msg"     , true);
 
 	// default plugin for movieplayer
 	g_settings.movieplayer_plugin = configfile.getString( "movieplayer_plugin", "Teletext" );
@@ -979,6 +982,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool  ("recording_epg_for_end"              , g_settings.recording_epg_for_end          );
 	configfile.setBool  ("recording_save_in_channeldir"       , g_settings.recording_save_in_channeldir   );
 	configfile.setBool  ("recording_slow_warning"             , g_settings.recording_slow_warning         );
+	configfile.setBool  ("recording_startstop_msg"             , g_settings.recording_startstop_msg       );
 
 	// default plugin for movieplayer
 	configfile.setString ( "movieplayer_plugin", g_settings.movieplayer_plugin );
@@ -1583,8 +1587,10 @@ void CNeutrinoApp::InitTimerdClient()
 	g_Timerd = new CTimerdClient;
 	g_Timerd->registerEvent(CTimerdClient::EVT_ANNOUNCE_SHUTDOWN, 222, NEUTRINO_UDS_NAME);
 	g_Timerd->registerEvent(CTimerdClient::EVT_SHUTDOWN, 222, NEUTRINO_UDS_NAME);
+#if 0
 	g_Timerd->registerEvent(CTimerdClient::EVT_ANNOUNCE_NEXTPROGRAM, 222, NEUTRINO_UDS_NAME);
 	g_Timerd->registerEvent(CTimerdClient::EVT_NEXTPROGRAM, 222, NEUTRINO_UDS_NAME);
+#endif
 	g_Timerd->registerEvent(CTimerdClient::EVT_STANDBY_ON, 222, NEUTRINO_UDS_NAME);
 	g_Timerd->registerEvent(CTimerdClient::EVT_STANDBY_OFF, 222, NEUTRINO_UDS_NAME);
 	g_Timerd->registerEvent(CTimerdClient::EVT_ANNOUNCE_RECORD, 222, NEUTRINO_UDS_NAME);
@@ -2736,7 +2742,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 				g_Zapit->zapTo_serviceID_NOWAIT(channel_id);
 			}
 		}
-		if(( mode != mode_scart ) && ( mode != mode_standby )){
+		if(( mode != mode_scart ) && ( mode != mode_standby ) && g_settings.recording_startstop_msg) {
 			std::string name = g_Locale->getText(LOCALE_RECORDTIMER_ANNOUNCE);
 			getAnnounceEpgName(eventinfo, name);
 			ShowHintUTF(LOCALE_MESSAGEBOX_INFO, name.c_str());
