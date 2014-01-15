@@ -49,7 +49,7 @@
 #ifndef __CC_PROGRESSBAR_H__
 #define __CC_PROGRESSBAR_H__
 
-#include "config.h"
+#include <config.h>
 #include <gui/components/cc_base.h>
 #include <string>
 

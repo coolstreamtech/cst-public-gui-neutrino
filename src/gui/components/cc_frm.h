@@ -25,7 +25,7 @@
 #define __CC_FORM_H__
 
 
-#include "config.h"
+#include <config.h>
 #include <gui/components/cc_base.h>
 
 

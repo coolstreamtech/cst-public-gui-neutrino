@@ -44,7 +44,7 @@
 #endif
 
 #include <driver/screen_max.h>
-#include "gui/cam_menu.h"
+#include <gui/cam_menu.h>
 
 extern CCAMMenuHandler * g_CamHandler;
 

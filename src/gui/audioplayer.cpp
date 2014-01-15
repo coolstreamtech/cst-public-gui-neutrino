@@ -65,7 +65,7 @@
 #include <gui/widget/stringinput.h>
 #include <gui/widget/stringinput_ext.h>
 
-#include "gui/pictureviewer.h"
+#include <gui/pictureviewer.h>
 extern CPictureViewer * g_PicViewer;
 
 #include <system/settings.h>

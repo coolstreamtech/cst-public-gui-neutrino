@@ -28,8 +28,8 @@
 #include <config.h>
 #endif
 
-#include "gui/volumebar.h"
-#include "gui/movieplayer.h"
+#include "volumebar.h"
+#include "movieplayer.h"
 
 #include <neutrino.h>
 #include <gui/infoclock.h>
