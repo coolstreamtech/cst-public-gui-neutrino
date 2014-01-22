@@ -30,6 +30,12 @@ AM_CPPFLAGS += \
 	@CURL_CFLAGS@ \
 	@FREETYPE_CFLAGS@
 
+if ENABLE_LUA
+AM_CPPFLAGS += \
+	@LUA_CFLAGS@
+endif
+
+
 if BOXTYPE_COOL
 if BOXMODEL_APOLLO
 AM_CPPFLAGS += -I$(top_srcdir)/lib/libcoolstream2
@@ -112,6 +118,11 @@ libneutrino_gui_a_SOURCES = \
 if ENABLE_TEST_MENU
 libneutrino_gui_a_SOURCES += \
 	test_menu.cpp
+endif
+
+if ENABLE_LUA
+libneutrino_gui_a_SOURCES += \
+	luainstance.cpp
 endif
 
 libneutrino_gui2_a_SOURCES = \

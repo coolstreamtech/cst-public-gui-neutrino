@@ -233,14 +233,14 @@ int CNetworkSetup::showNetworkSetup()
 	m0->setHint("", LOCALE_MENU_HINT_NET_SETUPNOW);
 
 	//eth id
-	CMenuForwarder *mac = new CMenuForwarderNonLocalized("MAC", false, mac_addr);
+	CMenuForwarder *mac = new CMenuForwarder("MAC", false, mac_addr);
 
 	//prepare input entries
-	CIPInput networkSettings_NetworkIP(LOCALE_NETWORKMENU_IPADDRESS , network_address   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, this);
-	CIPInput networkSettings_NetMask  (LOCALE_NETWORKMENU_NETMASK   , network_netmask   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
-	CIPInput networkSettings_Broadcast(LOCALE_NETWORKMENU_BROADCAST , network_broadcast , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
-	CIPInput networkSettings_Gateway  (LOCALE_NETWORKMENU_GATEWAY   , network_gateway   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
-	CIPInput networkSettings_NameServer(LOCALE_NETWORKMENU_NAMESERVER, network_nameserver, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
+	CIPInput networkSettings_NetworkIP(LOCALE_NETWORKMENU_IPADDRESS  , &network_address   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, this);
+	CIPInput networkSettings_NetMask  (LOCALE_NETWORKMENU_NETMASK    , &network_netmask   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
+	CIPInput networkSettings_Broadcast(LOCALE_NETWORKMENU_BROADCAST  , &network_broadcast , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
+	CIPInput networkSettings_Gateway  (LOCALE_NETWORKMENU_GATEWAY    , &network_gateway   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
+	CIPInput networkSettings_NameServer(LOCALE_NETWORKMENU_NAMESERVER, &network_nameserver, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
 
 	//hostname
 	CStringInputSMS networkSettings_Hostname(LOCALE_NETWORKMENU_HOSTNAME, &network_hostname, 30, LOCALE_NETWORKMENU_HOSTNAME_HINT1, LOCALE_NETWORKMENU_HOSTNAME_HINT2, "abcdefghijklmnopqrstuvwxyz0123456789-. ");
@@ -828,7 +828,7 @@ int CNetworkSetup::showWlanList()
 		const char * icon = NULL;
 		if (networks[i].encrypted)
 			icon = NEUTRINO_ICON_LOCK;
-		CMenuForwarderNonLocalized * net = new CMenuForwarderNonLocalized(networks[i].ssid.c_str(), true, option[i], selector, cnt, CRCInput::RC_nokey, NULL, icon);
+		CMenuForwarder * net = new CMenuForwarder(networks[i].ssid.c_str(), true, option[i], selector, cnt, CRCInput::RC_nokey, NULL, icon);
 		net->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
 		wlist.addItem(net, networks[i].ssid == network_ssid);
 	}

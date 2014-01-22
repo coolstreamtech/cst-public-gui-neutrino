@@ -478,12 +478,12 @@ void CThemes::initMenuThemes(CMenuWidget &themes)
 					sigc::slot0<void> sl = sigc::bind<0>(sigc::mem_fun1(*this, &CThemes::CallBackBeforePaint), ptr);
 					th_colors->OnBeforePaint.connect(sl);
 
-					CMenuForwarderNonLocalized *osd_colors = new CMenuForwarderNonLocalized(s_name.c_str(), true, NULL, th_colors, v_th_data[i].dirname.c_str());
+					CMenuForwarder *osd_colors = new CMenuForwarder(s_name.c_str(), true, NULL, th_colors, v_th_data[i].dirname.c_str());
 					themes.addItem(osd_colors);
 
 					initMenuThemeColors(th_colors, v_th_data[i].dirname);
 					CMenuSeparator *sep =  static_cast<CMenuSeparator*>(th_colors->getItem(0));
-					sep->setString(s_name);
+					sep->setName(s_name);
 				}
 			}
 		}
@@ -515,8 +515,7 @@ void CThemes::initMenuThemeColors(CMenuWidget *menu_colors, const string &themed
 	
 	//apply settings
 	
-	CMenuForwarderNonLocalized* oj = NULL;
-	oj = new CMenuForwarderNonLocalized("Apply Settings...", true, "", this, themedir.c_str(), CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder* oj = new CMenuForwarder("Apply Settings...", true, "", this, themedir.c_str(), CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	menu_colors->addItem( oj );
 	
 	//init theme name edit
