@@ -1758,7 +1758,7 @@ TIMER_START();
 
 	/* later on, we'll crash anyway, so tell about it. */
 	if (! zapit_init)
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO,
+		ShowMsg(LOCALE_MESSAGEBOX_INFO,
 				"Zapit initialization failed.\nThis is a fatal error, sorry.",
 				CMessageBox::mbrBack, CMessageBox::mbBack);
 
@@ -1868,7 +1868,7 @@ TIMER_START();
 	if(loadSettingsErg) {
 		hintBox->hide();
 		dprintf(DEBUG_INFO, "config file or options missing\n");
-		ShowHintUTF(LOCALE_MESSAGEBOX_INFO, loadSettingsErg ==  1 ? g_Locale->getText(LOCALE_SETTINGS_NOCONFFILE)
+		ShowHint(LOCALE_MESSAGEBOX_INFO, loadSettingsErg ==  1 ? g_Locale->getText(LOCALE_SETTINGS_NOCONFFILE)
 				: g_Locale->getText(LOCALE_SETTINGS_MISSINGOPTIONSCONFFILE));
 		configfile.setModifiedFlag(true);
 		saveSetup(NEUTRINO_SETTINGS_FILE);
@@ -1954,7 +1954,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 
 	g_PluginList->startPlugin("startup.cfg");
 	if (!g_PluginList->getScriptOutput().empty()) {
-		ShowMsgUTF(LOCALE_PLUGINS_RESULT, g_PluginList->getScriptOutput(), CMessageBox::mbrBack,CMessageBox::mbBack,NEUTRINO_ICON_SHELL);
+		ShowMsg(LOCALE_PLUGINS_RESULT, g_PluginList->getScriptOutput(), CMessageBox::mbrBack,CMessageBox::mbBack,NEUTRINO_ICON_SHELL);
 	}
 	g_RCInput->clearRCMsg();
 
@@ -2155,8 +2155,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_RED);
 					StartSubtitles();
 				}
-					else
-						ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
+				else
+					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
 			}
 			else if ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player)
 			{
@@ -2173,7 +2173,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					StartSubtitles();
 				}
 				else
-					ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
+					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
 			}
 			else if( msg == CRCInput::RC_yellow ) {       // NVODs
 				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_YELLOW_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)
@@ -2183,7 +2183,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					StartSubtitles();
 				}
 				else
-					ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
+					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
 			}
 			else if( (msg == CRCInput::RC_green) || ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player) )
 			{
@@ -2203,8 +2203,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_BLUE);
 					StartSubtitles();
 				}
-					else
-						ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
+				else
+					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
 			}
 			else if( (msg == CRCInput::RC_audio) && g_settings.audio_run_player) {
 				//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
@@ -2378,7 +2378,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			scrambled_timer = 0;
 			if(g_settings.scrambled_message && videoDecoder->getBlank() && videoDecoder->getPlayState()) {
 				const char * text = g_Locale->getText(LOCALE_SCRAMBLED_CHANNEL);
-				ShowHintUTF (LOCALE_MESSAGEBOX_INFO, text, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth (text, true) + 10, 5);
+				ShowHint (LOCALE_MESSAGEBOX_INFO, text, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth (text, true) + 10, 5);
 			}
 			return messages_return::handled;
 		}
@@ -2711,7 +2711,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			CTimerd::RecordingInfo * eventinfo = (CTimerd::RecordingInfo *) data;
 			std::string name = g_Locale->getText(LOCALE_ZAPTOTIMER_ANNOUNCE);
 			getAnnounceEpgName( eventinfo, name);
-			ShowHintUTF( LOCALE_MESSAGEBOX_INFO, name.c_str() );
+			ShowHint( LOCALE_MESSAGEBOX_INFO, name.c_str() );
 		}
 		delete [] (unsigned char*) data;
 		return messages_return::handled;
@@ -2747,20 +2747,20 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		if(( mode != mode_scart ) && ( mode != mode_standby ) && g_settings.recording_startstop_msg) {
 			std::string name = g_Locale->getText(LOCALE_RECORDTIMER_ANNOUNCE);
 			getAnnounceEpgName(eventinfo, name);
-			ShowHintUTF(LOCALE_MESSAGEBOX_INFO, name.c_str());
+			ShowHint(LOCALE_MESSAGEBOX_INFO, name.c_str());
 		}
 		delete[] (unsigned char*) data;
 		return messages_return::handled;
 	}
 	else if( msg == NeutrinoMessages::ANNOUNCE_SLEEPTIMER) {
 		if( mode != mode_scart && mode != mode_standby)
-		  	skipSleepTimer = (ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, g_settings.shutdown_real ? LOCALE_SHUTDOWNTIMER_ANNOUNCE:LOCALE_SLEEPTIMERBOX_ANNOUNCE,CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, true) == CMessageBox::mbrYes);
+			skipSleepTimer = (ShowMsg(LOCALE_MESSAGEBOX_INFO, g_settings.shutdown_real ? LOCALE_SHUTDOWNTIMER_ANNOUNCE:LOCALE_SLEEPTIMERBOX_ANNOUNCE,CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, true) == CMessageBox::mbrYes);
 		return messages_return::handled;
 	}
 	else if( msg == NeutrinoMessages::SLEEPTIMER) {
 		if(data) {//INACTIVITY SLEEPTIMER
 			skipShutdownTimer =
-				(ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, g_settings.shutdown_real ? LOCALE_SHUTDOWNTIMER_ANNOUNCE:LOCALE_SLEEPTIMERBOX_ANNOUNCE,
+				(ShowMsg(LOCALE_MESSAGEBOX_INFO, g_settings.shutdown_real ? LOCALE_SHUTDOWNTIMER_ANNOUNCE:LOCALE_SLEEPTIMERBOX_ANNOUNCE,
 				      CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, true) == CMessageBox::mbrYes);//FIXME
 			if(skipShutdownTimer) {
 				printf("NeutrinoMessages::INACTIVITY SLEEPTIMER: skiping\n");
@@ -2809,7 +2809,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 	}
 	else if( msg == NeutrinoMessages::ANNOUNCE_SHUTDOWN) {
 		if( mode != mode_scart )
-			skipShutdownTimer = (ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, LOCALE_SHUTDOWNTIMER_ANNOUNCE, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 5) == CMessageBox::mbrYes);
+			skipShutdownTimer = (ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_SHUTDOWNTIMER_ANNOUNCE, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 5) == CMessageBox::mbrYes);
 	}
 	else if( msg == NeutrinoMessages::SHUTDOWN ) {
 		if(!skipShutdownTimer) {
@@ -2838,9 +2838,9 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			}
 
 			if (msg == NeutrinoMessages::EVT_POPUP)
-				ShowHintUTF(LOCALE_MESSAGEBOX_INFO, text.c_str(), 0, atoi(timeout.c_str()));
+				ShowHint(LOCALE_MESSAGEBOX_INFO, text.c_str(), 0, atoi(timeout.c_str()));
 			else if (msg == NeutrinoMessages::EVT_EXTMSG)
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, text, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO, 0, atoi(timeout.c_str()));
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, text, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO, 0, atoi(timeout.c_str()));
 
 		}
 		delete[] (unsigned char*) data;
@@ -2862,7 +2862,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			text[pos] = '\n';
 		}
 		if( mode != mode_scart )
-			ShowMsgUTF(LOCALE_TIMERLIST_TYPE_REMIND, text, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO); // UTF-8
+			ShowMsg(LOCALE_TIMERLIST_TYPE_REMIND, text, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO); // UTF-8
 		delete[] (unsigned char*) data;
 		return messages_return::handled;
 	}
@@ -2919,7 +2919,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 	else if (msg == NeutrinoMessages::EVT_START_PLUGIN) {
 		g_PluginList->startPlugin((const char *)data);
 		if (!g_PluginList->getScriptOutput().empty()) {
-			ShowMsgUTF(LOCALE_PLUGINS_RESULT, g_PluginList->getScriptOutput(), CMessageBox::mbrBack,CMessageBox::mbBack,NEUTRINO_ICON_SHELL);
+			ShowMsg(LOCALE_PLUGINS_RESULT, g_PluginList->getScriptOutput(), CMessageBox::mbrBack,CMessageBox::mbBack,NEUTRINO_ICON_SHELL);
 		}
 
 		delete[] (unsigned char*) data;
@@ -2932,7 +2932,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			g_RCInput->postMsg(NeutrinoMessages::SHOW_INFOBAR , 0);
 		}
 		return messages_return::handled;
-//		ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_EXTRA_ZAPIT_SDT_CHANGED),
+//		ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_EXTRA_ZAPIT_SDT_CHANGED),
 //				CMessageBox::mbrBack,CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 	}
 	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
@@ -2951,7 +2951,7 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 	CRecordManager::getInstance()->StopAutoRecord();
 	if(CRecordManager::getInstance()->RecordingStatus()) {
 		do_shutdown =
-			(ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, LOCALE_SHUTDOWN_RECODING_QUERY, CMessageBox::mbrNo,
+			(ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_SHUTDOWN_RECODING_QUERY, CMessageBox::mbrNo,
 					CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, true) == CMessageBox::mbrYes);
 	}
 
@@ -3404,7 +3404,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	int returnval = menu_return::RETURN_REPAINT;
 	
 	if(actionKey == "help_recording") {
-		ShowLocalizedMessage(LOCALE_SETTINGS_HELP, LOCALE_RECORDINGMENU_HELP, CMessageBox::mbrBack, CMessageBox::mbBack);
+		ShowMsg(LOCALE_SETTINGS_HELP, LOCALE_RECORDINGMENU_HELP, CMessageBox::mbrBack, CMessageBox::mbBack);
 	}
 	else if(actionKey=="shutdown") {
 		ExitRun(true, 1);
@@ -3547,7 +3547,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 			g_settings.easymenu = (g_settings.easymenu == 0) ? 1 : 0;
 			INFO("change easymenu to %d\n", g_settings.easymenu);
 			const char * text = g_settings.easymenu ? "Easy menu switched ON, restart box ?" : "Easy menu switched OFF, restart box ?";
-			if (ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, text, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_INFO, 0) == CMessageBox::mbrYes)
+			if (ShowMsg(LOCALE_MESSAGEBOX_INFO, text, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_INFO, 0) == CMessageBox::mbrYes)
 				g_RCInput->postMsg(NeutrinoMessages::REBOOT, 0);
 		}
 	}
