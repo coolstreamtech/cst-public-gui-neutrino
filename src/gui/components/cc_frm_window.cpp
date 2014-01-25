@@ -40,19 +40,9 @@ CComponentsWindow::CComponentsWindow()
 	initVarWindow();
 }
 
-CComponentsWindow::CComponentsWindow(const std::string& caption, const char* iconname)
-{
-	initVarWindow(0, 0, 0, 0, caption, iconname);
-}
-
-CComponentsWindow::CComponentsWindow(neutrino_locale_t locale_caption, const char* iconname)
-{
-	initVarWindow(0, 0, 0, 0, locale_caption != NONEXISTANT_LOCALE ? g_Locale->getText(locale_caption) : "", iconname);
-}
-
 CComponentsWindow::CComponentsWindow(	const int& x_pos, const int& y_pos, const int& w, const int& h,
 					neutrino_locale_t locale_caption,
-					const char* iconname,
+					const string& iconname,
 					bool has_shadow,
 					fb_pixel_t color_frame,
 					fb_pixel_t color_body,
@@ -63,8 +53,8 @@ CComponentsWindow::CComponentsWindow(	const int& x_pos, const int& y_pos, const 
 }
 
 CComponentsWindow::CComponentsWindow(	const int& x_pos, const int& y_pos, const int& w, const int& h,
-					const std::string& caption,
-					const char* iconname,
+					const string& caption,
+					const string& iconname,
 					bool has_shadow,
 					fb_pixel_t color_frame,
 					fb_pixel_t color_body,
@@ -73,9 +63,15 @@ CComponentsWindow::CComponentsWindow(	const int& x_pos, const int& y_pos, const 
 	initVarWindow(x_pos, y_pos, w, h, caption, iconname, has_shadow, color_frame, color_body, color_shadow);
 }
 
+CComponentsWindowMax::CComponentsWindowMax(const string& caption, const string& iconname)
+					:CComponentsWindow(0, 0, 0, 0, caption, iconname){};
+
+CComponentsWindowMax::CComponentsWindowMax(neutrino_locale_t locale_caption, const string& iconname)
+					:CComponentsWindow(0, 0, 0, 0, locale_caption != NONEXISTANT_LOCALE ? g_Locale->getText(locale_caption) : "", iconname){};
+
 void CComponentsWindow::initVarWindow(	const int& x_pos, const int& y_pos, const int& w, const int& h,
-					const std::string& caption,
-					const char* iconname,
+					const string& caption,
+					const string& iconname,
 					bool has_shadow,
 					fb_pixel_t color_frame,
 					fb_pixel_t color_body,
@@ -84,15 +80,19 @@ void CComponentsWindow::initVarWindow(	const int& x_pos, const int& y_pos, const
 	//CComponentsForm
 	cc_item_type 	= CC_ITEMTYPE_FRM_WINDOW;
 
-	//using current screen settings for default dimensions, do centering if default values == 0
-	width 		= w == 0 ? frameBuffer->getScreenWidth(true) : w;
-	height 		= h == 0 ? frameBuffer->getScreenHeight(true) : h;
-	x 		= x_pos == (CC_CENTERED || 0) ? getScreenStartX(width) : x_pos;
-	y 		= y_pos == (CC_CENTERED || 0) ? getScreenStartY(height) : y_pos;
+	//using current screen settings for default dimensions, do use full screen if default values for width/height = 0
+	int w_tmp = frameBuffer->getScreenWidth(w == 0 ? true : false);
+	int h_tmp = frameBuffer->getScreenHeight(h == 0 ? true : false);
+	width 		= w == 0 ? w_tmp : w;
+	height 		= h == 0 ? h_tmp : h;
+	x 		= x_pos;
+	y 		= y_pos;
 
 	ccw_caption 	= caption;
 	ccw_icon_name	= iconname;
-
+#ifdef DEBUG_CC
+	printf("[CComponentsWindow]   [%s - %d] icon name = %s\n", __func__, __LINE__, ccw_icon_name.c_str());
+#endif
 	shadow		= has_shadow;
 	col_frame	= color_frame;
 	col_body	= color_body;
@@ -110,6 +110,11 @@ void CComponentsWindow::initVarWindow(	const int& x_pos, const int& y_pos, const
 	initCCWItems();
 }
 
+void CComponentsWindow::doCenter(){
+	x = cc_parent ? cc_parent->getWidth() - width/2 : frameBuffer->getScreenWidth(true)/2 - width/2;
+	y = cc_parent ? cc_parent->getHeight() - height/2 : frameBuffer->getScreenHeight(true)/2 -height/2;
+}
+
 void CComponentsWindow::setWindowCaption(neutrino_locale_t locale_text, const int& align_mode)
 {
 	ccw_caption = g_Locale->getText(locale_text);
@@ -118,31 +123,39 @@ void CComponentsWindow::setWindowCaption(neutrino_locale_t locale_text, const in
 
 void CComponentsWindow::initHeader()
 {
-	if (ccw_head == NULL){
+	if (ccw_head == NULL)
 		ccw_head = new CComponentsHeader();
-		initHeader();
-		//add of header item happens initCCWItems()
-	}
-
+	//add of header item happens initCCWItems()
 	//set header properties //TODO: assigned properties with internal header objekt have no effect!
 	if (ccw_head){
 		ccw_head->setWidth(width-2*fr_thickness);
 // 		ccw_head->setPos(0, 0);
 		ccw_head->setIcon(ccw_icon_name);
 		ccw_head->setCaption(ccw_caption, ccw_align_mode);
-		ccw_head->initCCItems();
 		ccw_head->setDefaultButtons(ccw_buttons);
+		ccw_head->setCorner(corner_rad, CORNER_TOP);
+	}
+}
+
+void CComponentsWindow::initFooter()
+{
+	if (ccw_footer== NULL)
+		ccw_footer= new CComponentsFooter();
+	//add of footer item happens initCCWItems()
+	//set footer properties
+	if (ccw_footer){
+		ccw_footer->setPos(0, CC_APPEND);
+		ccw_footer->setWidth(width-2*fr_thickness);
+		ccw_footer->setShadowOnOff(shadow);
+		ccw_footer->setCorner(corner_rad, CORNER_BOTTOM);
 	}
 }
 
 void CComponentsWindow::initBody()
 {
-	if (ccw_body== NULL){
+	if (ccw_body== NULL)
 		ccw_body = new CComponentsForm();
-		initBody();
-		//add of body item happens initCCWItems()
-	}
-
+	//add of body item happens initCCWItems()
 	//set body properties
 	if (ccw_body){
 		ccw_body->setCornerType(0);
@@ -158,34 +171,16 @@ void CComponentsWindow::initBody()
 	}
 }
 
-void CComponentsWindow::initFooter()
-{
-	if (ccw_footer== NULL){
-		ccw_footer= new CComponentsFooter();
-		initFooter();
-		//add of footer item happens initCCWItems()
-	}
-
-	//set footer properties
-	if (ccw_footer){
-		ccw_footer->setPos(0, CC_APPEND);
-		ccw_footer->setWidth(width-2*fr_thickness);
-		ccw_footer->setShadowOnOff(shadow);
-	}
-}
-
-void CComponentsWindow::addWindowItem(CComponentsItem* cc_Item)
-{
-	if (ccw_body)
-		ccw_body->addCCItem(cc_Item);
-}
-
 void CComponentsWindow::initCCWItems()
 {
 #ifdef DEBUG_CC
 	printf("[CComponentsWindow]   [%s - %d] init items...\n", __func__, __LINE__);
 #endif
-	//add header if required
+	initHeader();
+	initFooter();
+	initBody();
+
+	//add/remove header if required
 	if (ccw_show_header){
 		initHeader();
 	}else{
@@ -195,7 +190,7 @@ void CComponentsWindow::initCCWItems()
 		}
 	}
 
-	//add footer if required
+	//add/remove footer if required
 	if (ccw_show_footer){
 		initFooter();
 	}else{
@@ -204,7 +199,6 @@ void CComponentsWindow::initCCWItems()
 			ccw_footer = NULL;
 		}
 	}
-	initBody();
 
 	//add header, body and footer items only one time
 	if (ccw_head)
@@ -216,6 +210,13 @@ void CComponentsWindow::initCCWItems()
 		if (!ccw_footer->isAdded())
 			addCCItem(ccw_footer);
 }
+
+void CComponentsWindow::addWindowItem(CComponentsItem* cc_Item)
+{
+	if (ccw_body)
+		ccw_body->addCCItem(cc_Item);
+}
+
 
 void CComponentsWindow::paint(bool do_save_bg)
 {
