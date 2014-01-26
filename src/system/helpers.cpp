@@ -293,7 +293,7 @@ bool get_mem_usage(unsigned long &kbtotal, unsigned long &kbfree)
 	return true;
 }
 
-std::string find_executable(const char *name)
+string find_executable(const char *name)
 {
 	struct stat s;
 	char *path = getenv("PATH");
