@@ -36,6 +36,7 @@
 
 #include <system/settings.h>
 #include <driver/screen_max.h>
+
 #include <gui/components/cc.h>
 #include <gui/widget/messagebox.h>
 #include <gui/widget/hintbox.h>
@@ -164,6 +165,7 @@ void CBookmarkManager::writeBookmarkFile() {
 
 CBookmarkManager::CBookmarkManager() : bookmarkfile ('\t')
 {
+	bookmarksmodified = false;
 	readBookmarkFile();
 }
 
@@ -457,9 +459,7 @@ void CBookmarkManager::paint()
 		if (sbc < 1)
 			sbc = 1;
 
-		float sbh= (sb- 4)/ sbc;
-
-		frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ int(page_nr * sbh) , 11, int(sbh),  COL_MENUCONTENT_PLUS_3);
+		frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ page_nr * (sb-4)/sbc, 11, (sb-4)/sbc,  COL_MENUCONTENT_PLUS_3);
 	}
 
 	paintFoot();

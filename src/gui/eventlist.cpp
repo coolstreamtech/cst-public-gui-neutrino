@@ -32,6 +32,7 @@
 #include <neutrino.h>
 #include <gui/eventlist.h>
 #include <gui/epgplus.h>
+
 #include <gui/timerlist.h>
 #include <gui/user_menue.h>
 
@@ -47,6 +48,7 @@
 
 #include <driver/screen_max.h>
 #include <driver/fade.h>
+
 
 #include <zapit/client/zapittools.h>
 #include <zapit/zapit.h>
@@ -281,7 +283,7 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 	infozone_width = full_width - width;
 
 	// init right info_zone
-	if (g_settings.eventlist_additional)
+	if ((g_settings.eventlist_additional) && (cc_infozone == NULL))
 		cc_infozone = new CComponentsText(x+width+10, y+theight, infozone_width-20, listmaxshow*fheight);
 
 	int res = menu_return::RETURN_REPAINT;
@@ -918,13 +920,11 @@ void CNeutrinoEventList::paint(t_channel_id channel_id)
 	frameBuffer->paintBoxRel(x+ width- 15,ypos, 15, sb,  COL_MENUCONTENT_PLUS_1);
 
 	int sbc= ((evtlist.size()- 1)/ listmaxshow)+ 1;
+	int sbs= (selected/listmaxshow);
 	if (sbc < 1)
 		sbc = 1;
 
-	float sbh= (sb- 4)/ sbc;
-	int sbs= (selected/listmaxshow);
-
-	frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ int(sbs* sbh) , 11, int(sbh),  COL_MENUCONTENT_PLUS_3);
+	frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ sbs * (sb-4)/sbc, 11, (sb-4)/sbc, COL_MENUCONTENT_PLUS_3);
 
 }
 
@@ -969,6 +969,7 @@ void  CNeutrinoEventList::showFunctionBar (bool show, t_channel_id channel_id)
 		buttons[btn_cnt].locale = LOCALE_EVENTFINDER_SEARCH; // search button
 		btn_cnt++;
 	}
+
 	// Button: Timer Channelswitch
 	if ((uint) g_settings.key_channelList_addremind != CRCInput::RC_nokey) {
 		if (!g_settings.minimode) {
