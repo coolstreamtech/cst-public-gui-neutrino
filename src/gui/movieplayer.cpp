@@ -508,6 +508,7 @@ void CMoviePlayerGui::PlayFile(void)
 
 	//CTimeOSD FileTime;
 	position = 0, duration = 0;
+	speed = 1;
 
 	playstate = CMoviePlayerGui::STOPPED;
 	printf("Startplay at %d seconds\n", startposition/1000);
@@ -574,7 +575,13 @@ void CMoviePlayerGui::PlayFile(void)
 
 		/* playback->Start() starts paused */
 		if(timeshift == 3) {
+			speed = -1;
 			playback->SetSpeed(-1);
+			playstate = CMoviePlayerGui::REW;
+			if (!FileTime.IsVisible() && !time_forced) {
+				FileTime.switchMode(position, duration);
+				time_forced = true;
+			}
 		} else if(!timeshift || !g_settings.timeshift_pause) {
 			playback->SetSpeed(1);
 		}

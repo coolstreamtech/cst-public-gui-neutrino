@@ -503,6 +503,7 @@ void CInfoViewer::showMovieTitle(const int playState, const t_channel_id &Channe
 	infoViewerBB->is_visible = true;
 
 	ChannelName = Channel;
+	t_channel_id old_channel_id = channel_id;
 	channel_id = Channel_Id;
 
 	/* showChannelLogo() changes this, so better reset it every time... */
@@ -582,6 +583,7 @@ void CInfoViewer::showMovieTitle(const int playState, const t_channel_id &Channe
 	loop(show_dot);
 	aspectRatio = 0;
 	fileplay = 0;
+	channel_id = old_channel_id;
 }
 
 void CInfoViewer::reset_allScala()
@@ -923,7 +925,8 @@ void CInfoViewer::loop(bool show_dot)
 					res = messages_return::cancel_info;
 				}
 			}
-		} else if (fileplay && !CMoviePlayerGui::getInstance().timeshift /* && ( (msg == (neutrino_msg_t) g_settings.mpkey_pause) || (msg == (neutrino_msg_t) g_settings.mpkey_rewind) || (msg == (neutrino_msg_t) g_settings.mpkey_play) || (msg == (neutrino_msg_t) g_settings.mpkey_forward) || (msg == (neutrino_msg_t) g_settings.mpkey_stop)) */ ) {
+		} else if (fileplay || CMoviePlayerGui::getInstance().timeshift) {
+
 			/* this debug message will only hit in movieplayer mode, where console is
 			 * spammed to death anyway... */
 			printf("%s:%d msg:%08lx, data: %08lx\n", __func__, __LINE__, (long)msg, (long)data);
@@ -941,6 +944,7 @@ void CInfoViewer::loop(bool show_dot)
 			CMoviePlayerGui::getInstance().start_timeshift = false;
                 }
 #endif
+#if 0
 		else if (CMoviePlayerGui::getInstance().timeshift && ((msg == (neutrino_msg_t) g_settings.mpkey_rewind)  || \
 									(msg == (neutrino_msg_t) g_settings.mpkey_forward) || \
 									(msg == (neutrino_msg_t) g_settings.mpkey_pause)   || \
@@ -951,6 +955,7 @@ void CInfoViewer::loop(bool show_dot)
 			g_RCInput->postMsg (msg, data);
 			res = messages_return::cancel_info;
                 }
+#endif
 	}
 
 	if (hideIt) {
@@ -1273,8 +1278,9 @@ int CInfoViewer::handleMsg (const neutrino_msg_t msg, neutrino_msg_data_t data)
 		} else if (data == lcdUpdateTimer) {
 //printf("CInfoViewer::handleMsg: lcdUpdateTimer\n");
 			if (is_visible) {
-				if (fileplay) {
+				if (fileplay || CMoviePlayerGui::getInstance().timeshift)
 					CMoviePlayerGui::getInstance().UpdatePosition();
+				if (fileplay) {
 					char runningRest[32]; // %d can be 10 digits max...
 					int curr_pos = CMoviePlayerGui::getInstance().GetPosition(); 
 					int duration = CMoviePlayerGui::getInstance().GetDuration();
