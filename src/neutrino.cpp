@@ -128,7 +128,6 @@
 
 int old_b_id = -1;
 CHintBox * reloadhintBox = 0;
-bool has_hdd;
 
 CInfoClock      *InfoClock;
 int allow_flash = 1;
@@ -2733,9 +2732,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 					break;
 				}
 			}
-			if(has_hdd) {
-				wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
-			}
+			wakeup_hdd(recordingDir);
 		}
 
 		if( g_settings.recording_zap_on_announce && (mode != mode_standby) && (eventinfo->channel_id != CZapit::getInstance()->GetCurrentChannelID())) {
@@ -2945,6 +2942,14 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 
 		return messages_return::handled;
 	}
+	else if (msg == NeutrinoMessages::EVT_SET_MUTE) {
+		g_audioMute->AudioMute((int)data, true);
+		return messages_return::handled;
+	}
+	else if (msg == NeutrinoMessages::EVT_SET_VOLUME) {
+		g_volume->setVolumeExt((int)data);
+		return messages_return::handled;
+	}
 	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
 		delete [] (unsigned char*) data;
 	
@@ -2981,7 +2986,9 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 		frameBuffer->paintBackground();
 		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/shutdown.jpg");
 
+		CEpgScan::getInstance()->Stop();
 		if(g_settings.epg_save /* && timeset && g_Sectionsd->getIsTimeSet ()*/) {
+			g_Sectionsd->setPauseScanning(true);
 			saveEpg(true);// true CVFD::MODE_SHUTDOWN
 		}
 		CVFD::getInstance()->setMode(CVFD::MODE_SHUTDOWN);
