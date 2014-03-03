@@ -64,6 +64,8 @@ struct SNeutrinoSettings
 	int current_volume_step;
 	int channel_mode;
 	int channel_mode_radio;
+	int channel_mode_initial;
+	int channel_mode_initial_radio;
 
 	//misc
 	int shutdown_real;
@@ -138,6 +140,7 @@ struct SNeutrinoSettings
 
 	std::string pref_lang[3];
 	std::string pref_subs[3];
+	std::string subs_charset;
 
 	// EPG
 	int epg_save;
@@ -479,6 +482,8 @@ struct SNeutrinoSettings
 	int channellist_show_channellogo;
 	int repeat_blocker;
 	int repeat_genericblocker;
+#define LONGKEYPRESS_OFF 499
+	int longkeypress_duration;
 	int remote_control_hardware;
 	int audiochannel_up_down_enable;
 
@@ -555,6 +560,7 @@ struct SNeutrinoSettings
 		FONT_TYPE_INFOBAR_SMALL,
 		FONT_TYPE_FILEBROWSER_ITEM,
 		FONT_TYPE_MENU_HINT,
+		FONT_TYPE_SUBTITLES,
 		FONT_TYPE_COUNT
 	};
 
@@ -787,6 +793,8 @@ class CScanSettings
 		std::string	cable_TP_freq;
 		std::string	cable_TP_rate;
 
+		std::string	terrName;
+		std::string	terr_TP_freq;
 		CScanSettings();
 
 		//void useDefaults(const delivery_system_t _delivery_system);

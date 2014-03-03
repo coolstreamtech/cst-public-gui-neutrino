@@ -85,7 +85,7 @@ void  wakeup_hdd(const char *hdd_dir)
 	if(!check_dir(hdd_dir) && hdd_get_standby(hdd_dir)){
 		string wakeup_file = hdd_dir;
 		wakeup_file += "/.wakeup";
-		int fd = open(wakeup_file.c_str(), O_SYNC | O_WRONLY | O_CREAT | O_TRUNC);
+		int fd = open(wakeup_file.c_str(), O_SYNC | O_WRONLY | O_CREAT | O_TRUNC, S_IWUSR);
 		if (fd >= 0) {
 			unsigned char buf[512];
 			memset(buf, 0xFF, sizeof(buf));
@@ -208,8 +208,8 @@ FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type)
 		close(pfd[1]);
 		if ((fp = fdopen(pfd[0], type)) == NULL)
 			return(NULL);
-		} else {
-			close(pfd[0]);
+	} else {
+		close(pfd[0]);
 		if ((fp = fdopen(pfd[1], type)) == NULL)
 			return(NULL);
 	}
@@ -404,6 +404,43 @@ time_t toEpoch(std::string &date)
 	return 0;
 
 }
+
+std::string& str_replace(const std::string &search, const std::string &replace, std::string &text)
+{
+	if (search.empty() || text.empty())
+		return text;
+
+	size_t searchLen = search.length();
+	while (1) {
+		size_t pos = text.find(search);
+		if (pos == std::string::npos)
+			break;
+		text.replace(pos, searchLen, replace);
+	}
+	return text;
+}
+
+std::string& htmlEntityDecode(std::string& text)
+{
+	struct decode_table {
+		const char* code;
+		const char* htmlCode;
+	};
+	decode_table dt[] =
+	{
+		{" ",  "&nbsp;"},
+		{"&",  "&amp;"},
+		{"<",  "&lt;"},
+		{">",  "&gt;"},
+		{"\"", "&quot;"},
+		{"'",  "&apos;"},
+		{NULL,  NULL}
+	};
+	for (int i = 0; dt[i].code != NULL; i++)
+		text = str_replace(dt[i].htmlCode, dt[i].code, text);
+
+	return text;
+}	
 
 CFileHelpers::CFileHelpers()
 {

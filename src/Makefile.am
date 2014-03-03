@@ -107,6 +107,7 @@ neutrino_LDADD = \
 	@CURL_LIBS@ \
 	@FREETYPE_LIBS@ \
 	@PNG_LIBS@ \
+	@BLURAY_LIBS@ \
 	@LIBCS_LIBS@ \
 	@AVFORMAT_LIBS@ \
 	@AVUTIL_LIBS@ \
@@ -141,6 +142,10 @@ neutrino_LDADD += -lca-ci -llnxtmvssUsr -llnxUKAL -llnxplatUsr -llnxtmasUsr -lln
 else
 neutrino_LDADD += -lnxp
 endif
+endif
+
+if BOXMODEL_APOLLO
+neutrino_LDADD += -liconv
 endif
 
 bin_PROGRAMS += drivertool

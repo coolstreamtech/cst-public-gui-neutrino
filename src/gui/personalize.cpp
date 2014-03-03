@@ -171,6 +171,7 @@
 #include "widget/keychooser.h"
 #include "color.h"
 #include "personalize.h"
+#include "plugins.h"
 
 #include <system/settings.h>
 
@@ -456,10 +457,23 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*
 
 	pluginSelectionMenu = new CMenuWidget(LOCALE_PERSONALIZE_USERMENU_PLUGIN_TYPES, NEUTRINO_ICON_SETTINGS);
 	pluginSelectionMenu->addIntroItems(LOCALE_MAINMENU_SETTINGS);
-	pluginSelectionMenu->addItem(new CMenuOptionChooser(LOCALE_MAINMENU_GAMES,   &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_GAMES],   OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	pluginSelectionMenu->addItem(new CMenuOptionChooser(LOCALE_MAINMENU_TOOLS,   &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_TOOLS],   OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	pluginSelectionMenu->addItem(new CMenuOptionChooser(LOCALE_MAINMENU_SCRIPTS, &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_SCRIPTS], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	pluginSelectionMenu->addItem(new CMenuOptionChooser(LOCALE_MAINMENU_LUA,     &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_LUA],     OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+
+	CMenuOptionChooser * /*oc = NULL;*/
+	oc = new CMenuOptionChooser(LOCALE_MAINMENU_GAMES, &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_GAMES], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	oc->setHint(NEUTRINO_ICON_HINT_PERSONALIZE, LOCALE_MENU_HINT_PLUGIN_TYPE_GAMES);
+	pluginSelectionMenu->addItem(oc);
+
+	oc = new CMenuOptionChooser(LOCALE_MAINMENU_TOOLS, &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_TOOLS], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	oc->setHint(NEUTRINO_ICON_HINT_PERSONALIZE, LOCALE_MENU_HINT_PLUGIN_TYPE_TOOLS);
+	pluginSelectionMenu->addItem(oc);
+
+	oc = new CMenuOptionChooser(LOCALE_MAINMENU_SCRIPTS, &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_SCRIPTS], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	oc->setHint(NEUTRINO_ICON_HINT_PERSONALIZE, LOCALE_MENU_HINT_PLUGIN_TYPE_SCRIPTS);
+	pluginSelectionMenu->addItem(oc);
+
+	oc = new CMenuOptionChooser(LOCALE_MAINMENU_LUA, &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE_LUA], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	oc->setHint(NEUTRINO_ICON_HINT_PERSONALIZE, LOCALE_MENU_HINT_PLUGIN_TYPE_LUA);
+	pluginSelectionMenu->addItem(oc);
 
 	p_widget->addItem(new CMenuForwarder(LOCALE_PERSONALIZE_USERMENU_PLUGIN_TYPES, true, NULL, pluginSelectionMenu));
 }
@@ -860,7 +874,7 @@ void CPersonalizeGui::addPersonalizedItems()
 				//convert item to locked forwarder and use generated pin mode for usage as ask parameter 
 				v_item[i].menuItem = new CLockedMenuForwarder(fw->getTextLocale(), 
 						g_settings.easymenu ? g_settings.parentallock_pincode : g_settings.personalize_pincode,
-						use_pin, fw->active, NULL, fw->getTarget(), fw->getActionKey().c_str(), d_key, fw->iconName.c_str(), lock_icon);
+						use_pin, fw->active, NULL, fw->getTarget(), fw->getActionKey(), d_key, fw->iconName.c_str(), lock_icon);
 				v_item[i].menuItem->hintIcon = fw->hintIcon;
 				v_item[i].menuItem->hint = fw->hint;
 				//add item if it's set to visible or pin protected and allow to add an forwarder as next

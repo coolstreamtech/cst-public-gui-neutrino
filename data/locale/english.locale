@@ -240,6 +240,7 @@ channellist.nonefound No channels were found!\nPlease execute a scan\n(MENU-key 
 channellist.numeric_adjust Numeric zap adjust
 channellist.provs Providers
 channellist.recording_not_possible Recording not possible!
+channellist.remember Last used
 channellist.reset_all Reset 'new' flag for all channels
 channellist.reset_flags Reset 'new' channel flag
 channellist.sats Satellites
@@ -571,6 +572,7 @@ fontmenu.gamelist Gamelist
 fontmenu.head Font settings
 fontmenu.infobar Infobar
 fontmenu.menu Menu
+fontmenu.other Other
 fontmenu.scaling Global Font Zoom Factor
 fontmenu.scaling_x Horizontal (in %)
 fontmenu.scaling_x_hint2 Horizontal (in %) min 50 / max 200
@@ -599,10 +601,11 @@ fontsize.infobar_channame Channel name
 fontsize.infobar_info info
 fontsize.infobar_number Number
 fontsize.infobar_small Small
-fontsize.menu Menutext
+fontsize.menu Menu text
 fontsize.menu_hint Menu hints
 fontsize.menu_info Menu Info
 fontsize.menu_title Menu Title
+fontsize.subtitles Text subtitles
 hdd_10min 10 min.
 hdd_1min 1 min.
 hdd_20min 20 min.
@@ -612,18 +615,18 @@ hdd_60min 60 min.
 hdd_activate Apply settings
 hdd_check Check filesystem
 hdd_check_failed HDD-check failed!
-hdd_ext3 ext3
+hdd_check_format_bad Checking of disks with format %s is not supported.
 hdd_extended_settings Extended HDD-Settings
 hdd_fast Fast
 hdd_format Formating drive...
 hdd_format_failed Formating failed!
 hdd_format_warn Start format...
-hdd_fs Filesystem
+hdd_fs Filesystem used to format
+hdd_fs_unknown unknown
 hdd_manage Manage drives
 hdd_middle Mid
 hdd_noise Acoustic-control (AAM)
 hdd_not_found No HDD found
-hdd_reiser ReiserFS
 hdd_removable_device Removable device
 hdd_settings Hard Disk Drive/USB
 hdd_sleep Switch off after...
@@ -674,6 +677,7 @@ keybindingmenu.channellist Channellist
 keybindingmenu.channelup channel up
 keybindingmenu.head Edit Keybindings
 keybindingmenu.lastchannel Quick Zap
+keybindingmenu.longkeypress_duration Long key-press
 keybindingmenu.misc Misc
 keybindingmenu.mode_left_right_key_tv Left/Right Key Behavior in TV-Mode
 keybindingmenu.mode_left_right_key_tv_infobar Show Infobar
@@ -817,6 +821,8 @@ menu.hint_channellist_epg_align EPG event align
 menu.hint_channellist_extended Show current event progress bar
 menu.hint_channellist_fonts Change channel list font sizes
 menu.hint_channellist_foot Show additional information\nin bottom box
+menu.hint_channellist_mode Use the selected channel list mode on startup if last mode is TV
+menu.hint_channellist_mode_radio Use the selected channel list mode on startup if last mode is Radio
 menu.hint_channellist_setup Configure channel list GUI options
 menu.hint_channellist_show_channellogo Show channellogos in channel list
 menu.hint_channels Open channel list
@@ -863,6 +869,7 @@ menu.hint_games Show list of installed games
 menu.hint_hdd Format / check hard disk drive
 menu.hint_hdd_apply Apply sleep/noise parameters
 menu.hint_hdd_check Check filesystem (fsck)
+menu.hint_hdd_fmt Select the disk format
 menu.hint_hdd_format Create HDD partition and format it
 menu.hint_hdd_noise Set Automatic Acoustic Management\nnot all drives support this
 menu.hint_hdd_sleep Select time to stop hdd on inactivity
@@ -931,6 +938,7 @@ menu.hint_key_pic_size_active Disable/enable key for the 4:3 display behavior
 menu.hint_key_pip_close Assign button to stop PiP\nor start it for current channel
 menu.hint_key_pip_setup Assign button to configure PiP
 menu.hint_key_pip_swap Assign button to swap PiP and live channel
+menu.hint_key_plugin Assign button to execute the one touch plugin
 menu.hint_key_poweroff Assign button to switch power state\n (standby/deepstandby <-> running)
 menu.hint_key_quickzap Configure keybingdings for quick\nchannel switch
 menu.hint_key_repeatblock Delay after button press and before\nfirst key repeat
@@ -957,6 +965,7 @@ menu.hint_leds_record LEDs state when box recording
 menu.hint_leds_standby LEDs state in soft-standby mode
 menu.hint_leds_tv Working LEDs state
 menu.hint_load Load Neutrino-HD GUI settings from file
+menu.hint_longkeypress_duration A key press will be considered as "long key press" if it's pressed longer than the specified time.
 menu.hint_lua Run Plugins
 menu.hint_make_hdlist Auto-create HD channel list based on\nchannel type and name
 menu.hint_make_newlist Create list of recently added channels
@@ -976,6 +985,7 @@ menu.hint_misc_filebrowser Filesystem encoding, file rights\ndeny directory leav
 menu.hint_misc_general Start to standby, cache teletext, swp rotor\nplugin hdd dir
 menu.hint_misc_zapit Initial TV/Radio channels
 menu.hint_movie Play movies
+menu.hint_movieplayer_plugin Choose a plugin that's executed with the one touch key in movieplayer mode
 menu.hint_net_broadcast Enter broadcast address\nif unsure, use IP address with last .255
 menu.hint_net_dhcp Use DHCP server to auto-configure
 menu.hint_net_djmount Mount UPnP devices as filesystem\nunder /media/00upnp
@@ -1011,6 +1021,7 @@ menu.hint_net_xupnpd Share live channels over UPNP
 menu.hint_network IP address, gateway, DNS, Time sync\nNetwork shares and services
 menu.hint_new_zap_mode Allow channel switch while browsing\n(toggle mode with 'mute' in channel list)
 menu.hint_numeric_adjust Adjust channel list mode on numeric zap
+menu.hint_onekey_plugin Choose a plugin that's executed with the one touch key
 menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
@@ -1024,6 +1035,10 @@ menu.hint_pictureviewer_defdir Default picture viewer directory
 menu.hint_pictureviewer_scaling Picture scaling algorithm
 menu.hint_pictureviewer_slide_time Slideshow interval, in seconds
 menu.hint_picview View pictures
+menu.hint_plugin_type_games Show games in usermenu at selection 'Plugin types'
+menu.hint_plugin_type_lua Show plugins in usermenu at selection 'Plugin types'
+menu.hint_plugin_type_scripts Show scripts in usermenu at selection 'Plugin types'
+menu.hint_plugin_type_tools Show tools in usermenu at selection 'Plugin types'
 menu.hint_plugins_hdd_dir Select directory to load\nplugins from
 menu.hint_power_leds Configure power-button LEDs behavior
 menu.hint_pref_lang Select preferred audio and EPG language\nselect 'none' to disable
@@ -1465,10 +1480,12 @@ movieplayer.bookmark Bookmarks
 movieplayer.bookmarkname Bookmarkname
 movieplayer.bookmarkname_hint1 Enter a name for your new bookmark
 movieplayer.bookmarkname_hint2 
+movieplayer.chapters Chapters
 movieplayer.defplugin Start-Plugin
 movieplayer.fileplayback File play
 movieplayer.head Movieplayer
 movieplayer.starting Starting playback...
+movieplayer.titles Titles
 movieplayer.toomanybookmarks There are too many bookmarks.\nYou need to delete one of them first.
 movieplayer.tshelp1 Stop
 movieplayer.tshelp10 approx. 10 minutes back
@@ -1489,7 +1506,7 @@ mpkey.bookmark save bookmark
 mpkey.forward Forward
 mpkey.pause Pause
 mpkey.play Play
-mpkey.plugin Run plugin
+mpkey.plugin Movieplayer plugin
 mpkey.rewind Rewind
 mpkey.stop Stop
 mpkey.subtitle Subtitles
@@ -1735,9 +1752,9 @@ satsetup.fastscan_prov_tvv TV Vlaanderen
 satsetup.fastscan_sd SD only
 satsetup.fastscan_type Scan type
 satsetup.fe_mode Tuner mode
-satsetup.fe_mode_independent Independent
+satsetup.fe_mode_independent Independent / TWIN Monoblock
 satsetup.fe_mode_link_loop Loop
-satsetup.fe_mode_link_twin TWIN
+satsetup.fe_mode_link_twin TWIN LNB
 satsetup.fe_mode_master Master
 satsetup.fe_mode_unused Unused
 satsetup.fe_setup Setup tuner
@@ -1775,6 +1792,7 @@ scants.abort_body Should the search really be aborted?
 scants.abort_header Abortion of channel scan
 scants.actcable Cable:
 scants.actsatellite Satellite:
+scants.actterrestrial Terrestrial:
 scants.bouquet Bouquet
 scants.bouquet_create create new
 scants.bouquet_erase erase old
@@ -1866,8 +1884,11 @@ streaming.slow System/hdd too slow, consider to stop some records
 streaming.write_error The recording was aborted,\nsince an error occured during the writing process.
 stringinput.caps caps / no caps
 stringinput.clear clear all
+subtitles.charset Charset
 subtitles.head Subtitles
 subtitles.stop Stop subtitles
+terrestrialsetup.area Area
+terrestrialsetup.provider Terrestrial Provider
 timer.eventrecord.msg The event is scheduled for recording.\nTo edit the schedule open the timer list.
 timer.eventrecord.title Schedule Record
 timer.eventtimed.msg The event is scheduled.\nThe box will power on and \nswitch to this channel at the given time.
@@ -2047,6 +2068,8 @@ zapit.scantype.all all services
 zapit.scantype.radio only radio
 zapit.scantype.tv only tv
 zapit.scantype.tvradio tv & radio
+zapitsetup.channelmode Initial TV channel list
+zapitsetup.channelmode_radio Initial Radio channel list
 zapitsetup.head Start Channel Settings
 zapitsetup.info Start Channel
 zapitsetup.last_radio Radio Channel

@@ -162,8 +162,6 @@ class CMenuItem
 		
 		virtual void paintItemButton(const bool select_mode, const int &item_height, const std::string& icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
 		
-		virtual void paintItemBackground (const bool select_mode, const int &item_height);
-		
 		virtual void prepareItem(const bool select_mode, const int &item_height);
 
 		virtual void setItemButton(const std::string& icon_Name, const bool is_select_button = false);
@@ -245,7 +243,7 @@ class CMenuForwarder : public CMenuItem
 	int getWidth(void);
 	neutrino_locale_t getTextLocale() const {return name;}
 	CMenuTarget* getTarget() const {return jumpTarget;}
-	std::string getActionKey(){return actionKey;}
+	const char *getActionKey(){return actionKey.c_str();}
 
 	int exec(CMenuTarget* parent);
 	bool isSelectable(void) const { return active; }
@@ -442,29 +440,6 @@ class CMenuOptionStringChooser : public CMenuItem
 		void sortOptions();
 		int exec(CMenuTarget* parent);
 		int isMenueOptionChooser(void) const{return 1;}
-};
-
-class CMenuOptionLanguageChooser : public CMenuItem
-{
-		int                      height;
-		std::string		 optionValue;
-		CChangeObserver *        observ;
-
-	public:
-		CMenuOptionLanguageChooser(char* OptionValue, CChangeObserver* Observ = NULL, const char * const IconName = NULL);
-		~CMenuOptionLanguageChooser();
-
-		int paint(bool selected);
-		int getHeight(void) const
-		{
-			return height;
-		}
-		bool isSelectable(void) const
-		{
-			return true;
-		}
-
-		int exec(CMenuTarget* parent);
 };
 
 class CMenuGlobal
