@@ -41,8 +41,10 @@ using namespace std;
 
 
 CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, const int& w, const int& h,
-						const char* format_str,
+						const char* prformat_str,
+						const char* secformat_str,
 						bool activ,
+						const int& interval_seconds,
 						CComponentsForm* parent,
 						bool has_shadow,
 						fb_pixel_t color_frame, fb_pixel_t color_body, fb_pixel_t color_shadow)
@@ -68,10 +70,10 @@ CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, c
 
 	cl_col_text	= COL_MENUCONTENT_TEXT;
 
-	cl_format_str	= cl_blink_str = format_str;
+	setClockFormat(prformat_str, secformat_str);
 
 	cl_align	= CC_ALIGN_VER_CENTER | CC_ALIGN_HOR_CENTER;
-	cl_interval	= 1;
+	cl_interval	= interval_seconds;
 	cl_timer 	= NULL;
 	
 	paintClock	= false;

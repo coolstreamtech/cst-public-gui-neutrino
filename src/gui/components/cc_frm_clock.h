@@ -94,7 +94,9 @@ class CComponentsFrmClock : public CComponentsForm
 	public:
 		CComponentsFrmClock( 	const int& x_pos = 1, const int& y_pos = 1, const int& w = 200, const int& h = 48,
 					const char* format_str = "%H:%M",
+					const char* secformat_str = NULL,
 					bool activ=false,
+					const int& interval_seconds = 1,
 					CComponentsForm *parent = NULL,
 					bool has_shadow = CC_SHADOW_OFF,
 					fb_pixel_t color_frame = COL_LIGHT_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);

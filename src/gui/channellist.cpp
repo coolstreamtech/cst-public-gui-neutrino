@@ -2123,12 +2123,8 @@ void CChannelList::paintHead()
 
 	if (g_Sectionsd->getIsTimeSet()) {
 		if (headerClock == NULL) {
-			headerClock = new CComponentsFrmClock(0, 0, 0, 0, "%H:%M");
-			headerClock->setClockFormat("%H:%M", "%H %M");
-			headerClock->setClockIntervall(1);
-
+			headerClock = new CComponentsFrmClock(0, 0, 0, 0, "%H:%M", "%H %M", false, 1);
 		}
-		headerClock->setClockFormat("%H:%M", "%H %M");
 		headerClock->setClockFont(SNeutrinoSettings::FONT_TYPE_MENU_TITLE);
 		headerClock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
 		headerClock->setYPos(y);
