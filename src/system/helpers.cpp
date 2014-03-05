@@ -319,7 +319,7 @@ string find_executable(const char *name)
 		path = strdupa("/bin:/usr/bin:/sbin:/usr/sbin");
 	if (name[0] == '/') { /* full path given */
 		if (!access(name, X_OK) && !stat(name, &s) && S_ISREG(s.st_mode))
-			return std::string(name);
+			return string(name);
 		return "";
 	}
 
@@ -329,7 +329,7 @@ string find_executable(const char *name)
 		if (n)
 			*n++ = '\0';
 		if (*p != '\0') {
-			std::string tmp = std::string(p) + "/" + std::string(name);
+			string tmp = string(p) + "/" + string(name);
 			const char *f = tmp.c_str();
 			if (!access(f, X_OK) && !stat(f, &s) && S_ISREG(s.st_mode))
 				return tmp;
@@ -393,7 +393,7 @@ string trim(string &str, const string &trimChars /*= " \n\r\t"*/)
 	return result.erase(0, result.find_first_not_of(trimChars));
 }
 
-time_t toEpoch(std::string &date)
+time_t toEpoch(string &date)
 {
 	struct tm t;
 	memset(&t, 0, sizeof(t));
@@ -405,7 +405,7 @@ time_t toEpoch(std::string &date)
 
 }
 
-std::string& str_replace(const std::string &search, const std::string &replace, std::string &text)
+string& str_replace(const string &search, const string &replace, string &text)
 {
 	if (search.empty() || text.empty())
 		return text;
@@ -413,14 +413,14 @@ std::string& str_replace(const std::string &search, const std::string &replace, 
 	size_t searchLen = search.length();
 	while (1) {
 		size_t pos = text.find(search);
-		if (pos == std::string::npos)
+		if (pos == string::npos)
 			break;
 		text.replace(pos, searchLen, replace);
 	}
 	return text;
 }
 
-std::string& htmlEntityDecode(std::string& text)
+string& htmlEntityDecode(string& text)
 {
 	struct decode_table {
 		const char* code;
