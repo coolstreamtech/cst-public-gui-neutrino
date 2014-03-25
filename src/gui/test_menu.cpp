@@ -485,9 +485,12 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			header->addContextButton(NEUTRINO_ICON_BUTTON_RED);
 			header->addContextButton(CComponentsHeader::CC_BTN_HELP | CComponentsHeader::CC_BTN_EXIT | CComponentsHeader::CC_BTN_MENU);
 		}
-		else	//For existing instances it's recommended to remove old button icons before add new buttons,
+		else{	//For existing instances it's recommended to remove old button icons before add new buttons,
 			//otherwise icons will be appended to already existant icons, alternatively use the setContextButton() methode
  			header->removeContextButtons();
+			//enable clock in header with default format
+			header->enableClock();
+		}
 
 //		example to manipulate header items
 // 		header->setFrameThickness(5);
@@ -642,7 +645,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey == "clock"){
 		if (clock == NULL){
-			clock = new CComponentsFrmClock(100, 50, 0, 50, "%H:%M", false);
+			clock = new CComponentsFrmClock(100, 50, 0, 50, "%d.%m.%Y-%H:%M", false);
 			clock->setClockFont(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
 		}
 
