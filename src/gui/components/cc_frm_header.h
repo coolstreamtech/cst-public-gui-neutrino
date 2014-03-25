@@ -29,6 +29,7 @@
 #include "cc_item_picture.h"
 #include "cc_item_text.h"
 #include "cc_frm_icons.h"
+#include "cc_frm_clock.h"
 
 //! Sub class of CComponentsForm. Shows a header with prepared items.
 /*!
@@ -55,6 +56,8 @@ class CComponentsHeader : public CComponentsForm
 		CComponentsText * cch_text_obj;
 		///object: context button object, see also addContextButton(), removeContextButtons()
 		CComponentsIconForm * cch_btn_obj;
+		///object: clock object
+		CComponentsFrmClock * cch_cl_obj;
 
 		///property: caption text, see also setCaption()
 		std::string cch_text;
@@ -71,6 +74,8 @@ class CComponentsHeader : public CComponentsForm
 		int cch_icon_x;
 		///property: internal width for icon object
 		int cch_icon_w;
+		///property: internal width for clock object
+		int cch_clock_w;
 		///property: internal x-position for caption object
 		int cch_text_x;
 		///property: internal offset of context button icons within context button object
@@ -83,6 +88,10 @@ class CComponentsHeader : public CComponentsForm
 		int cch_size_mode;
 		///property: alignment of caption within header, see also setCaptionAlignment(), possible values are CTextBox::CENTER, default = CTextBox::NO_AUTO_LINEBREAK (left)
 		int cch_caption_align;
+		///property: enable/disable of clock, see also enableClock()
+		int cch_cl_enable;
+		///property: clock format
+		const char* cch_cl_format;
 
 		///init font object and recalculates height if required
 		void initCaptionFont(Font* font = NULL);
@@ -92,6 +101,8 @@ class CComponentsHeader : public CComponentsForm
 		void initCaption();
 		///sub: init context button object
 		void initButtons();
+		///sub: init clock object
+		void initClock();
 
 	public:
 		enum
@@ -174,6 +185,9 @@ class CComponentsHeader : public CComponentsForm
 		virtual void initCCItems();
 		///returns the text object
 		virtual CComponentsText* getTextObject(){return cch_text_obj;};
+
+		///enable display of clock, parameter bool enable, const char* format
+		virtual void enableClock(bool enable = true, const char* format = "%H:%M"){cch_cl_enable = enable; cch_cl_format = format;};
 
 		///paint header
 		virtual void paint(bool do_save_bg = CC_SAVE_SCREEN_YES);

@@ -33,6 +33,12 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------------
+
+//	x/y	    width
+//	+---------------------------------------------------------+
+//	||icon |caption                    |clock|context buttons||height
+//	+---------------------------------------------------------+
+
 //sub class CComponentsHeader inherit from CComponentsForm
 CComponentsHeader::CComponentsHeader(CComponentsForm* parent)
 {
@@ -107,14 +113,19 @@ void CComponentsHeader::initVarHeader(	const int& x_pos, const int& y_pos, const
 	cch_icon_obj		= NULL;
 	cch_text_obj		= NULL;
 	cch_btn_obj		= NULL;
+	cch_cl_obj		= NULL;
 	cch_col_text		= COL_MENUHEAD_TEXT;
 	cch_caption_align	= CTextBox::NO_AUTO_LINEBREAK;
 	cch_items_y 		= 0;
 	cch_offset		= 8;
 	cch_icon_x 		= cch_offset;
 	cch_icon_w		= 0;
+	cch_clock_w		= 0;
 	cch_text_x		= cch_offset;
 	cch_buttons_space	= cch_offset;
+
+	cch_cl_enable 		= false;
+	cch_cl_format		= "%H:%M";
 
 	addContextButton(buttons);
 	initCCItems();
@@ -221,7 +232,7 @@ void CComponentsHeader::initIcon()
 		//global adapt height
 		height = max(height, cch_icon_obj->getHeight());
 
-		//re-align height of icon object
+		//re-assign height of icon object, for the case of changed height
 		cch_icon_obj->setHeight(height);
 	}
 }
@@ -301,6 +312,47 @@ void CComponentsHeader::initButtons()
 	}
 }
 
+void CComponentsHeader::initClock()
+{
+	//create instance for header clock object and add to container
+	if (cch_cl_obj == NULL){
+		dprintf(DEBUG_DEBUG, "[CComponentsHeader]\n    [%s - %d] init clock...\n", __func__, __LINE__);
+		cch_cl_obj = new CComponentsFrmClock(0, cch_items_y, 0, height, cch_cl_format, false, this);
+		cch_cl_obj->doPaintBg(false);
+	}
+
+	//set clock form properties
+	if (cch_cl_obj){
+		cch_cl_obj->setDimensionsAll(0, cch_items_y, 0, height);
+
+		//disallow paint of clock, if disabled and exit method
+		if (!cch_cl_enable){
+			cch_cl_obj->allowPaint(false);
+			return;
+		}
+		else
+			cch_cl_obj->allowPaint(true);
+
+		//assign time size and format
+		cch_cl_obj->setClockFontSize(cch_font->getHeight());
+		cch_cl_obj->setClockFormat(cch_cl_format);
+
+		//set corner mode of button item
+		int cc_btn_corner_type = corner_type;
+		if (corner_type == CORNER_TOP_RIGHT || corner_type == CORNER_TOP)
+			cc_btn_corner_type = CORNER_TOP_RIGHT;
+		else
+			cc_btn_corner_type = CORNER_RIGHT;
+		cch_cl_obj->setCorner(corner_rad-fr_thickness, cc_btn_corner_type);
+
+		//global adapt height
+		height = max(height, cch_cl_obj->getHeight());
+
+		//re-assign height of clock object, for the case of changed height
+		cch_cl_obj->setHeight(height);
+	}
+}
+
 void CComponentsHeader::initCaption()
 {
 	//recalc header text position if header icon is defined
@@ -311,31 +363,50 @@ void CComponentsHeader::initCaption()
 
 	//calc width of text object in header
 	cc_text_w = width-cch_text_x-cch_offset;
+
+	//context buttons
 	int buttons_w = 0;
 	if (cch_btn_obj){
 		//get width of buttons object
-		buttons_w = cch_btn_obj->getWidth();
+		buttons_w = cch_btn_obj->empty() ? 0 : cch_btn_obj->getWidth();
+
 		//set x position of buttons
 		cch_btn_obj->setXPos(width - buttons_w);
+
+		//set required width of caption object
+		cc_text_w -= (buttons_w + cch_offset);
 	}
-	//set required width of caption object
-	cc_text_w -= buttons_w-cch_offset;
+
+	//clock
+	int clock_w = 0;
+	if (cch_cl_obj){
+		//refresh clock properties
+		cch_cl_obj->refresh();
+
+		//get width of clock object
+		clock_w = cch_cl_enable ? cch_cl_obj->getWidth() : 0;
+
+		//set x position of clock
+		cch_cl_obj->setXPos(width - buttons_w - clock_w - cch_offset);
+
+		//set required width of caption object
+		cc_text_w -= (clock_w + cch_offset);
+	}
+
 
 	//create cch_text_obj and add to collection
 	if (cch_text_obj == NULL){
 		dprintf(DEBUG_DEBUG, "[CComponentsHeader]\n    [%s - %d] init header text: %s [ x %d w %d ]\n", __func__, __LINE__, cch_text.c_str(), cch_text_x, cc_text_w);
-		cch_text_obj = new CComponentsText();
+		cch_text_obj = new CComponentsText(this);
 	}
-
-	//add text item
-	if (!cch_text_obj->isAdded())
-		addCCItem(cch_text_obj); //text
 
 	//set header text properties
 	if (cch_text_obj){
-			//set alignment of text item in dependency from text alignment
+		//set alignment of text item in dependency from text alignment
 		if (cch_caption_align == CTextBox::CENTER)
 			cch_text_x = CC_CENTERED;
+
+		//assign general properties
 		cch_text_obj->setDimensionsAll(cch_text_x, cch_items_y, cc_text_w, height);
 		cch_text_obj->doPaintBg(true);
 		cch_text_obj->setText(cch_text, cch_caption_align, cch_font);
@@ -345,6 +416,10 @@ void CComponentsHeader::initCaption()
 
 		//corner of text item
 		cch_text_obj->setCorner(corner_rad-fr_thickness, corner_type);
+
+		//synchronize clock color with caption color
+		if (cch_cl_obj)
+			cch_cl_obj->setTextColor(cch_col_text);
 
 		/*
 		   global adapt height not needed here again
@@ -364,6 +439,9 @@ void CComponentsHeader::initCCItems()
 
 	//init buttons
 	initButtons();
+
+	//init clock
+	initClock();
 
 	//init text
 	initCaption();
