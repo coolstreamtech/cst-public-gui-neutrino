@@ -126,6 +126,8 @@ void CComponentsHeader::initVarHeader(	const int& x_pos, const int& y_pos, const
 
 	cch_cl_enable 		= false;
 	cch_cl_format		= "%H:%M";
+	cch_cl_sec_format 	= cch_cl_format;
+	cch_cl_run		= false;
 
 	addContextButton(buttons);
 	initCCItems();
@@ -312,6 +314,23 @@ void CComponentsHeader::initButtons()
 	}
 }
 
+
+void CComponentsHeader::enableClock(bool enable, const char* format, const char* sec_format_str, bool run)
+{
+	cch_cl_enable	= enable;
+	cch_cl_format 	= format;
+	if (sec_format_str)
+		cch_cl_sec_format = sec_format_str;
+	cch_cl_run 	= run;
+	initClock();
+}
+
+
+void CComponentsHeader::disableClock()
+{
+	enableClock(false, cch_cl_format, cch_cl_sec_format, false);
+}
+
 void CComponentsHeader::initClock()
 {
 	//create instance for header clock object and add to container
@@ -328,6 +347,7 @@ void CComponentsHeader::initClock()
 		//disallow paint of clock, if disabled and exit method
 		if (!cch_cl_enable){
 			cch_cl_obj->allowPaint(false);
+			cch_cl_obj->setClockActiv(false);
 			return;
 		}
 		else
@@ -336,6 +356,7 @@ void CComponentsHeader::initClock()
 		//assign time size and format
 		cch_cl_obj->setClockFontSize(cch_font->getHeight());
 		cch_cl_obj->setClockFormat(cch_cl_format);
+		cch_cl_obj->setClockBlink(cch_cl_sec_format);
 
 		//set corner mode of button item
 		int cc_btn_corner_type = corner_type;
@@ -350,6 +371,12 @@ void CComponentsHeader::initClock()
 
 		//re-assign height of clock object, for the case of changed height
 		cch_cl_obj->setHeight(height);
+
+		cch_cl_obj->setClockActiv(cch_cl_run);
+		if (cch_cl_run)
+			cch_cl_obj->Start();
+		else 
+			cch_cl_obj->Stop();
 	}
 }
 

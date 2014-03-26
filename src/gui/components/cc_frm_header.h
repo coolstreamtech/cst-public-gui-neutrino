@@ -92,6 +92,10 @@ class CComponentsHeader : public CComponentsForm
 		int cch_cl_enable;
 		///property: clock format
 		const char* cch_cl_format;
+		///property: secondary clock format
+		const char* cch_cl_sec_format;
+		///property: enable running clock
+		bool cch_cl_run;
 
 		///init font object and recalculates height if required
 		void initCaptionFont(Font* font = NULL);
@@ -186,11 +190,18 @@ class CComponentsHeader : public CComponentsForm
 		///returns the text object
 		virtual CComponentsText* getTextObject(){return cch_text_obj;};
 
-		///enable display of clock, parameter bool enable, const char* format
-		virtual void enableClock(bool enable = true, const char* format = "%H:%M"){cch_cl_enable = enable; cch_cl_format = format;};
+		///enable display of clock, parameter bool enable, const char* format, bool run
+		virtual void enableClock(bool enable = true, const char* format = "%H:%M", const char* sec_format_str = NULL, bool run = false);
+		///disable clock, without parameter
+		virtual void disableClock();
 
 		///paint header
 		virtual void paint(bool do_save_bg = CC_SAVE_SCREEN_YES);
+
+		///hides item, arg: no_restore see hideCCItem()
+		virtual void hide(bool no_restore = false){disableClock(); CComponentsItem::hide(no_restore);};
+		///erase current screen without restore of background, it's similar to paintBackgroundBoxRel() from CFrameBuffer
+		virtual void kill(){disableClock();};
 };
 
 //! Sub class of CComponentsHeader.
