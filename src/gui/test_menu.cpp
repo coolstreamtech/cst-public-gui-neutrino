@@ -489,7 +489,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			//otherwise icons will be appended to already existant icons, alternatively use the setContextButton() methode
  			header->removeContextButtons();
 			//enable clock in header with default format
-			header->enableClock();
+			header->enableClock(true, "%H:%M", "%H %M", true);
 		}
 
 //		example to manipulate header items
@@ -527,10 +527,13 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 // 		header->insertCCItem(1, logo); //replace text with logo
 
 		
-		if (!header->isPainted())
+		if (!header->isPainted()){
 			header->paint();
-		else
+		}
+		else{
 			header->hide();
+		}
+			
 		return res;
 	}
 	else if (actionKey == "footer"){
