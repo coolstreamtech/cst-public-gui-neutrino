@@ -89,9 +89,7 @@ extern bool autoshift;
 extern CBouquetManager *g_bouquetManager;
 extern int old_b_id;
 
-
-static CComponentsFrmClock *headerClock = NULL;
-static int headerClockWidth = 0;
+static CComponentsHeader *header = NULL;
 
 CChannelList::CChannelList(const char * const pName, bool phistoryMode, bool _vlist)
 {
@@ -134,13 +132,8 @@ CChannelList::~CChannelList()
 		delete 	cc_minitv;
 		cc_minitv = NULL;
 	}
-	if (headerClock) {
-		headerClock->Stop();
-		if (headerClock->isPainted())
-			headerClock->hide();
-		delete headerClock;
-		headerClock = NULL;
-	}
+	delete header;
+	header = NULL;
 }
 void CChannelList::ClearList(void)
 {
@@ -988,8 +981,8 @@ int CChannelList::show()
 		printf("CChannelList:: bouquetList->exec res %d\n", res);
 	}
 
-	if (headerClock)
-		headerClock->Stop();
+// 	if (header)
+// 		header->disableClock();
 
 	if(NeutrinoMessages::mode_ts == CNeutrinoApp::getInstance()->getMode())
 		return -1;
@@ -1011,10 +1004,9 @@ void CChannelList::hide()
 			delete cc_minitv;
 		cc_minitv = NULL;
 	}
-	if (headerClock) {
-		headerClock->Stop();
-		headerClock->kill();
-	}
+
+	header->kill();
+
 	frameBuffer->paintBackgroundBoxRel(x, y, full_width, height + info_height);
 	clearItem2DetailsLine();
 }
@@ -2118,29 +2110,38 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 
 void CChannelList::paintHead()
 {
-	CComponentsHeader header(x, y, full_width, theight, name /*no header icon*/);
-	header.paint(CC_SAVE_SCREEN_NO);
+	if (header == NULL)
+		header = new CComponentsHeader();
+	header->setDimensionsAll(x, y, full_width, theight);
+	header->setCaption(name);
+	if (g_Sectionsd->getIsTimeSet())
+		header->enableClock(true, "%H:%M", "%H %M", true);
+	header->paint(CC_SAVE_SCREEN_NO);
 
-	if (g_Sectionsd->getIsTimeSet()) {
-		if (headerClock == NULL) {
-			headerClock = new CComponentsFrmClock(0, 0, 0, 0, "%H:%M", "%H %M", false, 1);
-		}
-		headerClock->setClockFont(SNeutrinoSettings::FONT_TYPE_MENU_TITLE);
-		headerClock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
-		headerClock->setYPos(y);
-		headerClock->setHeight(theight);
-		headerClock->setTextColor(header.getTextObject()->getTextColor());
-		headerClock->setColorBody(header.getColorBody());
-		headerClock->refresh();
-		headerClockWidth = headerClock->getWidth();
-		headerClock->setXPos(x + full_width - headerClockWidth - 10);
-		headerClockWidth += 6;
-
-		headerClock->Start();
-	}
-	else
-		headerClockWidth = 0;
-	logo_off = headerClockWidth + 10;
+// 	if (g_Sectionsd->getIsTimeSet()) {
+// 		if (headerClock == NULL) {
+// 			headerClock = new CComponentsFrmClock(0, 0, 0, 0, "%H:%M", true);
+// 			headerClock->setClockBlink("%H %M");
+// 			headerClock->setClockIntervall(1);
+// 
+// 		}
+// 		headerClock->setClockFormat("%H:%M");
+// 		headerClock->setClockFont(SNeutrinoSettings::FONT_TYPE_MENU_TITLE);
+// 		headerClock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
+// 		headerClock->setYPos(y);
+// 		headerClock->setHeight(theight);
+// 		headerClock->setTextColor(header.getTextObject()->getTextColor());
+// 		headerClock->setColorBody(header.getColorBody());
+// 		headerClock->refresh();
+// 		headerClockWidth = headerClock->getWidth();
+// 		headerClock->setXPos(x + full_width - headerClockWidth - 10);
+// 		headerClockWidth += 6;
+// 
+// 		headerClock->Start();
+// 	}
+// 	else
+// 		headerClockWidth = 0;
+// 	logo_off = headerClockWidth + 10;
 }
 
 void CChannelList::paint()

@@ -288,7 +288,7 @@ void CComponentsHeader::initButtons()
 
 	//set button form properties
 	if (cch_btn_obj){
-		cch_btn_obj->setDimensionsAll(0, cch_items_y, 0, 0);
+		cch_btn_obj->setYPos(cch_items_y);
 		cch_btn_obj->doPaintBg(false);
 		cch_btn_obj->setAppendOffset(cch_buttons_space, 0);
 		cch_btn_obj->removeAllIcons();
@@ -308,9 +308,9 @@ void CComponentsHeader::initButtons()
 		//re-align height of button object
 		cch_btn_obj->setHeight(height);
 
-		//re-align height of icon object
-		if (cch_icon_obj)
-			cch_icon_obj->setHeight(height);
+// 		//re-align height of icon object
+// 		if (cch_icon_obj)
+// 			cch_icon_obj->setHeight(height);
 	}
 }
 
@@ -322,7 +322,7 @@ void CComponentsHeader::enableClock(bool enable, const char* format, const char*
 	if (sec_format_str)
 		cch_cl_sec_format = sec_format_str;
 	cch_cl_run 	= run;
-	initClock();
+	initCCItems();
 }
 
 
@@ -342,13 +342,14 @@ void CComponentsHeader::initClock()
 
 	//set clock form properties
 	if (cch_cl_obj){
-		cch_cl_obj->setDimensionsAll(0, cch_items_y, 0, height);
+		cch_cl_obj->setYPos(cch_items_y);
+		cch_cl_obj->setHeight(height);
 
 		//disallow paint of clock, if disabled and exit method
 		if (!cch_cl_enable){
 			cch_cl_obj->allowPaint(false);
 			cch_cl_obj->setClockActiv(false);
-			return;
+// 			return;
 		}
 		else
 			cch_cl_obj->allowPaint(true);
@@ -375,7 +376,7 @@ void CComponentsHeader::initClock()
 		cch_cl_obj->setClockActiv(cch_cl_run);
 		if (cch_cl_run)
 			cch_cl_obj->Start();
-		else 
+		else
 			cch_cl_obj->Stop();
 	}
 }
@@ -396,7 +397,7 @@ void CComponentsHeader::initCaption()
 	if (cch_btn_obj){
 		//get width of buttons object
 		buttons_w = cch_btn_obj->empty() ? 0 : cch_btn_obj->getWidth();
-
+		dprintf(DEBUG_DEBUG, "[CComponentsHeader]\n    [%s - %d] init context buttons...x=%d, y=%d, width=%d, height=%d\n", __func__, __LINE__, cch_btn_obj->getXPos(), cch_btn_obj->getYPos(), cch_btn_obj->getWidth(), cch_btn_obj->getHeight());
 		//set x position of buttons
 		cch_btn_obj->setXPos(width - buttons_w);
 

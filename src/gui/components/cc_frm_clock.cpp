@@ -81,8 +81,8 @@ CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, c
 		startClock();
 
 	initCCLockItems();
-	initParent(parent);
 
+	initParent(parent);
 }
 
 CComponentsFrmClock::~CComponentsFrmClock()
@@ -150,9 +150,9 @@ void CComponentsFrmClock::initCCLockItems()
 	height = max(height, min_text_h);
 	width = max(width, min_text_w);
 
-	int cl_x = 0;
+	int cl_x = x;
 	int cl_h = min_text_h;
-	int cl_y = 0;
+	int cl_y = y;
 	int w_lbl_tmp = 0;
 	
 	//create label objects and add to container, ensure count of items = count of chars (one char = one segment)
