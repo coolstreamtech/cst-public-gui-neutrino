@@ -36,9 +36,9 @@
 #include <errno.h>
 #include <ctype.h>
 #include <system/helpers.h>
+#include <system/debug.h>
 
 using namespace std;
-
 
 CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, const int& w, const int& h,
 						const char* prformat_str,
@@ -77,12 +77,17 @@ CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, c
 	cl_timer 	= NULL;
 	
 	paintClock	= false;
-	if (activ)
-		startClock();
-
 	initCCLockItems();
 
 	initParent(parent);
+	
+	if (activ){
+		if (cl_interval <= 0){
+			dprintf(DEBUG_NORMAL, "[CComponentsFrmClock]    [%s]  clock is set to active, but interval is initialized with value %d ...\n", __func__, cl_interval);
+			return;
+		}
+		startClock();
+	}
 }
 
 CComponentsFrmClock::~CComponentsFrmClock()
@@ -293,13 +298,12 @@ bool CComponentsFrmClock::startClock()
 {
 	if (cl_timer == NULL){
 		cl_timer = new CComponentsTimer();
+
+		dprintf(DEBUG_INFO, "[CComponentsFrmClock]    [%s]  init slot...\n", __func__);
+
 		sigc::slot0<void> sl = sigc::mem_fun0(*this, &CComponentsFrmClock::ShowTime);
 		cl_timer->OnTimer.connect(sl);
-#ifdef DEBUG_CC
-		printf("[CComponentsFrmClock]    [%s]  init slot...\n", __func__);
-#endif
 	}
-	
 	cl_timer->setTimerIntervall(cl_interval);
 
 	if (cl_timer->isRun())
@@ -312,16 +316,14 @@ bool CComponentsFrmClock::startClock()
 bool CComponentsFrmClock::stopClock()
 {
 	if (cl_timer){
-#ifdef DEBUG_CC
-		printf("[CComponentsFrmClock]    [%s]  stopping clock...\n", __func__);
-#endif
 		if (cl_timer->stopTimer()){
+			dprintf(DEBUG_INFO, "[CComponentsFrmClock]    [%s]  stopping clock...\n", __func__);
 			delete cl_timer;
 			cl_timer = NULL;
 			return true;
 		}
 		else
-			printf("[CComponentsFrmClock]    [%s]  stopping timer failed...\n", __func__);
+			dprintf(DEBUG_NORMAL, "[CComponentsFrmClock]    [%s]  stopping timer failed...\n", __func__);
 	}
 	return false;
 }
