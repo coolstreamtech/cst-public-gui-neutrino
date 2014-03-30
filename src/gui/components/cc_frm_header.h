@@ -89,7 +89,7 @@ class CComponentsHeader : public CComponentsForm
 		///property: alignment of caption within header, see also setCaptionAlignment(), possible values are CTextBox::CENTER, default = CTextBox::NO_AUTO_LINEBREAK (left)
 		int cch_caption_align;
 		///property: enable/disable of clock, see also enableClock()
-		int cch_cl_enable;
+		bool cch_cl_enable;
 		///property: clock format
 		const char* cch_cl_format;
 		///property: secondary clock format

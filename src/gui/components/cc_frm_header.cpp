@@ -308,9 +308,9 @@ void CComponentsHeader::initButtons()
 		//re-align height of button object
 		cch_btn_obj->setHeight(height);
 
-// 		//re-align height of icon object
-// 		if (cch_icon_obj)
-// 			cch_icon_obj->setHeight(height);
+		//re-align height of icon object
+		if (cch_icon_obj)
+			cch_icon_obj->setHeight(height);
 	}
 }
 
@@ -336,7 +336,7 @@ void CComponentsHeader::initClock()
 	//create instance for header clock object and add to container
 	if (cch_cl_obj == NULL){
 		dprintf(DEBUG_DEBUG, "[CComponentsHeader]\n    [%s - %d] init clock...\n", __func__, __LINE__);
-		cch_cl_obj = new CComponentsFrmClock(0, cch_items_y, 0, height, cch_cl_format, false, this);
+		cch_cl_obj = new CComponentsFrmClock(0, cch_items_y, 0, height, cch_cl_format, NULL, false, 1, this);
 		cch_cl_obj->doPaintBg(false);
 	}
 
@@ -348,16 +348,13 @@ void CComponentsHeader::initClock()
 		//disallow paint of clock, if disabled and exit method
 		if (!cch_cl_enable){
 			cch_cl_obj->allowPaint(false);
-			cch_cl_obj->setClockActiv(false);
-// 			return;
+			cch_cl_obj->Stop();
+			return;
 		}
-		else
-			cch_cl_obj->allowPaint(true);
 
 		//assign time size and format
 		cch_cl_obj->setClockFontSize(cch_font->getHeight());
-		cch_cl_obj->setClockFormat(cch_cl_format);
-		cch_cl_obj->setClockBlink(cch_cl_sec_format);
+		cch_cl_obj->setClockFormat(cch_cl_format, cch_cl_sec_format);
 
 		//set corner mode of button item
 		int cc_btn_corner_type = corner_type;
@@ -372,12 +369,6 @@ void CComponentsHeader::initClock()
 
 		//re-assign height of clock object, for the case of changed height
 		cch_cl_obj->setHeight(height);
-
-		cch_cl_obj->setClockActiv(cch_cl_run);
-		if (cch_cl_run)
-			cch_cl_obj->Start();
-		else
-			cch_cl_obj->Stop();
 	}
 }
 
@@ -406,19 +397,29 @@ void CComponentsHeader::initCaption()
 	}
 
 	//clock
-	int clock_w = 0;
 	if (cch_cl_obj){
 		//refresh clock properties
 		cch_cl_obj->refresh();
 
 		//get width of clock object
-		clock_w = cch_cl_enable ? cch_cl_obj->getWidth() : 0;
+		int clock_w = cch_cl_enable ? cch_cl_obj->getWidth() : 0;
 
 		//set x position of clock
 		cch_cl_obj->setXPos(width - buttons_w - clock_w - cch_offset);
 
 		//set required width of caption object
 		cc_text_w -= (clock_w + cch_offset);
+
+		//start clock if run option is enabled and clock still not running
+		if (cch_cl_run && !cch_cl_obj->isRun())
+			cch_cl_obj->Start();
+
+		//stop clock if disabled or option run is disabled and clock is running
+		if ((!cch_cl_enable || !cch_cl_run ) && cch_cl_obj->isRun())
+			cch_cl_obj->Stop();
+
+		//clock visible or not visible if enabled or not
+		cch_cl_obj->allowPaint(cch_cl_enable);
 	}
 
 
