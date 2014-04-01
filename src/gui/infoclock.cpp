@@ -4,7 +4,7 @@
 
 	Info Clock Window
 	based up CComponentsFrmClock
-	Copyright (C) 2013, Thilo Graf 'dbt'
+	Copyright (C) 2013, 2014, Thilo Graf 'dbt'
 	Copyright (C) 2013, Michael Liebmann 'micha-bbg'
 
 	License: GPL
@@ -51,11 +51,8 @@ CInfoClock* CInfoClock::getInstance()
 
 void CInfoClock::Init()
 {
-	static int oldSize = 0;
-	if (oldSize != g_settings.infoClockFontSize) {
-		oldSize = g_settings.infoClockFontSize;
-		setClockFontSize(g_settings.infoClockFontSize);
-	}
+	//assign current font size
+	setClockFontSize(g_settings.infoClockFontSize);
 
 	//use current theme colors
 	syncSysColors();
