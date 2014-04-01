@@ -375,5 +375,6 @@ Font** CComponentsFrmClock::getClockFont()
 {
 	if (dyn_font_size == 0)
 		cl_font = &g_Font[cl_font_type];
+	dyn_font_size = (*cl_font)->getHeight();
 	return cl_font;
 }
