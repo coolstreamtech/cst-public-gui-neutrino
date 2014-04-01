@@ -2112,34 +2112,14 @@ void CChannelList::paintHead()
 		header = new CComponentsHeader();
 	header->setDimensionsAll(x, y, full_width, theight);
 	header->setCaption(name);
-	if (g_Sectionsd->getIsTimeSet())
+	if (g_Sectionsd->getIsTimeSet()){
 		header->enableClock(true, "%H:%M", "%H %M", true);
+		logo_off = header->getClockObject()->getWidth() + 10;
+	}
+	else
+		logo_off = 10;
+	
 	header->paint(CC_SAVE_SCREEN_NO);
-
-// 	if (g_Sectionsd->getIsTimeSet()) {
-// 		if (headerClock == NULL) {
-// 			headerClock = new CComponentsFrmClock(0, 0, 0, 0, "%H:%M", true);
-// 			headerClock->setClockBlink("%H %M");
-// 			headerClock->setClockIntervall(1);
-// 
-// 		}
-// 		headerClock->setClockFormat("%H:%M");
-// 		headerClock->setClockFont(SNeutrinoSettings::FONT_TYPE_MENU_TITLE);
-// 		headerClock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
-// 		headerClock->setYPos(y);
-// 		headerClock->setHeight(theight);
-// 		headerClock->setTextColor(header.getTextObject()->getTextColor());
-// 		headerClock->setColorBody(header.getColorBody());
-// 		headerClock->refresh();
-// 		headerClockWidth = headerClock->getWidth();
-// 		headerClock->setXPos(x + full_width - headerClockWidth - 10);
-// 		headerClockWidth += 6;
-// 
-// 		headerClock->Start();
-// 	}
-// 	else
-// 		headerClockWidth = 0;
-// 	logo_off = headerClockWidth + 10;
 }
 
 void CChannelList::paint()
