@@ -36,12 +36,13 @@ class CZapitBouquet
 	bool        bUser;
 	bool        bFav;
 	bool        bOther;
+	int         bScanEpg;
 	t_satellite_position satellitePosition;
 
 	ZapitChannelList radioChannels;
 	ZapitChannelList tvChannels;
 
-	inline CZapitBouquet(const std::string name) { Name = name; bHidden = false; bLocked = false; bUser = true; }
+	inline CZapitBouquet(const std::string name) { Name = name; bHidden = false; bLocked = false; bUser = false; bOther = false; bScanEpg = false; }
 
 	void addService(CZapitChannel* newChannel);
 
@@ -105,7 +106,7 @@ class CBouquetManager
 
 		void saveBouquets(void);
 		void saveUBouquets(void);
-		void saveBouquets(const CZapitClient::bouquetMode bouquetMode, const char * const providerName, t_satellite_position satellitePosition = -1);
+		void saveBouquets(const CZapitClient::bouquetMode bouquetMode, const char * const providerName, t_satellite_position satellitePosition = INVALID_SAT_POSITION);
 		void loadBouquets(bool ignoreBouquetFile = false);
 		void renumServices();
 

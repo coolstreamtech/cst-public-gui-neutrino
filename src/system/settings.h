@@ -151,6 +151,7 @@ struct SNeutrinoSettings
 	int epg_extendedcache;
 	std::string epg_dir;
 	int epg_scan;
+	int epg_scan_mode;
 
 	int epg_search_history_size;
 	int epg_search_history_max;
@@ -378,6 +379,7 @@ struct SNeutrinoSettings
 	int recording_slow_warning;
 	int recording_startstop_msg;
 	int shutdown_timer_record_type;
+	std::string recording_filename_template;
 
 	int filesystem_is_utf8;
 	// default plugin for ts-movieplayer (red button)
@@ -416,6 +418,7 @@ struct SNeutrinoSettings
 	int temp_timeshift;
 	int auto_delete;
 	int record_hours;
+	int timeshift_hours;
 
 	int mpkey_rewind;
 	int mpkey_forward;

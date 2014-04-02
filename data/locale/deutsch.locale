@@ -318,6 +318,11 @@ date.Sun  So
 date.Thu  Do
 date.Tue  Di
 date.Wed  Mi
+debug Debug Ausgabe
+debug.level Stufe
+debug.level_1 normal
+debug.level_2 informativ
+debug.level_3 ausführlich
 epg.saving Speichere EPG
 epgextended.actors Darsteller
 epgextended.director Regie
@@ -404,7 +409,8 @@ extra.lodirection Längengrad-Ausrichtung
 extra.longitude Längengrad
 extra.menu_left_exit "links" = Menü zurück
 extra.north Norden
-extra.record_time Maximale Aufnahmezeit
+extra.record_time Maximale Aufnahmedauer
+extra.record_time_ts Maximale Timeshiftdauer
 extra.rotor_swap Rotor dreht Ost/West
 extra.rounded_corners Eckendarstellung
 extra.rounded_corners_off eckig
@@ -741,6 +747,9 @@ ledcontroler.off LED1 & LED2 aus
 ledcontroler.on.all LED1 & LED2 an
 ledcontroler.on.led1 LED1 an
 ledcontroler.on.led2 LED2 an
+lua.function_deprecated1 Achtung!
+lua.function_deprecated2 Die Funktion
+lua.function_deprecated3 ist veraltet,\n                      bitte nutzen Sie
 mainmenu.audioplayer Audioplayer
 mainmenu.channels Kanalliste
 mainmenu.clearsectionsd Lösche EPG Cache
@@ -848,6 +857,7 @@ menu.hint_epg_old_events Veraltete EPG-Daten werden nach dieser Zeit (in Stunden
 menu.hint_epg_save Speichert die EPG-Daten auf einem externen Datenträger und läd es von dort nach einen Neustart
 menu.hint_epg_save_standby Speichert die EPG-Daten auch im Standby-Modus
 menu.hint_epg_scan Aktivieren Sie den Hintergrundscan der EPG-Daten, wenn ein freier Tuner vorhanden ist, im aktuellen Bouquet oder in allen Favoriten
+menu.hint_epg_scan_mode Wählen Sie den Modus für den EPG Scan aus.
 menu.hint_event_textcolor Ändern Sie die Farbe für farbige Events in der Kanalliste und der Infobar
 menu.hint_eventlist_additional Definiert, ob zusätzliche Informationen im Hauptfenster angezeigt werden sollen
 menu.hint_eventlist_fonts Ändern Sie die Schriftgröße in der Event-Liste
@@ -1061,10 +1071,12 @@ menu.hint_record_data_dvbsub Untertitel-Spur zu Aufnahme hinzufügen
 menu.hint_record_data_vtxt Teletext-Spur zu Aufnahme hinzufügen
 menu.hint_record_dir Wählen Sie das Aufnahmeverzeichnis
 menu.hint_record_end Wählen Sie zwischen maximaler Aufnahmezeit oder einem Aufnahmeende anhand der EPG-Daten
+menu.hint_record_filename_template Vorlagemuster für den Dateinamen bearbeiten
 menu.hint_record_slow_warn Zeige Warnung, wenn der Aufnahmepuffer zu überlaufen droht
 menu.hint_record_startstop_msg Schaltet die Meldung bei Aufnahmestart/ende ein oder aus.
 menu.hint_record_tdir Wählen Sie ein Verzeichnis für Ihre Timeshift-Aufnahmen im temporären Timeshift-Modus
-menu.hint_record_time Geben Sie eine maximale Aufnahmezeit in Stunden ein, wenn Sie die Aufnahme nicht vorzeitig stoppen
+menu.hint_record_time Aufzeichnungsdauer vor dem Stopp bei der Verwendung von Direktaufzeichnung mit Record-Taste.
+menu.hint_record_time_ts Timeshiftdauer vor dem Stopp, wenn temporäres Timeshift aktiviert.
 menu.hint_record_timeafter Stellen Sie die Nachlaufzeit für Timer-Aufnahmen ein\nEin Wert von 2 beendet die Aufnahme 2 Minuten nach dem Sendungsende
 menu.hint_record_timebefore Stellen Sie die Vorlaufzeit für Timer-Aufnahmen ein\nEin Wert von 2 startet die Aufnahme 2 Minuten vor dem Sendungsbeginn
 menu.hint_record_timer Konfigurieren Sie Optionen für Timer-Aufnahmen
@@ -1117,6 +1129,7 @@ menu.hint_scan_logical_hd Wenn der Kanal in SD und in HD verfügbar ist, wird HD
 menu.hint_scan_longitude Geben Sie ihren Längengrad ein
 menu.hint_scan_manual Manueller Transponder-Suchlauf mit ausgewählten Parametern
 menu.hint_scan_mod Wählen Sie eine Transponder-Modulation
+menu.hint_scan_motor Rotor Optionen, Satfinder
 menu.hint_scan_motor_18v Benutze 18V für Motorbewegungen
 menu.hint_scan_motor_speed Rotor-Bewegungsgeschwindigkeit in 1/10 Grad pro Sekunde
 menu.hint_scan_motorpos Wählen Sie eine gespeicherten Positions-Nummer für diesen Satelliten,\nwird ignoriert, wenn USALS aktiv
@@ -1141,6 +1154,7 @@ menu.hint_scan_start Startet die Kanalsuche mit den angegebenen Parametern.\nMit
 menu.hint_scan_test Testen Sie das Signal für diesen Transponder
 menu.hint_scan_tpselect Wählen Sie einen einzelnen Transponder für den Suchlauf
 menu.hint_scan_uncommited Wählen Sie nicht festgeschriebene Angaben für diesen Satelliten
+menu.hint_scan_usals USALS Optionen
 menu.hint_scan_usals_repeat Geben Sie die USALS-Wiederholungen für den Rotor ein
 menu.hint_scan_usalsall Verwenden Sie USALS für alle Satelliten an diesem Tuner
 menu.hint_scan_useusals Verwenden Sie USALS für diesen Satelliten,\nwenn aktiv, wird Rotorposition ignoriert
@@ -1252,8 +1266,12 @@ miscsettings.epg_old_events_hint2 Angabe in Stunden
 miscsettings.epg_save EPG zwischenspeichern
 miscsettings.epg_save_standby EPG speichern in Standby-Modus
 miscsettings.epg_scan Hintergrundscan EPG
+miscsettings.epg_scan_always Immer
 miscsettings.epg_scan_bq Aktuelles Bouquet
 miscsettings.epg_scan_fav Alle Favoriten
+miscsettings.epg_scan_live Bei eingeschaltener Box
+miscsettings.epg_scan_sel Markierte Bouquets
+miscsettings.epg_scan_standby Im Standby Modus
 miscsettings.general Allgemein
 miscsettings.head Erweitert
 miscsettings.infobar Infobar
@@ -1700,6 +1718,9 @@ recordingmenu.end_of_recording_epg EPG aktuelles Event
 recordingmenu.end_of_recording_max max. Aufnahmezeit
 recordingmenu.end_of_recording_name Ende der Sofortaufnahme
 recordingmenu.file Direkt (Datei)
+recordingmenu.filename_template Vorlage für Dateiname
+recordingmenu.filename_template_hint Platzhalter werden durch folgende Werte ersetzt:
+recordingmenu.filename_template_hint2 %C = Kanal, %T = Titel, %I = Info, %d = Datum, %t = Zeit
 recordingmenu.help Aufnahmegeräte:\n-----------------------\nServer:\nauf PC mit Hilfe eines Streaming-Programmes\n\n(analoger) Videorekorder:\nüber VCR-Ausgang\n\nDirekt (Datei):\nauf ein per NFS gemountetes Verzeichnis\noder eine interne Festplatte\nTS: SPTS-Mode Treiber laden(dbox2)\nPES: SPTS-Mode Treiber nicht laden(dbox2)\n\n\nMaximale Dateigröße:\n----------------------\nNFS V2: 2 GB (2048 MB)\nNFS V3: fast unendlich (0 MB)\nFAT: 2 GB (2048 MB)\nFAT32: 4 GB (4096 MB)
 recordingmenu.multimenu.ask_stop_all Wirklich alle %d Aufnahmen beenden?
 recordingmenu.multimenu.info_stop_all %d von %d Aufnahmen werden beendet.
@@ -1743,12 +1764,21 @@ satsetup.diseqcrepeat DiSEqC-Wiederholungen
 satsetup.extended DiSEqC-Einstellungen
 satsetup.extended_motor Motor-Einstellungen
 satsetup.fastscan_all SD und HD
+satsetup.fastscan_auto_diseqc Start automatische Diseqc Konfiguration
+satsetup.fastscan_auto_diseqc_wait Automatische Diseqc Konfiguration wird durchgeführt
 satsetup.fastscan_hd nur HD
 satsetup.fastscan_head Schnellscan (Astra 1, 19.2E, 12.515Mhz)
 satsetup.fastscan_prov Anbieter:
-satsetup.fastscan_prov_cd CanalDigitaal
-satsetup.fastscan_prov_telesat TéléSAT
-satsetup.fastscan_prov_tvv TV Vlaanderen
+satsetup.fastscan_prov_cd_hd CanalDigitaal (HD)
+satsetup.fastscan_prov_cd_sd CanalDigitaal (SD)
+satsetup.fastscan_prov_hda HD Austria
+satsetup.fastscan_prov_hello Hello
+satsetup.fastscan_prov_skylink_c Skylink Czech
+satsetup.fastscan_prov_skylink_s Skylink Slovak
+satsetup.fastscan_prov_telesat_b TéléSAT Belgium
+satsetup.fastscan_prov_telesat_l TéléSAT Luxemburg
+satsetup.fastscan_prov_tvv_hd TV Vlaanderen (HD)
+satsetup.fastscan_prov_tvv_sd TV Vlaanderen (SD)
 satsetup.fastscan_sd nur SD
 satsetup.fastscan_type Scantyp
 satsetup.fe_mode Tuner Modus

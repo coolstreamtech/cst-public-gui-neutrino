@@ -113,6 +113,7 @@ class CServiceScan : public OpenThreads::Thread
 		void process_service_list_descriptor(const unsigned char * const buffer, const t_transport_stream_id transport_stream_id, const t_original_network_id original_network_id, t_satellite_position satellitePosition, freq_id_t freq);
 		void process_satellite_delivery_system_descriptor(const unsigned char * const buffer, FrontendParameters * feparams, uint8_t * polarization, t_satellite_position * satellitePosition);
 		bool ScanFast();
+		void ReportFastScan(FrontendParameters &feparams, uint8_t polarization, t_satellite_position satellitePosition);
 
 		void run();
 
@@ -144,6 +145,7 @@ class CServiceScan : public OpenThreads::Thread
 		bool isFtaOnly() { return flags & SCAN_FTA; }
 		int GetFlags() { return flags; }
 		bool SatHaveChannels() { return satHaveChannels; }
+		bool TestDiseqcConfig(int num);
 };
 
 #endif /* __scan_h__ */

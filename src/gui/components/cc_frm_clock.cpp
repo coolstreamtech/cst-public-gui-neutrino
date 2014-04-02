@@ -80,6 +80,7 @@ CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, c
 	if (activ)
 		startClock();
 
+	initCCLockItems();
 	initParent(parent);
 
 }

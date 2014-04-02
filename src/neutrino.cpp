@@ -469,6 +469,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.epg_save = configfile.getBool("epg_save", false);
 	g_settings.epg_save_standby = configfile.getBool("epg_save_standby", true);
 	g_settings.epg_scan = configfile.getInt32("epg_scan", 0);
+	g_settings.epg_scan_mode = configfile.getInt32("epg_scan_mode", CEpgScan::MODE_ALWAYS);
 	//widget settings
 	g_settings.widget_fade = false;
 	g_settings.widget_fade           = configfile.getBool("widget_fade"          , false );
@@ -550,6 +551,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		}
 	}
 	g_settings.record_hours = configfile.getInt32( "record_hours", 4 );
+	g_settings.timeshift_hours = configfile.getInt32( "timeshift_hours", 4 );
 	g_settings.filesystem_is_utf8              = configfile.getBool("filesystem_is_utf8"                 , true );
 
 	//recording (server + vcr)
@@ -563,6 +565,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.recording_stream_vtxt_pid       = configfile.getBool("recordingmenu.stream_vtxt_pid"      , true);
 	g_settings.recording_stream_subtitle_pids  = configfile.getBool("recordingmenu.stream_subtitle_pids", true);
 	g_settings.recording_stream_pmt_pid        = configfile.getBool("recordingmenu.stream_pmt_pid"      , false);
+	g_settings.recording_filename_template     = configfile.getString("recordingmenu.filename_template" , "%C_%T%d_%t");
 	g_settings.recording_choose_direct_rec_dir = configfile.getInt32( "recording_choose_direct_rec_dir", 0 );
 	g_settings.recording_epg_for_filename      = configfile.getBool("recording_epg_for_filename"         , true);
 	g_settings.recording_epg_for_end           = configfile.getBool("recording_epg_for_end"              , true);
@@ -923,6 +926,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("epg_save", g_settings.epg_save);
 	configfile.setBool("epg_save_standby", g_settings.epg_save_standby);
 	configfile.setInt32("epg_scan", g_settings.epg_scan);
+	configfile.setInt32("epg_scan_mode", g_settings.epg_scan_mode);
 	configfile.setInt32("epg_cache_time"           ,g_settings.epg_cache );
 	configfile.setInt32("epg_extendedcache_time"   ,g_settings.epg_extendedcache);
 	configfile.setInt32("epg_old_events"           ,g_settings.epg_old_events );
@@ -998,6 +1002,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool  ("recordingmenu.stream_vtxt_pid"      , g_settings.recording_stream_vtxt_pid      );
 	configfile.setBool  ("recordingmenu.stream_subtitle_pids" , g_settings.recording_stream_subtitle_pids );
 	configfile.setBool  ("recordingmenu.stream_pmt_pid"       , g_settings.recording_stream_pmt_pid       );
+	configfile.setString("recordingmenu.filename_template"    , g_settings.recording_filename_template    );
 	configfile.setInt32 ("recording_choose_direct_rec_dir"    , g_settings.recording_choose_direct_rec_dir);
 	configfile.setBool  ("recording_epg_for_filename"         , g_settings.recording_epg_for_filename     );
 	configfile.setBool  ("recording_epg_for_end"              , g_settings.recording_epg_for_end          );
@@ -1018,6 +1023,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "auto_timeshift", g_settings.auto_timeshift );
 	configfile.setInt32( "auto_delete", g_settings.auto_delete );
 	configfile.setInt32( "record_hours", g_settings.record_hours );
+	configfile.setInt32( "timeshift_hours", g_settings.timeshift_hours );
 	//printf("set: key_unlock =============== %d\n", g_settings.key_unlock);
 	configfile.setInt32( "screenshot_count", g_settings.screenshot_count );
 	configfile.setInt32( "screenshot_format", g_settings.screenshot_format );
@@ -1282,6 +1288,7 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 			tvi = 0, ri = 0;
 			CBouquet* tmp1 = TVsatList->addBouquet(sit->second.name.c_str());
 			CBouquet* tmp2 = RADIOsatList->addBouquet(sit->second.name.c_str());
+			tmp1->satellitePosition = tmp2->satellitePosition = sit->first;
 
 			for(zapit_list_it_t it = zapitList.begin(); it != zapitList.end(); it++) {
 				if ((*it)->getServiceType() == ST_DIGITAL_TELEVISION_SERVICE) {
@@ -1293,7 +1300,7 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 					ri++;
 				}
 			}
-			printf("[neutrino] created %s bouquet with %d TV and %d RADIO channels\n", sit->second.name.c_str(), tvi, ri);
+			printf("[neutrino] created %s (%d) bouquet with %d TV and %d RADIO channels\n", sit->second.name.c_str(), sit->first, tvi, ri);
 			if(!tvi)
 				TVsatList->deleteBouquet(tmp1);
 			if(!ri)
@@ -2034,11 +2041,12 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					InfoClock->enableInfoClock(false);
 					int old_ttx = g_settings.cacheTXT;
 					int old_epg = g_settings.epg_scan;
+					int old_mode = g_settings.epg_scan_mode;
 					mainMenu.exec(NULL, "");
 					InfoClock->enableInfoClock(true);
 					StartSubtitles();
 					saveSetup(NEUTRINO_SETTINGS_FILE);
-					if (old_epg != g_settings.epg_scan) {
+					if (old_epg != g_settings.epg_scan || old_mode != g_settings.epg_scan_mode) {
 						if (g_settings.epg_scan)
 							CEpgScan::getInstance()->Start();
 						else
@@ -2179,12 +2187,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				else
 					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
 			}
-			else if ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player)
-			{
-				StopSubtitles();
-				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
-				StartSubtitles();
-			}
 			else if( msg == CRCInput::RC_green)
 			{
 				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_GREEN_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)
@@ -2206,17 +2208,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				else
 					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
 			}
-			else if( (msg == CRCInput::RC_green) || ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player) )
-			{
-				StopSubtitles();
-				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
-				StartSubtitles();
-			}
-			else if( msg == CRCInput::RC_yellow ) {       // NVODs
-				StopSubtitles();
-				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_YELLOW);
-				StartSubtitles();
-			}
 			else if( msg == CRCInput::RC_blue ) {
 				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_BLUE_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// Features Menu - Personalization Check
 				{
@@ -2226,6 +2217,12 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				}
 				else
 					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
+			}
+			else if ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player)
+			{
+				StopSubtitles();
+				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
+				StartSubtitles();
 			}
 			else if( (msg == CRCInput::RC_audio) && g_settings.audio_run_player) {
 				//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
@@ -2264,7 +2261,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				if (msg == CRCInput::RC_home) {
 					CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 				}
-				handleMsg(msg, data);
+				if (msg != CRCInput::RC_timeout)
+					handleMsg(msg, data);
 			}
 		}
 		else {
@@ -2276,7 +2274,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				}
 			}
 			else {
-				handleMsg(msg, data);
+				if (msg != CRCInput::RC_timeout)
+					handleMsg(msg, data);
 			}
 		}
 	}
@@ -2325,9 +2324,9 @@ _show:
 		nNewChannel = bouquetList->exec(true);
 	}
 _repeat:
-	CVFD::getInstance ()->showServicename(channelList->getActiveChannelName());
-	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 	printf("************************* ZAP RES: nNewChannel %d\n", nNewChannel);fflush(stdout);
+	//CVFD::getInstance ()->showServicename(channelList->getActiveChannelName());
+	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 	if(nNewChannel == -1) { // restore orig. bouquet and selected channel on cancel
 		/* FIXME if mode was changed while browsing,
 		 * other modes selected bouquet not restored */
@@ -2385,6 +2384,40 @@ void CNeutrinoApp::zapTo(t_channel_id channel_id)
 
 		dvbsub_stop();
 		g_Zapit->zapTo_serviceID_NOWAIT(channel_id);
+	}
+}
+
+void CNeutrinoApp::wakeupFromStandby(void)
+{
+	bool alive = recordingstatus || CEpgScan::getInstance()->Running() ||
+		CStreamManager::getInstance()->StreamStatus();
+
+	if ((mode == mode_standby) && !alive) {
+		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
+		if(g_settings.ci_standby_reset) {
+			g_CamHandler->exec(NULL, "ca_ci_reset0");
+			g_CamHandler->exec(NULL, "ca_ci_reset1");
+		}
+		g_Zapit->setStandby(false);
+		g_Zapit->getMode();
+	}
+}
+
+void CNeutrinoApp::standbyToStandby(void)
+{
+	bool alive = recordingstatus || CEpgScan::getInstance()->Running() ||
+		CStreamManager::getInstance()->StreamStatus();
+
+	if ((mode == mode_standby) && !alive) {
+		// zap back to pre-recording channel if necessary
+		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+		if (standby_channel_id && (live_channel_id != standby_channel_id)) {
+			live_channel_id = standby_channel_id;
+			channelList->zapTo_ChannelID(live_channel_id);
+		}
+		g_Zapit->setStandby(true);
+		g_Sectionsd->setPauseScanning(true);
+		cpuFreq->SetCpuFreq(g_settings.standby_cpufreq * 1000 * 1000);
 	}
 }
 
@@ -2630,27 +2663,9 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		/* sent by rcinput, when got msg from zapit about record activated/deactivated */
 		/* should be sent when no record running */
 		printf("NeutrinoMessages::EVT_RECORDMODE: %s\n", ( data ) ? "on" : "off");
-		//if(!CRecordManager::getInstance()->RecordingStatus() && was_record && (!data))
-
-		/* no records left and record mode off FIXME check !*/
-		if(!CRecordManager::getInstance()->RecordingStatus() && (!data))
-		{
-			if(mode == mode_standby) {
-				// zap back to pre-recording channel if necessary
-				t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
-				if (standby_channel_id && (live_channel_id != standby_channel_id)) {
-					live_channel_id = standby_channel_id;
-					channelList->zapTo_ChannelID(live_channel_id);
-				}
-				/* do not put zapit to standby, if epg scan not finished */
-				if (!CEpgScan::getInstance()->Running())
-					g_Zapit->setStandby(true);
-				cpuFreq->SetCpuFreq(g_settings.standby_cpufreq * 1000 * 1000);
-			}
-			/* try to wakeup epg scan */
-			CEpgScan::getInstance()->Next();
-		}
 		recordingstatus = data;
+		CEpgScan::getInstance()->Next();
+		standbyToStandby();
 		autoshift = CRecordManager::getInstance()->TimeshiftOnly();
 		CVFD::getInstance()->ShowIcon(FP_ICON_CAM1, recordingstatus != 0);
 
@@ -2660,15 +2675,8 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		return messages_return::handled;
 	}
 	else if (msg == NeutrinoMessages::RECORD_START) {
-
 		//FIXME better at announce ?
-		if( mode == mode_standby ) {
-			cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
-			if(!recordingstatus && g_settings.ci_standby_reset) {
-				g_CamHandler->exec(NULL, "ca_ci_reset0");
-				g_CamHandler->exec(NULL, "ca_ci_reset1");
-			}
-		}
+		wakeupFromStandby();
 #if 0
 		//zap to rec channel if box start from deepstandby
 		if(timer_wakeup){
@@ -2705,11 +2713,25 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		delete[] (unsigned char*) data;
 		return messages_return::handled;
 	}
+	else if (msg == NeutrinoMessages::EVT_STREAM_START) {
+		int fd = (int) data;
+		printf("NeutrinoMessages::EVT_STREAM_START: fd %d\n", fd);
+		wakeupFromStandby();
+
+		if (!CStreamManager::getInstance()->AddClient(fd))
+			close(fd);
+		return messages_return::handled;
+	}
+	else if (msg == NeutrinoMessages::EVT_STREAM_STOP) {
+		printf("NeutrinoMessages::EVT_STREAM_STOP\n");
+		CEpgScan::getInstance()->Next();
+		standbyToStandby();
+		return messages_return::handled;
+	}
 	else if( msg == NeutrinoMessages::EVT_PMT_CHANGED) {
-		res = messages_return::handled;
 		t_channel_id channel_id = *(t_channel_id*) data;
 		CRecordManager::getInstance()->Update(channel_id);
-		return res;
+		return messages_return::handled;
 	}
 
 	else if( msg == NeutrinoMessages::ZAPTO) {
@@ -3632,7 +3654,9 @@ void stop_daemons(bool stopall, bool for_flash)
 		pthread_join(nhttpd_thread, NULL);
 	}
 	printf("httpd shutdown done\n");
+	printf("streaming shutdown\n");
 	CStreamManager::getInstance()->Stop();
+	printf("streaming shutdown done\n");
 	if(stopall || for_flash) {
 		printf("timerd shutdown\n");
 		if (g_Timerd)
