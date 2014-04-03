@@ -50,7 +50,7 @@ void CTimeOSD::Init()
 
 	if (oldSize != g_settings.infoClockFontSize) {
 		oldSize = g_settings.infoClockFontSize;
-		setClockFontSize(g_settings.infoClockFontSize);
+		setClockFontSize(g_settings.infoClockFontSize, CNeutrinoFonts::FONT_ID_INFOCLOCK);
 	}
 
 	//use current theme colors

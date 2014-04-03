@@ -52,7 +52,11 @@ CInfoClock* CInfoClock::getInstance()
 void CInfoClock::Init()
 {
 	//assign current font size
-	setClockFontSize(g_settings.infoClockFontSize);
+	static int oldSize = 0;
+	if (oldSize != g_settings.infoClockFontSize) {
+		oldSize = g_settings.infoClockFontSize;
+		setClockFontSize(g_settings.infoClockFontSize, CNeutrinoFonts::FONT_ID_INFOCLOCK);
+	}
 
 	//use current theme colors
 	syncSysColors();
