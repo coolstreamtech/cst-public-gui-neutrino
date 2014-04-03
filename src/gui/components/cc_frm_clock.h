@@ -31,6 +31,7 @@
 #include <config.h>
 #endif
 
+#include <driver/neutrinofonts.h>
 #include "cc_base.h"
 #include "cc_frm.h"
 #include "cc_timer.h"
@@ -104,7 +105,7 @@ class CComponentsFrmClock : public CComponentsForm
 
 		///set font type or font size for segments
 		virtual void setClockFont(int font);
-		virtual void setClockFontSize(int font_size);
+		virtual void setClockFontSize(int font_size, int share=CNeutrinoFonts::FONT_ID_SHARE);
 
 		///set text color
 		virtual void setTextColor(fb_pixel_t color_text){ cl_col_text = color_text;};

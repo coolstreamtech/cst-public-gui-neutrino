@@ -27,7 +27,6 @@
 
 #include <global.h>
 #include <neutrino.h>
-#include <driver/neutrinofonts.h>
 
 #include "cc_frm_clock.h"
 #include <time.h>
@@ -358,11 +357,11 @@ void CComponentsFrmClock::paint(bool do_save_bg)
 	paintForm(do_save_bg);
 }
 
-void CComponentsFrmClock::setClockFontSize(int font_size)
+void CComponentsFrmClock::setClockFontSize(int font_size, int share)
 {
 	int tmp_w = 0;
 	dyn_font_size = font_size;
-	cl_font	= CNeutrinoFonts::getInstance()->getDynFont(tmp_w, dyn_font_size, "", CNeutrinoFonts::FONT_STYLE_BOLD);
+	cl_font	= CNeutrinoFonts::getInstance()->getDynFont(tmp_w, dyn_font_size, "", CNeutrinoFonts::FONT_STYLE_BOLD, share);
 }
 
 void CComponentsFrmClock::setClockFont(int font)
