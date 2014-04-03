@@ -627,7 +627,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey == "running_clock"){	
 		if (clock_r == NULL){
-			clock_r = new CComponentsFrmClock(100, 50, 0, 50, "%H.%M:%S");
+			clock_r = new CComponentsFrmClock(100, 50, 0, 50, "%H.%M:%S", NULL, true);
 			clock_r->setClockFont(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
 			clock_r->setClockIntervall(1);
 // 			clock_r->doPaintBg(false);
@@ -648,7 +648,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey == "clock"){
 		if (clock == NULL){
-			clock = new CComponentsFrmClock(100, 50, 0, 50, "%d.%m.%Y-%H:%M", false);
+			clock = new CComponentsFrmClock(100, 50, 0, 50, "%d.%m.%Y-%H:%M");
 			clock->setClockFont(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
 		}
 
