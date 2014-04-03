@@ -362,7 +362,7 @@ void CComponentsFrmClock::setClockFontSize(int font_size)
 {
 	int tmp_w = 0;
 	dyn_font_size = font_size;
-	cl_font	= CNeutrinoFonts::getInstance()->getDynFont(tmp_w, dyn_font_size, "", CNeutrinoFonts::FONT_STYLE_BOLD, CNeutrinoFonts::FONT_ID_INFOCLOCK);
+	cl_font	= CNeutrinoFonts::getInstance()->getDynFont(tmp_w, dyn_font_size, "", CNeutrinoFonts::FONT_STYLE_BOLD);
 }
 
 void CComponentsFrmClock::setClockFont(int font)
