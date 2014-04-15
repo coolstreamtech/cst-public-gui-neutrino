@@ -785,6 +785,7 @@ class CScanSettings
 		int		fast_type;
 		int		fast_op;
 		int		fst_version;
+		int		fst_update;
 		int		cable_nid;
 
 		std::string	satName;

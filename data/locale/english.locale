@@ -625,18 +625,21 @@ hdd_check_format_bad Checking of disks with format %s is not supported.
 hdd_extended_settings Extended HDD-Settings
 hdd_fast Fast
 hdd_format Formating drive...
-hdd_format_failed Formating failed!
-hdd_format_warn Start format...
+hdd_format_failed Formating failed! Make sure device not in use, reboot and try again
+hdd_format_warn All data on device will be lost ! Continue with format ?
 hdd_fs Filesystem used to format
 hdd_fs_unknown unknown
 hdd_manage Manage drives
 hdd_middle Mid
+hdd_mount Mount
+hdd_mount_umount Mount/Unmount
 hdd_noise Acoustic-control (AAM)
 hdd_not_found No HDD found
 hdd_removable_device Removable device
 hdd_settings Hard Disk Drive/USB
 hdd_sleep Switch off after...
 hdd_slow Slow
+hdd_umount Unmount
 hdd_umount_warn unmount device
 imageinfo.creator Creator:
 imageinfo.date Date:
@@ -816,6 +819,7 @@ menu.hint_audioplayer_title Enable SMS-style title search in playlist
 menu.hint_auto_lang Auto-switch audio to preferred language
 menu.hint_auto_subs Auto-start subtitles for preferred language
 menu.hint_back Return to previous menu\nPress menu key to close all menus
+menu.hint_back_brief Return to previous menu
 menu.hint_backlight Configure buttons backlight
 menu.hint_backup Backup configs and channels to selected dir
 menu.hint_bedit Edit favorites and bouquets
@@ -1032,6 +1036,8 @@ menu.hint_network IP address, gateway, DNS, Time sync\nNetwork shares and servic
 menu.hint_new_zap_mode Allow channel switch while browsing\n(toggle mode with 'mute' in channel list)
 menu.hint_numeric_adjust Adjust channel list mode on numeric zap
 menu.hint_onekey_plugin Choose a plugin that's executed with the one touch key
+menu.hint_opkg Install or update software packages
+menu.hint_opkg_upgrade Updates all installed packages to the most recent version available
 menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
@@ -1108,8 +1114,10 @@ menu.hint_scan_diseqcorder Diseqc command order for cascaded switches
 menu.hint_scan_diseqcrepeat Diseqc repeat for cascaded switches
 menu.hint_scan_diseqctype Select your diseqc switch protocol\nwith 'advanced' you can use uncommited switches
 menu.hint_scan_fast CanalDigitaal/TéléSAT/TV Vlaanderen provider scan\nWARNING: diseqc config will be overwritten
+menu.hint_scan_fastdiseqc Start diseqc auto-configuration
 menu.hint_scan_fastprov Select provider to scan
 menu.hint_scan_fasttype Select fast scan type
+menu.hint_scan_fastupdate Enable/disable fast scan auto-update
 menu.hint_scan_fec Select transponder FEC
 menu.hint_scan_felink Select tuner to link tuner to
 menu.hint_scan_femode Select tuner connection type
@@ -1591,6 +1599,19 @@ nvod.starting (starting in %d min)
 nvodselector.directormode Direct-Mode
 nvodselector.head Select starting-time
 nvodselector.subservice Select Subservice
+opkg.button.expert_off Standard mode
+opkg.button.expert_on Expert mode
+opkg.button.info Package information
+opkg.button.install Install package
+opkg.button.uninstall Uninstall package
+opkg.failure.install Install failed (%d)
+opkg.failure.update Update failed (%d)
+opkg.failure.upgrade Upgrade failed (%d)
+opkg.messagebox.reinstall Re-install %s?
+opkg.messagebox.remove Remove %s?
+opkg.success.install Install successful, restart of Neutrino might be required.
+opkg.title Package Management
+opkg.upgrade Upgrade installed packages
 options.default Reset to defaults
 options.fb framebuffer
 options.ntp_off DVB
@@ -1781,6 +1802,7 @@ satsetup.fastscan_prov_tvv_hd TV Vlaanderen (HD)
 satsetup.fastscan_prov_tvv_sd TV Vlaanderen (SD)
 satsetup.fastscan_sd SD only
 satsetup.fastscan_type Scan type
+satsetup.fastscan_update Auto update
 satsetup.fe_mode Tuner mode
 satsetup.fe_mode_independent Independent
 satsetup.fe_mode_link_loop Loop
