@@ -42,7 +42,7 @@
 #include <list>
 
 #ifdef BOXMODEL_APOLLO
-#define VIDEOMENU_VIDEOMODE_OPTION_COUNT 14
+#define VIDEOMENU_VIDEOMODE_OPTION_COUNT 16
 #else
 #define VIDEOMENU_VIDEOMODE_OPTION_COUNT 12
 #endif
@@ -59,6 +59,7 @@ struct SNeutrinoSettings
 	int brightness;
 	int contrast;
 	int saturation;
+	int enable_sd_osd;
 #endif
 	char current_volume;
 	int current_volume_step;
