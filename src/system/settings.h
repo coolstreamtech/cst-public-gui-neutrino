@@ -443,6 +443,7 @@ struct SNeutrinoSettings
 	int screenshot_mode;
 	int screenshot_video;
 	int screenshot_scale;
+	int auto_cover;
 	std::string screenshot_dir;
 
 	int key_current_transponder;

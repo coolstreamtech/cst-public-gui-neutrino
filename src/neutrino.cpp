@@ -591,6 +591,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.screenshot_mode = configfile.getInt32( "screenshot_mode",  0);
 	g_settings.screenshot_video = configfile.getInt32( "screenshot_video",  1);
 	g_settings.screenshot_scale = configfile.getInt32( "screenshot_scale",  0);
+	g_settings.auto_cover = configfile.getInt32( "auto_cover",  0);
 
 	g_settings.screenshot_dir = configfile.getString( "screenshot_dir", "/media/sda1/movies" );
 	g_settings.cacheTXT = configfile.getInt32( "cacheTXT",  0);
@@ -1034,6 +1035,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "screenshot_mode", g_settings.screenshot_mode );
 	configfile.setInt32( "screenshot_video", g_settings.screenshot_video );
 	configfile.setInt32( "screenshot_scale", g_settings.screenshot_scale );
+	configfile.setInt32( "auto_cover", g_settings.auto_cover );
 
 	configfile.setString( "screenshot_dir", g_settings.screenshot_dir);
 	configfile.setInt32( "cacheTXT", g_settings.cacheTXT );
@@ -2748,10 +2750,10 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 				dvbsub_stop();
 
 				if ((!isTVMode) && (mode != mode_radio)) {
-					radioMode(false);
+					radioMode(true);
 				}
 				else if (isTVMode && (mode != mode_tv)) {
-					tvMode(false);
+					tvMode(true);
 				}
 				channelList->zapTo_ChannelID(eventinfo->channel_id);
 			}

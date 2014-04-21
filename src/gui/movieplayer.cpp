@@ -349,6 +349,7 @@ void CMoviePlayerGui::Cleanup()
 	startposition = 0;
 	is_file_player = false;
 	p_movie_info = NULL;
+	autoshot_done = false;
 }
 
 void CMoviePlayerGui::makeFilename()
@@ -510,10 +511,12 @@ void CMoviePlayerGui::PlayFile(void)
 
 	MI_MOVIE_INFO mi;
 
-	if(p_movie_info) {
+	if (p_movie_info) {
+		if (timeshift != TSHIFT_MODE_OFF) {
 		// p_movie_info may be invalidated by CRecordManager while we're still using it. Create and use a copy.
-		mi = *p_movie_info;
-		p_movie_info = &mi;
+			mi = *p_movie_info;
+			p_movie_info = &mi;
+		}
 
 		duration = p_movie_info->length * 60 * 1000;
 		int percent = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, currentapid, currentac3 == 1);
@@ -638,6 +641,8 @@ void CMoviePlayerGui::PlayFile(void)
 			g_PluginList->startPlugin_by_name(g_settings.movieplayer_plugin.c_str ());
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_stop) {
 			playstate = CMoviePlayerGui::STOPPED;
+			if ((duration - position) > 600000)
+				makeScreenShot(true);
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_play) {
 			if (time_forced) {
 				time_forced = false;
@@ -767,35 +772,10 @@ void CMoviePlayerGui::PlayFile(void)
 			}
 			if(restore)
 				FileTime.show(position);
+		} else if (msg == NeutrinoMessages::SHOW_EPG) {
+			handleMovieBrowser(NeutrinoMessages::SHOW_EPG, position);
 		} else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
-
-			char ending[(sizeof(int)*2) + 6] = ".jpg";
-			if(!g_settings.screenshot_cover)
-				snprintf(ending, sizeof(ending) - 1, "_%x.jpg", position);
-
-			std::string fname = full_name;
-			std::string::size_type pos = fname.find_last_of('.');
-			if(pos != std::string::npos) {
-				fname.replace(pos, fname.length(), ending);
-			} else
-				fname += ending;
-
-			if(!g_settings.screenshot_cover){
-				pos = fname.find_last_of('/');
-				if(pos != std::string::npos) {
-					fname.replace(0, pos, g_settings.screenshot_dir);
-				}
-			}
-
-#if 0 // TODO disable overwrite ?
-			if(!access(fname.c_str(), F_OK)) {
-			}
-#endif
-			CScreenShot * sc = new CScreenShot(fname);
-			if(g_settings.screenshot_cover && !g_settings.screenshot_video)
-				sc->EnableVideo(true);
-			sc->Start();
-
+			makeScreenShot();
 		} else if ( msg == NeutrinoMessages::EVT_SUBT_MESSAGE) {
 			showSubtitle(data);
 		} else if ( msg == NeutrinoMessages::ANNOUNCE_RECORD ||
@@ -811,9 +791,12 @@ void CMoviePlayerGui::PlayFile(void)
 
 			playstate = CMoviePlayerGui::STOPPED;
 			g_RCInput->postMsg(msg, data);
-		} else if (msg == CRCInput::RC_timeout) {
-			// nothing
-		} else if (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites) {
+		} else if (msg == CRCInput::RC_timeout || msg == NeutrinoMessages::EVT_TIMER) {
+			if (playstate == CMoviePlayerGui::PLAY && position >= 300000)
+				makeScreenShot(true);
+		} else if (msg == CRCInput::RC_favorites) {
+			makeScreenShot(false, true);
+		} else if (msg == CRCInput::RC_sat) {
 			//FIXME do nothing ?
 		} else {
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all) {
@@ -1280,6 +1263,20 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				cSelectedMenuBookStart[5].selected = false;	// clear for next bookmark menu
 			}
 		}
+	} else if (msg == NeutrinoMessages::SHOW_EPG && p_movie_info) {
+		CTimeOSD::mode m_mode = FileTime.getMode();
+		bool restore = FileTime.IsVisible();
+		if (restore)
+			FileTime.kill();
+		InfoClock->enableInfoClock(false);
+
+		cMovieInfo.showMovieInfo(*p_movie_info);
+
+		InfoClock->enableInfoClock(true);
+		if (restore) {
+			FileTime.setMode(m_mode);
+			FileTime.update(position, duration);
+		}
 	}
 	return;
 }
@@ -1639,7 +1636,7 @@ void CMoviePlayerGui::selectAutoLang()
 			}
 		}
 	}
-	if(g_settings.auto_lang) {
+	if(g_settings.auto_lang &&  (numpida > 1)) {
 		int pref_idx = -1;
 
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
@@ -1711,4 +1708,52 @@ bool CMoviePlayerGui::mountIso(CFile *file)
 		return true;
 	}
 	return false;
+}
+
+void CMoviePlayerGui::makeScreenShot(bool autoshot, bool forcover)
+{
+	if (autoshot) {
+		if (autoshot_done || !g_settings.auto_cover)
+			return;
+		autoshot_done = true;
+	}
+
+	bool cover = autoshot || g_settings.screenshot_cover || forcover;
+	char ending[(sizeof(int)*2) + 6] = ".jpg";
+	if (!cover)
+		snprintf(ending, sizeof(ending) - 1, "_%x.jpg", position);
+
+	std::string fname = full_name;
+	std::string::size_type pos = fname.find_last_of('.');
+	if (pos != std::string::npos) {
+		fname.replace(pos, fname.length(), ending);
+	} else
+		fname += ending;
+
+	if (autoshot && !access(fname.c_str(), F_OK)) {
+		printf("CMoviePlayerGui::makeScreenShot: cover [%s] already exist..\n", fname.c_str());
+		return;
+	}
+
+	if (!cover) {
+		pos = fname.find_last_of('/');
+		if(pos != std::string::npos)
+			fname.replace(0, pos, g_settings.screenshot_dir);
+	}
+
+
+	CScreenShot * sc = new CScreenShot(fname);
+	if (cover) {
+		sc->EnableVideo(true);
+	}
+	if (autoshot || forcover) {
+		int xres = 0, yres = 0, framerate;
+		videoDecoder->getPictureInfo(xres, yres, framerate);
+		if (xres && yres) {
+			int w = std::min(300, xres);
+			int h = (float) yres / ((float) xres / (float) w);
+			sc->SetSize(w, h);
+		}
+	}
+	sc->Start();
 }
