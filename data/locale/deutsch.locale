@@ -574,7 +574,6 @@ flashupdate.wrongbase Abweichende Release-Information\nFortfahren?
 fontmenu.channellist Kanalliste
 fontmenu.epg EPG (Programmführer)
 fontmenu.eventlist Event-Liste
-fontmenu.gamelist Spiele-Liste
 fontmenu.head Schrift
 fontmenu.infobar Infobar
 fontmenu.menu Menü
@@ -600,8 +599,6 @@ fontsize.eventlist_itemlarge Groß
 fontsize.eventlist_itemsmall Klein
 fontsize.eventlist_title Titel
 fontsize.filebrowser_item Dateibrowsereinträge
-fontsize.gamelist_itemlarge Groß
-fontsize.gamelist_itemsmall Klein
 fontsize.hint Schriftart wird initialisiert,\nbitte warten...
 fontsize.infobar_channame Kanalname
 fontsize.infobar_info Info
@@ -620,11 +617,11 @@ hdd_5min 5 min.
 hdd_60min 60 min.
 hdd_activate Übernehmen
 hdd_check Dateisystemprüfung
-hdd_check_failed Festplattenprüfung fehlgeschlagen
+hdd_check_failed Datenträgerprüfung fehlgeschlagen
 hdd_check_format_bad Überprüfung von Datenträgern mit Format %s wird nicht unterstützt.
 hdd_extended_settings Erweiterte Festplatteneinstellungen
 hdd_fast Schnell
-hdd_format Formatiere Festplatte
+hdd_format Formatiere Datenträger
 hdd_format_failed Formatierung fehlgeschlagen! Stellen Sie sicher, dass der Datenträger nicht in Verwendung ist und versuchen Sie es erneut.
 hdd_format_warn Alle Daten auf dem Datenträger werden gelöscht! Formatierung starten?
 hdd_fs Dateisystem zum formatieren
@@ -632,15 +629,19 @@ hdd_fs_unknown unbekannt
 hdd_manage Laufwerke verwalten
 hdd_middle Mittel
 hdd_mount Mount
+hdd_mount_failed Fehler! Überprüfen Sie ihre Laufwerkseinstellungen.
+hdd_mount_ok Laufwerk bereit
 hdd_mount_umount Mount/Unmount
 hdd_noise Akustikkontrolle (AAM)
-hdd_not_found Keine Festplatte
+hdd_not_found Kein Datenträger
 hdd_removable_device Wechseldatenträger
+hdd_set_recdir Diesen Datenträger für die Aufnahme nutzen?
 hdd_settings Laufwerke
 hdd_sleep Ausschalten nach...
 hdd_slow Langsam
 hdd_umount Unmount
 hdd_umount_warn Laufwerk aushängen
+hdd_umounted Laufwerk entfernt
 imageinfo.creator Ersteller:
 imageinfo.date Datum:
 imageinfo.dokumentation Dokus:
@@ -878,7 +879,6 @@ menu.hint_font_gui Wählen Sie die Schriftart für die Menüs
 menu.hint_font_scaling Legen Sie die vertikale und horizontale Skalierung der Menüschrift fest
 menu.hint_font_ttx Wählen Sie die Schriftart für den Teletext
 menu.hint_fonts Konfigurieren Sie die Schriftart und die Schriftgrößen für die Menüs
-menu.hint_gamelist_fonts Ändern die Schriftgrößen für die Spiele- und Script-Liste
 menu.hint_games Zeige Liste der installierten Spiele
 menu.hint_hdd Formatierung und Prüfung der Datenträger
 menu.hint_hdd_apply Die veränderten Einstellungen zum Sleep- und Akustik-Modus werden übernommen
@@ -1042,6 +1042,7 @@ menu.hint_osd Farben, Schriftarten, Anzeigegröße, Ansichtsoptionen der Menüs 
 menu.hint_osd_language Wählen Sie ihre Menü-Sprache
 menu.hint_osd_preset Wählen Sie zwischen Röhren-TV (CRT) oder Flachbildschirm (LCD)
 menu.hint_osd_timing Einblendzeit, die das OSD auf dem TV angezeigt wird
+menu.hint_other_fonts Ändern Sie andere Schriftgrößen
 menu.hint_parentallock_changepin Geben Sie den 4-stelligen PIN-Code ein, der dann ggf. abgefragt wird
 menu.hint_parentallock_lockage Legen Sie fest, bei welcher Altersklasse die Abfrage der PIN erfolgt
 menu.hint_parentallock_menu Menüs mit PIN Code sichern
@@ -1071,6 +1072,7 @@ menu.hint_record_apid_alt Sind weitere Tonspuren verfügbar, dann können diese 
 menu.hint_record_apid_std Schließt bei einer Aufnahme die durch den Sender definierte Tonspur 'Standard' in die Aufnahme ein bzw. aus
 menu.hint_record_apids Konfigurieren Sie die Tonspuren für die Aufnahme
 menu.hint_record_apply Hiermit werden die Aufnahmeoptionen übernommen
+menu.hint_record_auto_cover Automatisch ein Film-Vorschaubild beim Abspielen erzeugen
 menu.hint_record_chandir Diese Option speichert Aufnahmen mit dem Namen des Kanals in ein eigenes Verzeichnis
 menu.hint_record_data Daten-Spuren (Teletext, Untertitel) für die Aufnahme
 menu.hint_record_data_dvbsub Untertitel-Spur zu Aufnahme hinzufügen
@@ -1733,6 +1735,7 @@ recordingmenu.apids Tonspuren
 recordingmenu.apids_ac3 AC3 Tonspuren aufnehmen
 recordingmenu.apids_alt Alternative Tonspuren aufn.
 recordingmenu.apids_std Standard Tonspur aufnehmen
+recordingmenu.auto_cover Autom. Film-Vorschaubild
 recordingmenu.data_pids Daten-Spuren
 recordingmenu.defdir Aufnahmeverzeichnis
 recordingmenu.dvbsub_pids Untertitel aufnehmen

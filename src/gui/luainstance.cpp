@@ -203,8 +203,6 @@ static void set_lua_variables(lua_State *L)
 		{ "EVENTLIST_ITEMLARGE",SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMLARGE },
 		{ "EVENTLIST_ITEMSMALL",SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMSMALL },
 		{ "EVENTLIST_DATETIME",	SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME },
-		{ "GAMELIST_ITEMLARGE",	SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMLARGE },
-		{ "GAMELIST_ITEMSMALL",	SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL },
 		{ "CHANNELLIST",	SNeutrinoSettings::FONT_TYPE_CHANNELLIST },
 		{ "CHANNELLIST_DESCR",	SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR },
 		{ "CHANNELLIST_NUMBER",	SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER },
@@ -1787,8 +1785,8 @@ int CLuaInstance::ComponentsTextSetText(lua_State *L)
 	if (!m) return 0;
 
 	std::string text = "";
-	int mode = m->mode;
-	int font_text = m->font_text;
+	lua_Integer mode = m->mode;
+	lua_Integer font_text = m->font_text;
 	tableLookup(L, "text", text);
 	tableLookup(L, "mode", mode);
 	tableLookup(L, "font_text", font_text);
@@ -1862,9 +1860,9 @@ int CLuaInstance::CPictureNew(lua_State *L)
 	lua_assert(lua_istable(L,1));
 
 	CLuaCWindow* parent = NULL;
-	int x=10, y=10, dx=100, dy=100;
+	lua_Integer x=10, y=10, dx=100, dy=100;
 	std::string image_name         = "";
-	int         alignment         = CC_ALIGN_HOR_CENTER | CC_ALIGN_VER_CENTER;
+	lua_Integer alignment         = CC_ALIGN_HOR_CENTER | CC_ALIGN_VER_CENTER;
 
 	std::string tmp1             = "false";	// has_shadow
 	lua_Integer color_frame      = (lua_Integer)COL_MENUCONTENT_PLUS_6;
