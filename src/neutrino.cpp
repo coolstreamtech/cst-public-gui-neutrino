@@ -336,6 +336,10 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.video_43mode = configfile.getInt32("video_43mode", DISPLAY_AR_MODE_LETTERBOX);
 	g_settings.current_volume = configfile.getInt8("current_volume", 50);
 	g_settings.current_volume_step = configfile.getInt32("current_volume_step", 2);
+	g_settings.start_volume = configfile.getInt32("start_volume", -1);
+	if (g_settings.start_volume >= 0)
+		g_settings.current_volume = g_settings.start_volume;
+
 	g_settings.channel_mode = configfile.getInt32("channel_mode", LIST_MODE_PROV);
 	g_settings.channel_mode_radio = configfile.getInt32("channel_mode_radio", LIST_MODE_PROV);
 	g_settings.channel_mode_initial = configfile.getInt32("channel_mode_initial", -1);
@@ -470,8 +474,13 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.epg_save = configfile.getBool("epg_save", false);
 	g_settings.epg_save_standby = configfile.getBool("epg_save_standby", true);
-	g_settings.epg_scan = configfile.getInt32("epg_scan", 0);
-	g_settings.epg_scan_mode = configfile.getInt32("epg_scan_mode", CEpgScan::MODE_ALWAYS);
+	g_settings.epg_scan = configfile.getInt32("epg_scan", CEpgScan::SCAN_CURRENT);
+	g_settings.epg_scan_mode = configfile.getInt32("epg_scan_mode", CEpgScan::MODE_OFF);
+	// backward-compatible check
+	if (g_settings.epg_scan == 0) {
+		g_settings.epg_scan = CEpgScan::SCAN_CURRENT;
+		g_settings.epg_scan_mode = CEpgScan::MODE_OFF;
+	}
 	//widget settings
 	g_settings.widget_fade = false;
 	g_settings.widget_fade           = configfile.getBool("widget_fade"          , false );
@@ -831,6 +840,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 
 	configfile.setInt32( "current_volume", g_settings.current_volume );
 	configfile.setInt32( "current_volume_step", g_settings.current_volume_step );
+	configfile.setInt32( "start_volume", g_settings.start_volume );
 	configfile.setInt32( "channel_mode", g_settings.channel_mode );
 	configfile.setInt32( "channel_mode_radio", g_settings.channel_mode_radio );
 	configfile.setInt32( "channel_mode_initial", g_settings.channel_mode_initial );
@@ -1850,9 +1860,6 @@ TIMER_START();
 	CEitManager::getInstance()->Start();
 #endif
 
-	CVFD::getInstance()->showVolume(g_settings.current_volume);
-	CVFD::getInstance()->setMuted(current_muted);
-
 	g_RemoteControl = new CRemoteControl;
 	g_EpgData = new CEpgData;
 	g_InfoViewer = new CInfoViewer;
@@ -1887,8 +1894,16 @@ TIMER_START();
 
 	InitTimerdClient();
 
+	// volume
+	if (g_settings.show_mute_icon && g_settings.current_volume == 0)
+		current_muted = true;
+
 	g_volume = CVolume::getInstance();
 	g_audioMute = CAudioMute::getInstance();
+
+	g_audioMute->AudioMute(current_muted, true);
+	CVFD::getInstance()->showVolume(g_settings.current_volume);
+	CVFD::getInstance()->setMuted(current_muted);
 
 	if (show_startwizard) {
 		hintBox->hide();
@@ -1912,7 +1927,6 @@ TIMER_START();
 	cCA::GetInstance()->Ready(true);
 	InitZapper();
 
-	g_audioMute->AudioMute(current_muted, true);
 	SHTDCNT::getInstance()->init();
 
 	hintBox->hide();
@@ -2041,7 +2055,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					StartSubtitles();
 					saveSetup(NEUTRINO_SETTINGS_FILE);
 					if (old_epg != g_settings.epg_scan || old_mode != g_settings.epg_scan_mode) {
-						if (g_settings.epg_scan)
+						if (g_settings.epg_scan_mode != CEpgScan::MODE_OFF)
 							CEpgScan::getInstance()->Start();
 						else
 							CEpgScan::getInstance()->Clear();
@@ -3300,7 +3314,8 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		g_Zapit->stopPip();
 #endif
 		bool stream_status = CStreamManager::getInstance()->StreamStatus();
-		if(!g_settings.epg_scan && !fromDeepStandby && !CRecordManager::getInstance()->RecordingStatus() && !stream_status) {
+		if((g_settings.epg_scan_mode == CEpgScan::MODE_OFF) && !fromDeepStandby && 
+				!CRecordManager::getInstance()->RecordingStatus() && !stream_status) {
 			g_Zapit->setStandby(true);
 		} else {
 			//g_Zapit->stopPlayBack();
@@ -3653,7 +3668,7 @@ void stop_daemons(bool stopall, bool for_flash)
 		CVFD::getInstance()->Clear();
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		CVFD::getInstance()->ShowText("Stop daemons...");
-		g_settings.epg_scan = false;
+		g_settings.epg_scan_mode = CEpgScan::MODE_OFF;
 		my_system(NEUTRINO_ENTER_FLASH_SCRIPT);
 	}
 
