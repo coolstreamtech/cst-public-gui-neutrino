@@ -204,8 +204,8 @@ class CComponents : public CComponentsSignals
 		virtual void hide();
 
 		///erase or paint over rendered objects without restore of background, it's similar to paintBackgroundBoxRel() known
-		///from CFrameBuffer but with possiblity to define color, default color is 0 (empty background)
-		virtual void kill(const fb_pixel_t& bg_color = 0);
+		///from CFrameBuffer but with possiblity to define color, default color is COL_BACKGROUND (empty background)
+		virtual void kill(const fb_pixel_t& bg_color = COL_BACKGROUND, const int& corner_radius = -1);
 
 		///returns paint mode, true=item was painted
 		virtual bool isPainted(){return is_painted;}
@@ -213,8 +213,8 @@ class CComponents : public CComponentsSignals
 		virtual void doPaintBg(bool do_paint){paint_bg = do_paint;};
 
 		///allow/disalows paint of item and its contents, but initialize of other properties are not touched
-		///this can be understood as a counterpart to isPainted(), but before paint
-		virtual void allowPaint(bool allow){cc_allow_paint = allow;};
+		///this can be understood as a counterpart to isPainted(), but before paint and value of is_painted is modified temporarily till next paint of item //TODO: is this sufficiently?
+		virtual void allowPaint(bool allow){cc_allow_paint = allow; is_painted = cc_allow_paint ? false : true;};
 		///returns visibility mode
 		virtual bool paintAllowed(){return cc_allow_paint;};
 };
@@ -269,7 +269,7 @@ class CComponentsItem : public CComponents
 		///erase or paint over rendered objects without restore of background, it's similar to paintBackgroundBoxRel() known
 		///from CFrameBuffer but with possiblity to define color, default color is 0 (empty background)
 		///NOTE: Items with parent binding use the parent background color as default! Set parameter 'ignore_parent=true' to ignore parent background color!
-		virtual void kill(const fb_pixel_t& bg_color = 0, bool ignore_parent = false);
+		virtual void kill(const fb_pixel_t& bg_color = COL_BACKGROUND, bool ignore_parent = false);
 
 		///get the current item type, see attribute cc_item_type above
 		virtual int getItemType();

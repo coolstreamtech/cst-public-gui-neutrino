@@ -55,8 +55,18 @@
 #include <zapit/femanager.h>
 #include <gui/widget/messagebox.h>
 #include <gui/buildinfo.h>
+#include <gui/widget/buttons.h>
 
 extern int cs_test_card(int unit, char * str);
+
+#define TestButtonsCount 4
+const struct button_label TestButtons[/*TestButtonsCount*/] =
+{
+	{ NEUTRINO_ICON_BUTTON_RED   	, LOCALE_STRINGINPUT_CAPS  	},
+	{ NEUTRINO_ICON_BUTTON_GREEN	, LOCALE_STRINGINPUT_CLEAR 	},
+	{ NEUTRINO_ICON_BUTTON_YELLOW	, LOCALE_MESSAGEBOX_INFO	},
+	{ NEUTRINO_ICON_BUTTON_BLUE	, LOCALE_STRINGINPUT_CLEAR	}
+};
 
 
 CTestMenu::CTestMenu()
@@ -359,7 +369,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey == "button"){
 		if (button == NULL)
-			button = new CComponentsButtonRed(100, 100, 100, 40, "Test");
+			button = new CComponentsButtonRed(100, 100, 100, 50, "Test");
 
 		if (!button->isPainted()){
 			if (button->isSelected())
@@ -369,7 +379,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			button->paint();
 		}else			
 			button->hide();
-		
+
 		return res;
 	}
 	else if (actionKey == "circle"){
@@ -539,13 +549,24 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	else if (actionKey == "footer"){
 		int hh = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getHeight();
 		if (footer == NULL){
-			footer = new CComponentsFooter (100, 50, 500, hh, CComponentsHeader::CC_BTN_HELP | CComponentsHeader::CC_BTN_EXIT | CComponentsHeader::CC_BTN_MENU, NULL, true);
+			footer = new CComponentsFooter (100, 30, 1000, hh, CComponentsFooter::CC_BTN_HELP | CComponentsFooter::CC_BTN_EXIT | CComponentsFooter::CC_BTN_MENU |CComponentsFooter::CC_BTN_MUTE_ZAP_ACTIVE, NULL, true);
 			int start = 5, btnw =90, btnh = 37;
-			footer->addCCItem(new CComponentsButtonRed(start, 0, btnw, btnh, "Button1"));
-			footer->addCCItem(new CComponentsButtonGreen(start+=btnw, 0, btnw, btnh, "Button2"));
-			footer->addCCItem(new CComponentsButtonYellow(start+=btnw, 0, btnw, btnh, "Button3"));
-			footer->addCCItem(new CComponentsButtonBlue(start+=btnw, 0, btnw, btnh, "Button4"));
+			footer->setButtonFont(g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]);
+			footer->setIcon(NEUTRINO_ICON_INFO);
+
+			//add button labels with conventional button label struct
+			footer->setButtonLabels(TestButtons, TestButtonsCount, 0, footer->getWidth()/6);
+
+			//also possible: use directly button name and as 2nd parameter string or locale as text
+//			footer->setButtonLabel(NULL, "Test", 0, 250);
+
+			//also possible: use Button objects
+// 			footer->addCCItem(new CComponentsButtonRed(start, 0, btnw, btnh, "Button1"));
+// 			footer->addCCItem(new CComponentsButtonGreen(start+=btnw, 0, btnw, btnh, "Button2"));
+// 			footer->addCCItem(new CComponentsButtonYellow(start+=btnw, 0, btnw, btnh, "Button3"));
+// 			footer->addCCItem(new CComponentsButtonBlue(start+=btnw, 0, btnw, btnh, "Button4"));
 		}
+
 		if (!footer->isPainted())
 			footer->paint();
 		else

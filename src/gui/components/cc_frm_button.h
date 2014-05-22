@@ -28,7 +28,9 @@
 
 #include <config.h>
 #include "cc_base.h"
-#include "cc_frm.h"
+#include "cc_frm_chain.h"
+#include "cc_item_picture.h"
+#include "cc_item_text.h"
 #include <string>
 #include <driver/neutrinofonts.h>
 
@@ -36,7 +38,7 @@
 /*!
 Shows a button box with caption and optional icon.
 */
-class CComponentsButton : public CComponentsForm
+class CComponentsButton : public CComponentsFrmChain
 {
 	protected:
 		///object: picture object
@@ -58,7 +60,7 @@ class CComponentsButton : public CComponentsForm
 		std::string cc_btn_capt;
 		///property: button text as locale, see also setCaption() and getCaptionLocale()
 		neutrino_locale_t cc_btn_capt_locale;
-		
+
 		///property: icon name, only icons supported, to find in gui/widget/icons.h
 		std::string cc_btn_icon;
 
@@ -73,19 +75,20 @@ class CComponentsButton : public CComponentsForm
 		void initIcon();
 		///initialize label object
 		void initCaption();
-		
+
 		///initialize picture and label object
 		void initCCBtnItems();
-	
+
 	public:
 		///basic constructor for button object with most needed params, no button icon is definied here
 		CComponentsButton(	const int& x_pos, const int& y_pos, const int& w, const int& h,
-					const std::string& caption, const std::string& icon_name = "",
+					const std::string& caption,
+					const std::string& icon_name = "",
 					CComponentsForm *parent = NULL,
 					bool selected = false,
 					bool enabled = true,
 					bool has_shadow = CC_SHADOW_OFF,
-					fb_pixel_t color_frame = COL_LIGHT_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
+					fb_pixel_t color_frame = COL_DARK_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
 
 		CComponentsButton(	const int& x_pos, const int& y_pos, const int& w, const int& h,
 					const neutrino_locale_t& caption_locale,
@@ -94,21 +97,42 @@ class CComponentsButton : public CComponentsForm
 					bool selected = false,
 					bool enabled = true,
 					bool has_shadow = CC_SHADOW_OFF,
-					fb_pixel_t color_frame = COL_LIGHT_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
+					fb_pixel_t color_frame = COL_DARK_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
+
+		CComponentsButton(	const int& x_pos, const int& y_pos, const int& w, const int& h,
+					const neutrino_locale_t& caption_locale,
+					const char* icon_name = NULL,
+					CComponentsForm *parent = NULL,
+					bool selected = false,
+					bool enabled = true,
+					bool has_shadow = CC_SHADOW_OFF,
+					fb_pixel_t color_frame = COL_DARK_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
+
+		CComponentsButton(	const int& x_pos, const int& y_pos, const int& w, const int& h,
+					const std::string& caption,
+					const char* icon_name = NULL,
+					CComponentsForm *parent = NULL,
+					bool selected = false,
+					bool enabled = true,
+					bool has_shadow = CC_SHADOW_OFF,
+					fb_pixel_t color_frame = COL_DARK_GRAY, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0);
 
 		///set text color
 		virtual void setButtonTextColor(fb_pixel_t caption_color){cc_btn_capt_col = caption_color;};
-		
+
 		///set caption: parameter as string
 		virtual void setCaption(const std::string& text);
 		///set caption: parameter as locale
 		virtual void setCaption(const neutrino_locale_t locale_text);
-		
+
 		///get caption, type as std::string
 		virtual std::string getCaptionString(){return cc_btn_capt;};
 		///get loacalized caption id, type = neutrino_locale_t
 		virtual neutrino_locale_t getCaptionLocale(){return cc_btn_capt_locale;};
-		
+
+		///property: set font for label caption, parameter as font object, value NULL causes usaage of dynamic font
+		virtual void setButtonFont(Font* font){cc_btn_font = font; initCCBtnItems();};
+
 		///reinitialize items
 		virtual void Refresh(){initCCBtnItems();};
 
