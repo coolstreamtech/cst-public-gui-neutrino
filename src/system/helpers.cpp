@@ -393,6 +393,14 @@ string trim(string &str, const string &trimChars /*= " \n\r\t"*/)
 	return result.erase(0, result.find_first_not_of(trimChars));
 }
 
+string strftime(const char *format, const struct tm *tm)
+{
+	char buf[4096];
+	*buf = 0;
+	strftime(buf, sizeof(buf), format, tm);
+	return string(buf);
+}
+
 time_t toEpoch(string &date)
 {
 	struct tm t;
