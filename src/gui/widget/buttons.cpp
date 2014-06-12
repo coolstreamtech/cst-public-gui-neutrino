@@ -140,9 +140,9 @@ int paintButtons(	const int &x,
 			buttontext[i] = g_Locale->getText(content[i].locale);
 			//text width
 			if (alt_buttontext != NULL && i == buttontext_id) 
-				fwidth[i] = font->getRenderWidth(alt_buttontext, true); //...with an alternate buttontext
+				fwidth[i] = font->getRenderWidth(alt_buttontext); //...with an alternate buttontext
 			else
-				fwidth[i] = font->getRenderWidth(buttontext[i], true);
+				fwidth[i] = font->getRenderWidth(buttontext[i]);
 			w_text += fwidth[i];
 			count_labels++;
 		} else {
@@ -205,7 +205,7 @@ int paintButtons(	const int &x,
 		// paint icon and text
 		frameBuffer->paintIcon(icon, x_button , y_base - iconh[j]/2);
 		x_caption = x_button + iconw[j] + h_space;
-		font->RenderString(x_caption, y_caption, fwidth[j], caption, fcolor, 0, true);
+		font->RenderString(x_caption, y_caption, fwidth[j], caption, fcolor);
  		
  		/* 	set next startposition x, if text is length=0 then offset is =renderwidth of icon, 
   		* 	for generating buttons without captions, 

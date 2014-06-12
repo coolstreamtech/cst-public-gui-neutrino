@@ -224,7 +224,7 @@ void CHintBoxExt::init(const neutrino_locale_t Caption, const std::string &Capti
 		m_iconfile = "";
 
 	const char *l_caption = (m_caption == NONEXISTANT_LOCALE) ? m_captionString.c_str() : g_Locale->getText(m_caption);
-	nw = additional_width + g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(l_caption, true); // UTF-8
+	nw = additional_width + g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(l_caption);
 
 	if (nw > m_width)
 		m_width = nw;
@@ -295,7 +295,7 @@ void CHintBoxExt::refresh(bool toround)
 		x_text = x_offset;
 	
 	// title text
-	m_window->RenderString(g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE], x_text, m_theight, m_width, title_text, COL_MENUHEAD_TEXT, 0, true); // UTF-8
+	m_window->RenderString(g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE], x_text, m_theight, m_width, title_text, COL_MENUHEAD_TEXT);
 
 	// background of text panel
 	m_window->paintBoxRel(0, m_theight, m_width, (m_maxEntriesPerPage + 1) * m_fheight, (CFBWindow::color_t)COL_MENUCONTENT_PLUS_0, toround ? RADIUS_LARGE : 0, CORNER_BOTTOM);//round

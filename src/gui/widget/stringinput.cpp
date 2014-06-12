@@ -114,7 +114,7 @@ void CStringInput::init()
 
 	width = std::max(size*input_w + 2*offset, (int) frameBuffer->getScreenWidth() / 100 * 45);
 
-	int tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(head.c_str(), true); // UTF-8
+	int tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(head);
 
 	if (!(iconfile.empty()))
 	{
@@ -130,13 +130,13 @@ void CStringInput::init()
 	{
 		if (hint_1 != NONEXISTANT_LOCALE)
 		{
-			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_1), true);
+			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_1));
 			width = std::max(width, tmp_w + 2*offset);
 			bheight += iheight;
 		}
 		if (hint_2 != NONEXISTANT_LOCALE)
 		{
-			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_2), true);
+			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_2));
 			width = std::max(width, tmp_w + 2*offset);
 			bheight += iheight;
 		}
@@ -552,7 +552,7 @@ void CStringInput::paint(bool sms)
 		icol_o = icol_w + (offset/2);
 	}
 
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+ (offset/2)+ icol_o, y+ hheight, width- offset- icol_o, head.c_str(), COL_MENUHEAD_TEXT, 0, true); // UTF-8
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+ (offset/2)+ icol_o, y+ hheight, width- offset- icol_o, head.c_str(), COL_MENUHEAD_TEXT);
 
 	int tmp_y = y+ hheight+ offset+ input_h+ offset;
 	if ((hint_1 != NONEXISTANT_LOCALE) || (hint_2 != NONEXISTANT_LOCALE))
@@ -560,12 +560,12 @@ void CStringInput::paint(bool sms)
 		if (hint_1 != NONEXISTANT_LOCALE)
 		{
 			tmp_y += iheight;
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_1), COL_MENUCONTENT_TEXT, 0, true); // UTF-8
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_1), COL_MENUCONTENT_TEXT);
 		}
 		if (hint_2 != NONEXISTANT_LOCALE)
 		{
 			tmp_y += iheight;
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_2), COL_MENUCONTENT_TEXT, 0, true); // UTF-8
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_2), COL_MENUCONTENT_TEXT);
 		}
 		tmp_y += offset;
 	}

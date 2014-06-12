@@ -66,7 +66,7 @@ void CExtendedInput::Init(void)
 
 	width = frameBuffer->getScreenWidth() / 100 * 45;
 
-	int tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(g_Locale->getText(name), true); // UTF-8
+	int tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(g_Locale->getText(name));
 	width = std::max(width, tmp_w + offset);
 
 	bheight = input_h + 2*offset;
@@ -74,13 +74,13 @@ void CExtendedInput::Init(void)
 	{
 		if (hint_1 != NONEXISTANT_LOCALE)
 		{
-			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_1), true);
+			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_1));
 			width = std::max(width, tmp_w + 2*offset);
 			bheight += iheight;
 		}
 		if (hint_2 != NONEXISTANT_LOCALE)
 		{
-			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_2), true);
+			tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getRenderWidth(g_Locale->getText(hint_2));
 			width = std::max(width, tmp_w + 2*offset);
 			bheight += iheight;
 		}
@@ -289,7 +289,7 @@ void CExtendedInput::paint()
 	frameBuffer->paintBoxRel(x, y, width, hheight, COL_MENUHEAD_PLUS_0, RADIUS_LARGE, CORNER_TOP);
 	frameBuffer->paintBoxRel(x, y + hheight, width, bheight, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE, CORNER_BOTTOM);
 
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+ (offset/2), y+ hheight, width- offset, g_Locale->getText(name), COL_MENUHEAD_TEXT, 0, true); // UTF-8
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+ (offset/2), y+ hheight, width- offset, g_Locale->getText(name), COL_MENUHEAD_TEXT);
 
 	int tmp_y = y+ hheight+ offset+ input_h+ offset;
 
@@ -298,12 +298,12 @@ void CExtendedInput::paint()
 		if (hint_1 != NONEXISTANT_LOCALE)
 		{
 			tmp_y += iheight;
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_1), COL_MENUCONTENT_TEXT, 0, true); // UTF-8
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_1), COL_MENUCONTENT_TEXT);
 		}
 		if (hint_2 != NONEXISTANT_LOCALE)
 		{
 			tmp_y += iheight;
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_2), COL_MENUCONTENT_TEXT, 0, true); // UTF-8
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->RenderString(x+ offset, tmp_y, width- 2*offset, g_Locale->getText(hint_2), COL_MENUCONTENT_TEXT);
 		}
 		tmp_y += offset;
 	}
