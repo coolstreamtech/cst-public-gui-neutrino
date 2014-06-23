@@ -276,7 +276,7 @@ void CComponentsForm::paintCCItems()
 		}
 		//positionize vertical centered
 		else if (xpos == CC_CENTERED){
-			auto_x =  width/2 - w_item/2 +fr_thickness;
+			auto_x =  width/2 - w_item/2;
 			cc_item->setRealXPos(this_x + auto_x);
 		}
 		else{
@@ -293,7 +293,7 @@ void CComponentsForm::paintCCItems()
 		}
 		//positionize hor centered
 		else if (ypos == CC_CENTERED){
-			auto_y =  height/2 - h_item/2 +fr_thickness;
+			auto_y =  height/2 - h_item/2;
 			cc_item->setRealYPos(this_y + auto_y);
 		}
 		else{
@@ -361,4 +361,11 @@ void CComponentsForm::hide(bool no_restore)
 
 	//hide body
 	hideCCItem(no_restore);
+}
+
+//erase or paint over rendered objects
+void CComponentsForm::killCCItems(const fb_pixel_t& bg_color, bool ignore_parent)
+{
+	for(size_t i=0; i<v_cc_items.size(); i++)
+		v_cc_items[i]->kill(bg_color, ignore_parent);
 }

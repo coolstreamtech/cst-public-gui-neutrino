@@ -35,7 +35,7 @@
 using namespace std;
 
 //abstract basic class CComponents
-CComponents::CComponents()
+CComponents::CComponents() : COSDFader(g_settings.menu_Content_alpha)
 {
 	x = saved_screen.x 	= 0;
 	y = saved_screen.y 	= 0;
@@ -281,4 +281,12 @@ inline void CComponents::setXPos(const int& xpos)
 inline void CComponents::setYPos(const int& ypos)
 {
 	y = ypos;
+}
+
+void CComponents::setFrameThickness(const int& thickness, const int& thickness_sel)
+{
+	fr_thickness = thickness;
+
+	if (fr_thickness_sel != thickness_sel)
+		fr_thickness_sel = thickness_sel;
 }

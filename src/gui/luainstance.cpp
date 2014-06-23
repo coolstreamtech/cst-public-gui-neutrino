@@ -29,9 +29,10 @@
 #include <gui/widget/msgbox.h>
 #include <gui/widget/messagebox.h>
 #include <gui/filebrowser.h>
+#include <gui/movieplayer.h>
 #include <driver/pictureviewer/pictureviewer.h>
 #include <neutrino.h>
-
+#include <system/debug.h>
 #include "luainstance.h"
 
 /* the magic color that tells us we are using one of the palette colors */
@@ -408,6 +409,7 @@ const luaL_Reg CLuaInstance::methods[] =
 	{ "Blit", CLuaInstance::Blit },
 	{ "GetLanguage", CLuaInstance::GetLanguage },
 	{ "runScript", CLuaInstance::runScriptExt },
+	{ "PlayFile", CLuaInstance::PlayFile },
 	{ NULL, NULL }
 };
 
@@ -562,6 +564,28 @@ int CLuaInstance::DisplayImage(lua_State *L)
 	if (lua_isnumber(L, 7))
 		trans = luaL_checkint(L, 7);
 	g_PicViewer->DisplayImage(fname, x, y, w, h, trans);
+	return 0;
+}
+
+int CLuaInstance::PlayFile(lua_State *L)
+{
+	printf("CLuaInstance::%s %d\n", __func__, lua_gettop(L));
+	int numargs = lua_gettop(L);
+
+	if (numargs < 3) {
+		printf("CLuaInstance::%s: not enough arguments (%d, expected 3)\n", __func__, numargs);
+		return 0;
+	}
+	const char *title;
+	const char *fname;
+
+	title = luaL_checkstring(L, 2);
+	fname = luaL_checkstring(L, 3);
+	printf("CLuaInstance::%s: title %s file %s\n", __func__, title, fname);
+	std::string st(title);
+	std::string sf(fname);
+	CMoviePlayerGui::getInstance().SetFile(st, sf);
+	CMoviePlayerGui::getInstance().exec(NULL, "http");
 	return 0;
 }
 
@@ -1862,8 +1886,7 @@ int CLuaInstance::CPictureNew(lua_State *L)
 	CLuaCWindow* parent = NULL;
 	lua_Integer x=10, y=10, dx=100, dy=100;
 	std::string image_name         = "";
-	lua_Integer alignment         = CC_ALIGN_HOR_CENTER | CC_ALIGN_VER_CENTER;
-
+	lua_Integer alignment          = 0;
 	std::string tmp1             = "false";	// has_shadow
 	lua_Integer color_frame      = (lua_Integer)COL_MENUCONTENT_PLUS_6;
 	lua_Integer color_background = (lua_Integer)COL_MENUCONTENT_PLUS_0;
@@ -1875,7 +1898,11 @@ int CLuaInstance::CPictureNew(lua_State *L)
 	tableLookup(L, "dx"               , dx);
 	tableLookup(L, "dy"               , dy);
 	tableLookup(L, "image"            , image_name);
-	tableLookup(L, "alignment"        , alignment);
+
+	tableLookup(L, "alignment"        , alignment); //invalid argumet, for compatibility
+	if (alignment)
+		dprintf(DEBUG_NORMAL, "[CLuaInstance][%s - %d] invalid argument: 'alignment' has no effect!\n", __func__, __LINE__);
+
 	tableLookup(L, "has_shadow"       , tmp1);
 	bool has_shadow = (tmp1 == "true" || tmp1 == "1" || tmp1 == "yes");
 	tableLookup(L, "color_frame"      , color_frame);
@@ -1886,7 +1913,7 @@ int CLuaInstance::CPictureNew(lua_State *L)
 
 	CLuaPicture **udata = (CLuaPicture **) lua_newuserdata(L, sizeof(CLuaPicture *));
 	*udata = new CLuaPicture();
-	(*udata)->cp = new CComponentsPicture(x, y, dx, dy, image_name, alignment, pw, has_shadow, (fb_pixel_t)color_frame, (fb_pixel_t)color_background, (fb_pixel_t)color_shadow);
+	(*udata)->cp = new CComponentsPicture(x, y, dx, dy, image_name, pw, has_shadow, (fb_pixel_t)color_frame, (fb_pixel_t)color_background, (fb_pixel_t)color_shadow);
 	(*udata)->parent = pw;
 	luaL_getmetatable(L, "cpicture");
 	lua_setmetatable(L, -2);

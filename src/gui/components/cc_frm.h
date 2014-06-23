@@ -50,11 +50,20 @@ class CComponentsForm : public CComponentsItem
 		
 		void paint(bool do_save_bg = CC_SAVE_SCREEN_YES);
 		void hide(bool no_restore = false);
+
+		///same like CComponentsItem::kill(), but erases all embedded items inside of parent at once, this = parent
+		///NOTE: Items always have parent bindings to "this" and use the parent background color as default! Set parameter 'ignore_parent=true' to ignore parent background color!
+		virtual void killCCItems(const fb_pixel_t& bg_color, bool ignore_parent);
+
 		virtual void addCCItem(CComponentsItem* cc_Item);
 		virtual void addCCItem(const std::vector<CComponentsItem*> &cc_items);
 		virtual void insertCCItem(const uint& cc_item_id, CComponentsItem* cc_Item);
+
+		///removes item object from container and deallocates instance
 		virtual void removeCCItem(const uint& cc_item_id);
+		///removes item object from container and deallocates instance
 		virtual void removeCCItem(CComponentsItem* cc_Item);
+
 		virtual void replaceCCItem(const uint& cc_item_id, CComponentsItem* new_cc_Item);
 		virtual void replaceCCItem(CComponentsItem* old_cc_Item, CComponentsItem* new_cc_Item);
 		virtual void exchangeCCItem(const uint& item_id_a, const uint& item_id_b);
