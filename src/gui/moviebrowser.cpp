@@ -375,6 +375,11 @@ CMovieBrowser::~CMovieBrowser()
 		m_FilterLines.lineArray[i].clear();
 	}
 	m_browserListLines.Icon.clear();
+
+	if (CChannelLogo) {
+		delete CChannelLogo;
+		CChannelLogo = NULL;
+	}
 }
 
 void CMovieBrowser::fileInfoStale(void)
@@ -516,6 +521,8 @@ void CMovieBrowser::init(void)
 	refreshFilterList();
   	g_PicViewer->getSupportedImageFormats(PicExts);
 	show_mode = MB_SHOW_RECORDS; //FIXME
+
+	CChannelLogo = NULL;
 #if 0
 	TRACE_1("Frames\r\n\tScren:\t%3d,%3d,%3d,%3d\r\n\tMain:\t%3d,%3d,%3d,%3d\r\n\tTitle:\t%3d,%3d,%3d,%3d \r\n\tBrowsr:\t%3d,%3d,%3d,%3d \r\n\tPlay:\t%3d,%3d,%3d,%3d \r\n\tRecord:\t%3d,%3d,%3d,%3d\r\n\r\n",
 	g_settings.screen_StartX,
@@ -641,9 +648,9 @@ void CMovieBrowser::initFrames(void)
 	m_cBoxFrameBrowserList.iHeight = 	m_cBoxFrame.iHeight * m_settings.browserFrameHeight / 100;
 
 	m_cBoxFrameFootRel.iX = 		0;
-	m_cBoxFrameFootRel.iY = 		m_cBoxFrame.iHeight - m_pcFontFoot->getHeight();
+	m_cBoxFrameFootRel.iY = 		m_cBoxFrame.iHeight - m_pcFontFoot->getHeight() - 6;
 	m_cBoxFrameFootRel.iWidth = 		m_cBoxFrameBrowserList.iWidth;
-	m_cBoxFrameFootRel.iHeight = 		m_pcFontFoot->getHeight();
+	m_cBoxFrameFootRel.iHeight = 		m_pcFontFoot->getHeight() + 6;
 
 	m_cBoxFrameLastPlayList.iX = 		m_cBoxFrameBrowserList.iX;
 	m_cBoxFrameLastPlayList.iY = 		m_cBoxFrameBrowserList.iY ;
@@ -1305,15 +1312,25 @@ void CMovieBrowser::refreshMovieInfo(void)
 		short pb_hdd_offset = 104;
 		if (show_mode == MB_SHOW_YT)
 			pb_hdd_offset = 0;
-		m_pcWindow->paintBoxRel(lx - pb_hdd_offset , ly, logo_w, logo_h, TITLE_BACKGROUND_COLOR);
-        	std::string lname;
-		if(g_PicViewer->GetLogoName(m_movieSelectionHandler->epgEpgId >>16, m_movieSelectionHandler->epgChannel, lname, &logo_w, &logo_h)){
-			if((logo_h > m_cBoxFrameTitleRel.iHeight) || (logo_w > logo_w_max))
-				g_PicViewer->rescaleImageDimensions(&logo_w, &logo_h, logo_w_max, m_cBoxFrameTitleRel.iHeight);
-			lx = m_cBoxFrame.iX+m_cBoxFrameTitleRel.iX+m_cBoxFrameTitleRel.iWidth-logo_w-10;
-			ly = m_cBoxFrameTitleRel.iY+m_cBoxFrame.iY+ (m_cBoxFrameTitleRel.iHeight-logo_h)/2;
-			g_PicViewer->DisplayImage(lname, lx - pb_hdd_offset, ly, logo_w, logo_h);
+		static uint64_t old_EpgId = 0;
+		if (CChannelLogo && (old_EpgId != m_movieSelectionHandler->epgEpgId >>16)) {
+			CChannelLogo->hide();
+			delete CChannelLogo;
 		}
+		if (old_EpgId != m_movieSelectionHandler->epgEpgId >>16) {
+			CChannelLogo = new CComponentsChannelLogo(0, 0, logo_w_max, m_cBoxFrameTitleRel.iHeight, 
+								  m_movieSelectionHandler->epgChannel, m_movieSelectionHandler->epgEpgId >>16);
+			old_EpgId = m_movieSelectionHandler->epgEpgId >>16;
+		}
+
+		if (CChannelLogo) {
+			lx = m_cBoxFrame.iX+m_cBoxFrameTitleRel.iX+m_cBoxFrameTitleRel.iWidth-CChannelLogo->getWidth()-10;
+			ly = m_cBoxFrameTitleRel.iY+m_cBoxFrame.iY+ (m_cBoxFrameTitleRel.iHeight-CChannelLogo->getHeight())/2;
+			CChannelLogo->setXPos(lx - pb_hdd_offset);
+			CChannelLogo->setYPos(ly);
+			CChannelLogo->paint();
+		}
+
 		if(logo_ok) {
 			lx = m_cBoxFrameInfo.iX+m_cBoxFrameInfo.iWidth - flogo_w -14;
 			ly = m_cBoxFrameInfo.iY - 1 + (m_cBoxFrameInfo.iHeight-flogo_h)/2;
@@ -1669,7 +1686,7 @@ void CMovieBrowser::refreshFoot(void)
 
 	// draw the background first
 	m_pcWindow->paintBoxRel(m_cBoxFrame.iX+m_cBoxFrameFootRel.iX, m_cBoxFrame.iY+	m_cBoxFrameFootRel.iY,
-				m_cBoxFrameFootRel.iWidth, m_cBoxFrameFootRel.iHeight+ 6,
+				m_cBoxFrameFootRel.iWidth, m_cBoxFrameFootRel.iHeight,
 				(CFBWindow::color_t)COL_INFOBAR_SHADOW_PLUS_0, RADIUS_LARGE, CORNER_BOTTOM);
 
 	if(m_settings.gui == MB_GUI_FILTER && m_windowFocus == MB_FOCUS_FILTER)
@@ -1683,7 +1700,7 @@ void CMovieBrowser::refreshFoot(void)
 
 	const int xoff = 10;
 	const int ypos_icon = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY;
-	const int ypos_font = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY + m_cBoxFrameFootRel.iHeight + 4;
+	const int ypos_font = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY + m_pcFontFoot->getHeight() + (m_cBoxFrameFootRel.iHeight - m_pcFontFoot->getHeight()) / 2;
 	int xpos = m_cBoxFrame.iX + m_cBoxFrameFootRel.iX + xoff;
 
 	int max_b = 5;
@@ -1695,38 +1712,38 @@ void CMovieBrowser::refreshFoot(void)
 	if (m_settings.gui != MB_GUI_LAST_PLAY && m_settings.gui != MB_GUI_LAST_RECORD)
 	{
 		m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_RED, &iw, &ih);
-		m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_RED, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+		m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_RED, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 		m_pcFontFoot->RenderString(xpos + xoff + iw, ypos_font, width - iw - 2*xoff, sort_text.c_str(), (CFBWindow::color_t)color);
 		xpos += width;
 
 		m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_GREEN, &iw, &ih);
-		m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_GREEN, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+		m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_GREEN, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 		m_pcFontFoot->RenderString(xpos + xoff + iw, ypos_font, width - iw - 2*xoff, filter_text.c_str(), (CFBWindow::color_t)color);
 		xpos += width;
 	}
 
 	m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_YELLOW, &iw, &ih);
-	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_YELLOW, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_YELLOW, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 	m_pcFontFoot->RenderString(xpos + xoff + iw, ypos_font, width - iw - 2*xoff, g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_FOCUS), (CFBWindow::color_t)color);
 	xpos += width;
 
 	m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_BLUE, &iw, &ih);
-	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_BLUE, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_BLUE, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 	m_pcFontFoot->RenderString(xpos + xoff + iw, ypos_font, width - iw - 2*xoff, g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_REFRESH), (CFBWindow::color_t)color);
 	xpos += width;
 
 	m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_OKAY, &iw, &ih);
-	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_OKAY, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_OKAY, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 	m_pcFontFoot->RenderString(xpos + xoff + iw, ypos_font, width - iw - 2*xoff, ok_text.c_str(), (CFBWindow::color_t)color);
 	xpos += width;
 
 	m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_MUTE_SMALL, &iw, &ih);
-	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_MUTE_SMALL, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_MUTE_SMALL, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 	m_pcFontFoot->RenderString(xpos + xoff + iw , ypos_font, width - iw - 2*xoff, g_Locale->getText(LOCALE_FILEBROWSER_DELETE), (CFBWindow::color_t)color);
 	xpos += width;
 
 	m_pcWindow->getIconSize(NEUTRINO_ICON_BUTTON_MENU_SMALL, &iw, &ih);
-	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_MENU_SMALL, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight+ 6);
+	m_pcWindow->paintIcon(NEUTRINO_ICON_BUTTON_MENU_SMALL, xpos, ypos_icon, m_cBoxFrameFootRel.iHeight);
 	m_pcFontFoot->RenderString(xpos + xoff + iw , ypos_font, width - iw - 2*xoff, g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_OPTIONS), (CFBWindow::color_t)color);
 }
 
