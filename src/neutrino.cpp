@@ -127,7 +127,6 @@
 #include <eitd/sectionsd.h>
 
 int old_b_id = -1;
-CHintBox * reloadhintBox = 0;
 
 CInfoClock      *InfoClock;
 int allow_flash = 1;
@@ -1323,10 +1322,6 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 	printf("[neutrino] Creating channels lists...\n");
 	TIMER_START();
 
-	if(!reloadhintBox)
-		reloadhintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_SERVICEMENU_RELOAD_HINT));
-	reloadhintBox->paint();
-
 	memset(tvsort, -1, sizeof(tvsort));
 	memset(radiosort, -1, sizeof(tvsort));
 
@@ -1500,7 +1495,6 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 	SetChannelMode(lastChannelMode);
 
 	dprintf(DEBUG_DEBUG, "\nAll bouquets-channels received\n");
-	reloadhintBox->hide();
 }
 
 void CNeutrinoApp::SetChannelMode(int newmode)
@@ -2467,12 +2461,14 @@ _repeat:
 		if(old_b_id < 0) old_b_id = old_b;
 		//g_Zapit->saveBouquets();
 		/* lets do it in sync */
-		reloadhintBox->paint();
+		CHintBox chb(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_SERVICEMENU_RELOAD_HINT));
+		chb.paint();
 		CServiceManager::getInstance()->SaveServices(true, true);
 		g_bouquetManager->saveBouquets();
 		g_bouquetManager->saveUBouquets();
 		g_bouquetManager->renumServices();
 		channelsInit(/*true*/);
+		chb.hide();
 		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
 		channelList->adjustToChannelID(live_channel_id);//FIXME what if deleted ?
 		bouquetList->activateBouquet(old_b_id, false);
