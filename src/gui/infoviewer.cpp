@@ -1445,7 +1445,7 @@ void CInfoViewer::showSNR ()
 
 			std::string polarisation = "";
 			
-			if (CFEManager::getInstance()->getLiveFE()->getType() == FE_QPSK)
+			if (CFrontend::isSat(CFEManager::getInstance()->getLiveFE()->getCurrentDeliverySystem()))
 				polarisation = transponder::pol(CFEManager::getInstance()->getLiveFE()->getPolarization());
 
 			int frequency = CFEManager::getInstance()->getLiveFE()->getFrequency();
