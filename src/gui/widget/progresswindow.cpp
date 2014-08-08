@@ -50,12 +50,15 @@ void CProgressWindow::Init()
 
 	int x_item = 10;
 	int y_item = 10;
+	setWidthP(75);
 	int w_item = width-2*x_item;
 	int h_item = 20;
+	w_bar_frame = 0;
 
 	//create status text object
 	status_txt = new CComponentsLabel();
-	status_txt->setDimensionsAll(x_item, y_item, w_item, h_item);
+	int h_txt = max(g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight(), h_item);
+	status_txt->setDimensionsAll(x_item, y_item, w_item, h_txt);
 	status_txt->setColorBody(col_body);
 	addWindowItem(status_txt);
 	y_item += 2*h_item;
@@ -65,7 +68,7 @@ void CProgressWindow::Init()
 	local_bar->setDimensionsAll(x_item, y_item, w_item, h_item);
 	local_bar->setColorBody(col_body);
 	local_bar->setActiveColor(COL_MENUCONTENT_PLUS_7);
-	local_bar->setFrameThickness(2);
+	local_bar->setFrameThickness(w_bar_frame);
 	local_bar->setColorFrame(COL_MENUCONTENT_PLUS_7);
 	addWindowItem(local_bar);
 	y_item += 2*h_item;
@@ -75,7 +78,7 @@ void CProgressWindow::Init()
 	global_bar->setDimensionsAll(x_item, y_item, w_item, h_item);
 	global_bar->setColorBody(col_body);
 	global_bar->setActiveColor(COL_MENUCONTENT_PLUS_7);
-	global_bar->setFrameThickness(2);
+	global_bar->setFrameThickness(w_bar_frame);
 	global_bar->setColorFrame(COL_MENUCONTENT_PLUS_7);
 	addWindowItem(global_bar);
 	y_item += 2*h_item;

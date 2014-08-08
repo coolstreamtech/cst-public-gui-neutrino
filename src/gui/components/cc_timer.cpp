@@ -102,4 +102,3 @@ bool CComponentsTimer::stopTimer()
 
 	return false;
 }
-

@@ -38,7 +38,7 @@
 
 class CComponentsTimer : public sigc::trackable
 {
-	private:	
+	private:
 		///thread
 		pthread_t  tm_thread;
 		///refresh interval in seconds
