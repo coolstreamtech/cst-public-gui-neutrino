@@ -1452,11 +1452,9 @@ void CInfoViewer::showSNR ()
 {
 	if (! is_visible)
 		return;
-	char percent[10];
-	uint16_t ssig, ssnr;
 	/* right now, infobar_show_channellogo == 3 is the trigger for signal bars etc.
 	   TODO: decouple this  */
-	if (! fileplay && ( g_settings.infobar_show_channellogo == 3 || g_settings.infobar_show_channellogo == 5 || g_settings.infobar_show_channellogo == 6 )) {
+	if (!fileplay && !IS_WEBTV(channel_id) && ( g_settings.infobar_show_channellogo == 3 || g_settings.infobar_show_channellogo == 5 || g_settings.infobar_show_channellogo == 6 )) {
 		int chanH = g_SignalFont->getHeight();
 		int freqStartY = BoxStartY + 2 * chanH - 3;
 		if ((newfreq && chanready) || SDT_freq_update) {
@@ -1475,6 +1473,9 @@ void CInfoViewer::showSNR ()
 			g_SignalFont->RenderString (3 + BoxStartX + ((ChanWidth - satNameWidth) / 2), BoxStartY + 2 * chanH - 3, satNameWidth, freq, SDT_freq_update ? COL_COLORED_EVENTS_TEXT:COL_INFOBAR_TEXT);
 			SDT_freq_update = false;
 		}
+
+		char percent[10];
+		uint16_t ssig, ssnr;
 		int sw, snr, sig, posx, posy;
 
 		int height;
