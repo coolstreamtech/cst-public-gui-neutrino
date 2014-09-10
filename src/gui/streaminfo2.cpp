@@ -257,7 +257,7 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 
 	int tuner = 1 + frontend->getNumber();
 	char tname[255];
-	snprintf(tname, sizeof(tname), "%s: %d: %s", g_Locale->getText(LOCALE_STREAMINFO_SIGNAL), tuner, frontend->getInfo()->name);
+	snprintf(tname, sizeof(tname), "%s: %d: %s", g_Locale->getText(LOCALE_STREAMINFO_SIGNAL), tuner, frontend->getName());
 
 	g_Font[font_small]->RenderString(_x, _y+iheight+15, width-_x-10, tname /*tuner_name.c_str()*/, COL_INFOBAR_TEXT);
 
@@ -471,7 +471,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 
 	average_bitrate_offset = spaceoffset;
 
-	if(channel->getVideoPid() && !(videoDecoder->getBlank())){
+	if((channel->getVideoPid() || IS_WEBTV(channel->getChannelID())) && !(videoDecoder->getBlank())){
 		 videoDecoder->getPictureInfo(xres, yres, framerate);
 		 if (yres == 1088)
 		 	yres = 1080;
@@ -565,16 +565,16 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 
 	//satellite
 	ypos += iheight;
-	if(t.deltype == FE_QPSK)
+	if (CFrontend::isSat(t.feparams.delsys))
 		sprintf (buf, "%s:",g_Locale->getText (LOCALE_SATSETUP_SATELLITE));//swiped locale
-	else if(t.deltype == FE_QAM)
+	else if (CFrontend::isCable(t.feparams.delsys))
 		sprintf (buf, "%s:",g_Locale->getText (LOCALE_CHANNELLIST_PROVS));
-	else
+	else if (CFrontend::isTerr(t.feparams.delsys))
 		snprintf (buf, sizeof(buf), "%s:",g_Locale->getText (LOCALE_TERRESTRIALSETUP_AREA));
 
 	g_Font[font_info]->RenderString(xpos, ypos, box_width, buf, COL_INFOBAR_TEXT);
 
-	sprintf (buf, "%s",
+	sprintf (buf, "%s", IS_WEBTV(channel->getChannelID()) ? g_Locale->getText(LOCALE_WEBTV_HEAD) :
 		CServiceManager::getInstance()->GetSatelliteName(channel->getSatellitePosition()).c_str());
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR_TEXT);
 
@@ -589,7 +589,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	ypos += iheight;
 
 	scaling = 27000;
-	if (t.deltype == FE_QPSK && t.feparams.dvb_feparams.u.qpsk.fec_inner < FEC_S2_QPSK_1_2)
+	if (CFrontend::isSat(t.feparams.delsys) && t.feparams.delsys == DVB_S)
 		scaling = 15000;
 
 	sprintf (buf, "%s",g_Locale->getText (LOCALE_SCANTS_FREQDATA));

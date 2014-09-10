@@ -121,6 +121,7 @@ struct SNeutrinoSettings
 	int cpufreq;
 	int standby_cpufreq;
 	int make_hd_list;
+	int make_webtv_list;
 	int make_new_list;
 	int make_removed_list;
 	int keep_channel_numbers;
@@ -164,7 +165,9 @@ struct SNeutrinoSettings
 	std::string network_ntprefresh;
 	int network_ntpenable;
 	std::string ifname;
-	
+
+	std::list<std::string> webtv_xml;
+
 	//personalize
 	enum PERSONALIZE_SETTINGS  //settings.h
 	{
@@ -795,15 +798,27 @@ class CScanSettings
 		int		sat_TP_pol;
 		std::string	sat_TP_freq;
 		std::string	sat_TP_rate;
+		int		sat_TP_delsys;
+		int		sat_TP_mod;
 
 		std::string	cableName;
 		int		cable_TP_mod;
 		int		cable_TP_fec;
 		std::string	cable_TP_freq;
 		std::string	cable_TP_rate;
+		int		cable_TP_delsys;
 
-		std::string	terrName;
-		std::string	terr_TP_freq;
+		std::string	terrestrialName;
+		std::string	terrestrial_TP_freq;
+		int		terrestrial_TP_constel;
+		int		terrestrial_TP_bw;
+		int		terrestrial_TP_coderate_HP;
+		int		terrestrial_TP_coderate_LP;
+		int		terrestrial_TP_guard;
+		int		terrestrial_TP_hierarchy;
+		int		terrestrial_TP_transmit_mode;
+		int		terrestrial_TP_delsys;
+
 		CScanSettings();
 
 		bool loadSettings(const char * const fileName);

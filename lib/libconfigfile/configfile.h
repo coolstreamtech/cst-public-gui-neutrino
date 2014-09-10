@@ -112,6 +112,7 @@ class CConfigFile
 	void setUnknownKeyQueryedFlag(const bool val) { unknownKeyQueryedFlag = val; }
 
 	ConfigDataMap getConfigDataMap(){ return configData; }
+	bool deleteKey(const std::string & key);
 };
 
 #endif /* __configfile_h__ */

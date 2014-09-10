@@ -713,7 +713,7 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 
 		int ChanNumYPos = BoxStartY + ChanHeight;
 		if (g_settings.infobar_sat_display) {
-			std::string name = CServiceManager::getInstance()->GetSatelliteName(satellitePosition);
+			std::string name = (IS_WEBTV(channel_id))? "WebTV" : CServiceManager::getInstance()->GetSatelliteName(satellitePosition);
 			int satNameWidth = g_SignalFont->getRenderWidth (name);
 			std::string satname_tmp = name;
 			if (satNameWidth > (ChanWidth - 4)) {
@@ -791,6 +791,17 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 
 	if (fileplay) {
 		show_Data ();
+	} else if (IS_WEBTV(new_channel_id)) {
+		CZapitChannel * channel = CServiceManager::getInstance()->FindChannel(new_channel_id);
+		if (channel) {
+			const char *current = channel->getDesc().c_str();
+			const char *next = channel->getUrl().c_str();
+			if (!current) {
+				current = next;
+				next = "";
+			}
+			display_Info(current, next, true, false, 0, NULL, NULL, NULL, NULL, true, true);
+		}
 	} else {
 		show_current_next(new_chan,epgpos);
 	}
@@ -827,6 +838,7 @@ void CInfoViewer::setInfobarTimeout(int timeout_ext)
 	switch (mode)
 	{
 		case NeutrinoMessages::mode_tv:
+		case NeutrinoMessages::mode_webtv:
 				timeoutEnd = CRCInput::calcTimeoutEnd (g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] + timeout_ext);
 				break;
 		case NeutrinoMessages::mode_radio:
@@ -1298,7 +1310,7 @@ int CInfoViewer::handleMsg (const neutrino_msg_t msg, neutrino_msg_data_t data)
  					int duration = CMoviePlayerGui::getInstance().GetDuration();
 					snprintf(runningRest, sizeof(runningRest), "%d / %d %s", (curr_pos + 30000) / 60000, (duration - curr_pos + 30000) / 60000, unit_short_minute);
 					display_Info(NULL, NULL, true, false, CMoviePlayerGui::getInstance().file_prozent, NULL, runningRest);
-				} else {
+				} else if (!IS_WEBTV(channel_id)) {
 					show_Data( true );
 				}
 			}
@@ -1398,6 +1410,14 @@ void CInfoViewer::sendNoEpg(const t_channel_id for_channel_id)
 
 CSectionsdClient::CurrentNextInfo CInfoViewer::getEPG (const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info)
 {
+	/* to clear the oldinfo for channels without epg, call getEPG() with for_channel_id = 0 */
+	if (for_channel_id == 0 || IS_WEBTV(for_channel_id))
+	{
+		oldinfo.current_uniqueKey = 0;
+		return info;
+	}
+
+
 	CEitManager::getInstance()->getCurrentNextServiceKey(for_channel_id, info);
 
 //printf("CInfoViewer::getEPG: old uniqueKey %llx new %llx\n", oldinfo.current_uniqueKey, info.current_uniqueKey);
@@ -1432,11 +1452,9 @@ void CInfoViewer::showSNR ()
 {
 	if (! is_visible)
 		return;
-	char percent[10];
-	uint16_t ssig, ssnr;
 	/* right now, infobar_show_channellogo == 3 is the trigger for signal bars etc.
 	   TODO: decouple this  */
-	if (! fileplay && ( g_settings.infobar_show_channellogo == 3 || g_settings.infobar_show_channellogo == 5 || g_settings.infobar_show_channellogo == 6 )) {
+	if (!fileplay && !IS_WEBTV(channel_id) && ( g_settings.infobar_show_channellogo == 3 || g_settings.infobar_show_channellogo == 5 || g_settings.infobar_show_channellogo == 6 )) {
 		int chanH = g_SignalFont->getHeight();
 		int freqStartY = BoxStartY + 2 * chanH - 3;
 		if ((newfreq && chanready) || SDT_freq_update) {
@@ -1445,7 +1463,7 @@ void CInfoViewer::showSNR ()
 
 			std::string polarisation = "";
 			
-			if (CFEManager::getInstance()->getLiveFE()->getType() == FE_QPSK)
+			if (CFrontend::isSat(CFEManager::getInstance()->getLiveFE()->getCurrentDeliverySystem()))
 				polarisation = transponder::pol(CFEManager::getInstance()->getLiveFE()->getPolarization());
 
 			int frequency = CFEManager::getInstance()->getLiveFE()->getFrequency();
@@ -1455,6 +1473,9 @@ void CInfoViewer::showSNR ()
 			g_SignalFont->RenderString (3 + BoxStartX + ((ChanWidth - satNameWidth) / 2), BoxStartY + 2 * chanH - 3, satNameWidth, freq, SDT_freq_update ? COL_COLORED_EVENTS_TEXT:COL_INFOBAR_TEXT);
 			SDT_freq_update = false;
 		}
+
+		char percent[10];
+		uint16_t ssig, ssnr;
 		int sw, snr, sig, posx, posy;
 
 		int height;
