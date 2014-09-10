@@ -2134,7 +2134,7 @@ int CLuaInstance::CPictureDelete(lua_State *L)
 	CLuaPicture *m = CPictureCheck(L, 1);
 	if (!m) return 0;
 
-	m->cp->hide();
+//	m->cp->hide();
 	delete m;
 	return 0;
 }
