@@ -66,6 +66,7 @@
 #include <system/helpers.h>
 
 #include <timerdclient/timerdclient.h>
+#include <system/hddstat.h>
 
 extern CPictureViewer * g_PicViewer;
 static CProgressBar *timescale;
@@ -2521,6 +2522,7 @@ void CMovieBrowser::updateDir(void)
     if(!g_settings.network_nfs_recordingdir.empty())
     {
         addDir(g_settings.network_nfs_recordingdir, &m_settings.storageDirRecUsed);
+	cHddStat::getInstance()->statOnce();
     }
 
     for(int i = 0; i < MB_MAX_DIRS; i++)
