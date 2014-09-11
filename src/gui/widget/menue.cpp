@@ -960,7 +960,7 @@ void CMenuWidget::paint()
 		int y_footer = y + height + RADIUS_LARGE - fbutton_height;
 		int w_footer = width + sb_width;
 		CComponentsFooter footer(x, y_footer, w_footer, fbutton_height);
-		footer.setButtonLabels(fbutton_labels, fbutton_count, 0, (w_footer/max(fbutton_count, 4)+2)-20);
+		footer.setButtonLabels(fbutton_labels, fbutton_count, 0, (w_footer/max(fbutton_count, 2)-1)-20);
 		footer.paint(CC_SAVE_SCREEN_NO);
 	}
 }
