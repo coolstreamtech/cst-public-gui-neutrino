@@ -2276,9 +2276,12 @@ int CLuaInstance::LuaConfigFileSetString(lua_State *L)
 {
 	CLuaConfigFile *c = LuaConfigFileCheck(L, 1);
 	if (!c) return 0;
+	int numargs = lua_gettop(L);
 
 	const char *key = luaL_checkstring(L, 2);
-	const char *val = luaL_checkstring(L, 3);
+	const char *val = "";
+	if (numargs > 2)
+		val = luaL_checkstring(L, 3);
 	c->c->setString(key, val);
 	return 0;
 }
@@ -2300,9 +2303,12 @@ int CLuaInstance::LuaConfigFileSetInt32(lua_State *L)
 {
 	CLuaConfigFile *c = LuaConfigFileCheck(L, 1);
 	if (!c) return 0;
+	int numargs = lua_gettop(L);
 
 	const char *key = luaL_checkstring(L, 2);
-	int val = luaL_checkint(L, 3);
+	int val = 0;
+	if (numargs > 2)
+		val = luaL_checkint(L, 3);
 	c->c->setInt32(key, val);
 	return 0;
 }
@@ -2324,9 +2330,12 @@ int CLuaInstance::LuaConfigFileSetBool(lua_State *L)
 {
 	CLuaConfigFile *c = LuaConfigFileCheck(L, 1);
 	if (!c) return 0;
+	int numargs = lua_gettop(L);
 
 	const char *key = luaL_checkstring(L, 2);
-	bool val = _luaL_checkbool(L, 3);
+	bool val = false;
+	if (numargs > 2)
+		val = _luaL_checkbool(L, 3);
 	c->c->setBool(key, val);
 	return 0;
 }
