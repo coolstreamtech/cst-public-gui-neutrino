@@ -159,7 +159,7 @@ int CThemes::Show()
 	CStringInputSMS nameInput(LOCALE_COLORTHEMEMENU_NAME, &file_name, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789- ");
 	CMenuForwarder *m1 = new CMenuForwarder(LOCALE_COLORTHEMEMENU_SAVE, true , NULL, &nameInput, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 
-	if (mkdirhier(USERDIR) && errno != EEXIST) {
+	if (CFileHelpers::createDir(USERDIR) && errno != EEXIST) {
 		printf("[neutrino theme] error creating %s\n", USERDIR);
 	}
 	if (access(USERDIR, F_OK) == 0 ) {
