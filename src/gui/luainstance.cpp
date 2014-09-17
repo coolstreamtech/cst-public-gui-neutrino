@@ -1847,7 +1847,6 @@ int CLuaInstance::CWindowDelete(lua_State *L)
 	if (!m)
 		return 0;
 
-	m->w->hide();
 	delete m;
 	return 0;
 }
@@ -1924,7 +1923,6 @@ int CLuaInstance::SignalBoxDelete(lua_State *L)
 	if (!m)
 		return 0;
 
-	m->s->kill();
 	delete m;
 	return 0;
 }
@@ -2122,7 +2120,6 @@ int CLuaInstance::ComponentsTextDelete(lua_State *L)
 	if (!m)
 		return 0;
 
-	m->ct->hide();
 	delete m;
 	return 0;
 }
@@ -2268,7 +2265,6 @@ int CLuaInstance::CPictureDelete(lua_State *L)
 	CLuaPicture *m = CPictureCheck(L, 1);
 	if (!m) return 0;
 
-//	m->cp->hide();
 	delete m;
 	return 0;
 }
