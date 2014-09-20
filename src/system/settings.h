@@ -148,8 +148,12 @@ struct SNeutrinoSettings
 	int infobar_show;
 	int infobar_show_channellogo;
 	int infobar_progressbar;
-	int progressbar_color;
 	int progressbar_design;
+	int progressbar_gradient;
+	int progressbar_timescale_red;
+	int progressbar_timescale_green;
+	int progressbar_timescale_yellow;
+	int progressbar_timescale_invert;
 	int casystem_display;
 	int scrambled_message;
 	int volume_pos;
@@ -196,7 +200,7 @@ struct SNeutrinoSettings
 	int ci_ignore_messages;
 	int radiotext_enable;
 	int easymenu;
-	
+
 	//vcr
 	int vcr_AutoSwitch;
 
@@ -235,20 +239,20 @@ struct SNeutrinoSettings
 	enum PERSONALIZE_SETTINGS  //settings.h
 	{
 		P_MAIN_PINSTATUS,
-		
+
 		//user menu
 		P_MAIN_BLUE_BUTTON,
 		P_MAIN_YELLOW_BUTTON,
 		P_MAIN_GREEN_BUTTON,
 		P_MAIN_RED_BUTTON,
-		
+
 		//main menu
 		P_MAIN_TV_MODE,
 		P_MAIN_TV_RADIO_MODE, //togglemode
 		P_MAIN_RADIO_MODE,
 		P_MAIN_TIMER,
 		P_MAIN_MEDIA,
-		
+
 		P_MAIN_GAMES,
 		P_MAIN_TOOLS,
 		P_MAIN_SCRIPTS,
@@ -261,7 +265,7 @@ struct SNeutrinoSettings
 		P_MAIN_SHUTDOWN,
 		P_MAIN_INFOMENU,
 		P_MAIN_CISETTINGS,
-		
+
 		//settings menu
 		P_MSET_SETTINGS_MANAGER,
 		P_MSET_VIDEO,
@@ -276,7 +280,7 @@ struct SNeutrinoSettings
 		P_MSET_KEYBINDING,
 		P_MSET_MEDIAPLAYER,
 		P_MSET_MISC,
-		
+
 		//service menu
 		P_MSER_TUNER,
 		P_MSER_SCANTS,
@@ -287,7 +291,7 @@ struct SNeutrinoSettings
 		P_MSER_RELOAD_PLUGINS,
 		P_MSER_SERVICE_INFOMENU,
 		P_MSER_SOFTUPDATE,
-		
+
 		//media menu
 		P_MEDIA_MENU,
 		P_MEDIA_AUDIO,
@@ -295,18 +299,18 @@ struct SNeutrinoSettings
 		P_MEDIA_MPLAYER,
 		P_MEDIA_PVIEWER,
 		P_MEDIA_UPNP,
-		
+
 		//movieplayer menu
 		P_MPLAYER_MBROWSER,
 		P_MPLAYER_FILEPLAY,
 		P_MPLAYER_YTPLAY,
-		
+
 		//feature keys
 		P_FEAT_KEY_FAVORIT,
 		P_FEAT_KEY_TIMERLIST,
 		P_FEAT_KEY_VTXT,
 		P_FEAT_KEY_RC_LOCK,
-		
+
 		//user menu
 		P_UMENU_SHOW_CANCEL,
 
@@ -316,10 +320,10 @@ struct SNeutrinoSettings
 		P_UMENU_PLUGIN_TYPE_SCRIPTS,
 		P_UMENU_PLUGIN_TYPE_LUA,
 
- 		P_SETTINGS_MAX
+		P_SETTINGS_MAX
 	};
 
- 	int  personalize[P_SETTINGS_MAX];
+	int  personalize[P_SETTINGS_MAX];
 	std::string personalize_pincode;
 
 	//timing
@@ -334,7 +338,7 @@ struct SNeutrinoSettings
 		TIMING_VOLUMEBAR	= 6,
 		TIMING_FILEBROWSER	= 7,
 		TIMING_NUMERICZAP	= 8,
-		
+
 		TIMING_SETTING_COUNT
 	};
 
@@ -393,16 +397,22 @@ struct SNeutrinoSettings
 	int filesystem_is_utf8;
 	// default plugin for ts-movieplayer (red button)
 	std::string movieplayer_plugin;
-	std::string onekey_plugin;
 	std::string plugin_hdd_dir;
-	
+
 	std::string logo_hdd_dir;
+
+	std::string plugins_disabled;
+	std::string plugins_game;
+	std::string plugins_tool;
+	std::string plugins_script;
+	std::string plugins_lua;
 
 	//key configuration
 	int key_tvradio_mode;
 
-	int key_channelList_pageup;
-	int key_channelList_pagedown;
+	int key_pageup;
+	int key_pagedown;
+
 	int key_channelList_cancel;
 	int key_channelList_sort;
 	int key_channelList_addrecord;
@@ -420,7 +430,6 @@ struct SNeutrinoSettings
 	int key_list_end;
 	int key_power_off;
 	int menu_left_exit;
-	int audio_run_player;
 	int key_click;
 	int timeshift_pause;
 	int auto_timeshift;
@@ -428,6 +437,12 @@ struct SNeutrinoSettings
 	int auto_delete;
 	int record_hours;
 	int timeshift_hours;
+	int key_record;
+	int key_help;
+	int key_next43mode;
+	int key_switchformat;
+	int key_volumeup;
+	int key_volumedown;
 
 	int mpkey_rewind;
 	int mpkey_forward;
@@ -438,7 +453,9 @@ struct SNeutrinoSettings
 	int mpkey_time;
 	int mpkey_bookmark;
 	int mpkey_plugin;
+	int mpkey_goto;
 	int mpkey_subtitle;
+	int mpkey_next_repeat_mode;
 	int key_timeshift;
 	int key_plugin;
 
@@ -491,12 +508,13 @@ struct SNeutrinoSettings
 	int eventlist_additional;
 	int channellist_additional;
 	int channellist_epgtext_align_right;
-	int channellist_extended;
+	int channellist_progressbar_design;
 	int channellist_foot;
 	int channellist_new_zap_mode;
 	int channellist_sort_mode;
 	int channellist_numeric_adjust;
 	int channellist_show_channellogo;
+	int channellist_show_numbers;
 	int repeat_blocker;
 	int repeat_genericblocker;
 #define LONGKEYPRESS_OFF 499
@@ -611,10 +629,10 @@ struct SNeutrinoSettings
 	int backlight_standby;
 	int backlight_deepstandby;
 	int lcd_scroll;
-//#define FILESYSTEM_ENCODING_TO_UTF8(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a).c_str())
+	//#define FILESYSTEM_ENCODING_TO_UTF8(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a).c_str())
 #define FILESYSTEM_ENCODING_TO_UTF8(a) (isUTF8(a) ? (a) : ZapitTools::Latin1_to_UTF8(a).c_str())
 #define UTF8_TO_FILESYSTEM_ENCODING(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::UTF8_to_Latin1(a).c_str())
-//#define FILESYSTEM_ENCODING_TO_UTF8_STRING(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a))
+	//#define FILESYSTEM_ENCODING_TO_UTF8_STRING(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a))
 #define FILESYSTEM_ENCODING_TO_UTF8_STRING(a) (isUTF8(a) ? (a) : ZapitTools::Latin1_to_UTF8(a))
 
 	// pictureviewer
@@ -691,10 +709,20 @@ struct SNeutrinoSettings
 		ITEM_FILEPLAY = 23,
 		ITEM_TOOLS = 24,
 		ITEM_LUA = 25,
+
+		ITEM_HDDMENU = 26,
+		ITEM_AUDIOPLAY = 27,
+		ITEM_INETPLAY = 28,
+
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
-	std::string usermenu_text[BUTTON_MAX];
-	int usermenu[BUTTON_MAX][ITEM_MAX];  // (USER_ITEM)  [button][position in Menue] = feature item
+	typedef struct {
+		unsigned int key;
+		std::string items;
+		std::string title;
+		std::string name;
+	} usermenu_t;
+	std::vector<usermenu_t *> usermenu;
 
 	//progressbar arrangement for infobar
 	typedef enum

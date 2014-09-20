@@ -39,7 +39,7 @@
 
 #include <global.h>
 #include <neutrino.h>
-#include <neutrino_menue.h>
+
 #include <driver/fontrenderer.h>
 #include <driver/screen_max.h>
 #include <driver/rcinput.h>
@@ -362,13 +362,13 @@ int CChannelList::doChannelMenu(void)
 		unlocked = (chanlist[selected]->last_unlocked_time + 3600 > time_monotonic());
 
 	snprintf(cnt, sizeof(cnt), "%d", i);
-	menu->addItem(new CMenuForwarder(LOCALE_BOUQUETEDITOR_DELETE, enabled && unlocked, NULL, selector, cnt, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED), old_selected == i++);
+	menu->addItem(new CMenuForwarder(LOCALE_BOUQUETEDITOR_DELETE, enabled && unlocked, NULL, selector, cnt, CRCInput::RC_red), old_selected == i++);
 	snprintf(cnt, sizeof(cnt), "%d", i);
-	menu->addItem(new CMenuForwarder(LOCALE_BOUQUETEDITOR_MOVE, enabled && unlocked, NULL, selector, cnt, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN), old_selected == i++);
+	menu->addItem(new CMenuForwarder(LOCALE_BOUQUETEDITOR_MOVE, enabled && unlocked, NULL, selector, cnt, CRCInput::RC_green), old_selected == i++);
 	snprintf(cnt, sizeof(cnt), "%d", i);
-	menu->addItem(new CMenuForwarder(LOCALE_EXTRA_ADD_TO_BOUQUET, unlocked, NULL, selector, cnt, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW), old_selected == i++);
+	menu->addItem(new CMenuForwarder(LOCALE_EXTRA_ADD_TO_BOUQUET, unlocked, NULL, selector, cnt, CRCInput::RC_yellow), old_selected == i++);
 	snprintf(cnt, sizeof(cnt), "%d", i);
-	menu->addItem(new CMenuForwarder(LOCALE_FAVORITES_MENUEADD, unlocked, NULL, selector, cnt, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE), old_selected == i++);
+	menu->addItem(new CMenuForwarder(LOCALE_FAVORITES_MENUEADD, unlocked, NULL, selector, cnt, CRCInput::RC_blue), old_selected == i++);
 	snprintf(cnt, sizeof(cnt), "%d", i);
 	bool reset_enabled = chanlist[selected]->flags & CZapitChannel::NEW;
 	menu->addItem(new CMenuForwarder(LOCALE_CHANNELLIST_RESET_FLAGS, reset_enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(shortcut++)), old_selected == i++);
@@ -377,10 +377,6 @@ int CChannelList::doChannelMenu(void)
 	menu->addItem(new CMenuForwarder(LOCALE_CHANNELLIST_RESET_ALL, reset_all, NULL, selector, cnt, CRCInput::convertDigitToKey(shortcut++)), old_selected == i++);
 	snprintf(cnt, sizeof(cnt), "%d", i);
 	menu->addItem(new CMenuSeparator(CMenuSeparator::LINE));
-
-	//use osd channel list settings widget from COsdSetup class
-	CMenuWidget osd_menu_chanlist(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_CHANNELLIST);
-	osd_menu_chanlist.suppressDetailsLine(true);
 	menu->addItem(new CMenuForwarder(LOCALE_MAINMENU_SETTINGS, true, NULL, selector, cnt, CRCInput::convertDigitToKey(shortcut++)), old_selected == i++);
 	menu->exec(NULL, "");
 	delete menu;
@@ -502,7 +498,7 @@ int CChannelList::doChannelMenu(void)
 			{
 				previous_channellist_additional = g_settings.channellist_additional;
 				COsdSetup osd_setup;
-				osd_setup.showContextChanlistMenu(&osd_menu_chanlist);
+				osd_setup.showContextChanlistMenu();
 				//FIXME check font/options changed ?
 				hide();
 				calcSize();
@@ -702,7 +698,7 @@ int CChannelList::show()
 			} else
 				loop=false;
 		}
-		else if( msg == CRCInput::RC_record) { //start direct recording from channellist
+		else if( msg == (neutrino_msg_t) g_settings.key_record) { //start direct recording from channellist
 #if 0
 			if(!CRecordManager::getInstance()->RecordingStatus(chanlist[selected]->channel_id))
 			{
@@ -793,10 +789,10 @@ int CChannelList::show()
 		else if (msg == (neutrino_msg_t) g_settings.key_list_end) {
 			actzap = updateSelection(chanlist.size()-1);
 		}
-		else if (msg == CRCInput::RC_up || (int) msg == g_settings.key_channelList_pageup)
+		else if (msg == CRCInput::RC_up || (int) msg == g_settings.key_pageup)
 		{
 			displayList = 1;
-			int step = ((int) msg == g_settings.key_channelList_pageup) ? listmaxshow : 1;  // browse or step 1
+			int step = ((int) msg == g_settings.key_pageup) ? listmaxshow : 1;  // browse or step 1
 			int new_selected = selected - step;
 			if (new_selected < 0) {
 				if (selected != 0 && step != 1)
@@ -806,10 +802,10 @@ int CChannelList::show()
 			}
 			actzap = updateSelection(new_selected);
 		}
-		else if (msg == CRCInput::RC_down || (int) msg == g_settings.key_channelList_pagedown)
+		else if (msg == CRCInput::RC_down || (int) msg == g_settings.key_pagedown)
 		{
 			displayList = 1;
-			int step =  ((int) msg == g_settings.key_channelList_pagedown) ? listmaxshow : 1;  // browse or step 1
+			int step =  ((int) msg == g_settings.key_pagedown) ? listmaxshow : 1;  // browse or step 1
 			int new_selected = selected + step;
 			if (new_selected >= (int) chanlist.size()) {
 				if ((chanlist.size() - listmaxshow -1 < selected) && (selected != (chanlist.size() - 1)) && (step != 1))
@@ -1948,7 +1944,7 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 		fb_pixel_t tcolor=(liststart + pos == selected) ? color : COL_MENUCONTENTINACTIVE_TEXT;
 		int xtheight=fheight-2;
 		int rec_mode;
-		if(g_settings.channellist_extended)
+		if(g_settings.channellist_progressbar_design != CProgressBar::PB_OFF)
 		{
 			prg_offset = g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->getRenderWidth("00:00");
 			title_offset=6;
@@ -2035,9 +2031,12 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 
 		int icon_space = r_icon_w+s_icon_w;
 
-		//number
-		int numpos = x+5+numwidth- g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->getRenderWidth(tmp);
-		g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->RenderString(numpos,ypos+fheight, numwidth+5, tmp, color, fheight);
+		//channel numbers
+		if (g_settings.channellist_show_numbers) {
+			int numpos = x+5+numwidth- g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->getRenderWidth(tmp);
+			g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->RenderString(numpos,ypos+fheight, numwidth+5, tmp, color, fheight);
+		} else
+			numwidth = -5;
 
 		int l=0;
 		if (this->historyMode)
@@ -2046,22 +2045,40 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			l = snprintf(nameAndDescription, sizeof(nameAndDescription), "%s", chan->getName().c_str());
 
 		int pb_space = prg_offset - title_offset;
-		bool pb_colored = ((g_settings.channellist_extended == 2) && g_settings.progressbar_color);
-		int pb_frame = pb_colored ? 0 : 1;
-		CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4, pb_space, fheight/2,
-				color, bgcolor, COL_MENUCONTENTDARK_PLUS_0, color, COL_MENUCONTENT_PLUS_1,
-				pb_colored, 0, 100, 70);
+		CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4 + 2, pb_space + 2, fheight/2 - 4,
+				0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3);
+		pb.setType(CProgressBar::PB_TIMESCALE);
+		pb.setDesign(g_settings.channellist_progressbar_design);
 		pb.setCornerType(0);
-		pb.setFrameThickness(pb_frame);
+		pb.setFrameThickness(0);	// no frame
+		pb.doPaintBg(false);		// no background
+		int pb_max = pb_space - 4;
+		if (g_settings.progressbar_design != CProgressBar::PB_MONO) {
+			if (liststart + pos != selected) {
+				fb_pixel_t pbgcol = COL_MENUCONTENT_PLUS_1;
+				if (pbgcol == bgcolor)
+					pbgcol = COL_MENUCONTENT_PLUS_0;
+				pb.setStatusColors(COL_MENUCONTENT_PLUS_3, pbgcol);
+			} else {
+				fb_pixel_t pbgcol = COL_MENUCONTENTSELECTED_PLUS_0;
+				if (pbgcol == bgcolor)
+					pbgcol = COL_MENUCONTENT_PLUS_0;
+				pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, pbgcol);
+			}
+		} else {
+			if (liststart + pos != selected)
+				pb.setStatusColors(COL_MENUCONTENT_PLUS_3, COL_MENUCONTENT_PLUS_1);
+			else
+				pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, COL_MENUCONTENTSELECTED_PLUS_0);
+		}
 
-		int pb_max = pb_space - (2*pb_frame);
 		if (!(p_event->description.empty())) {
 			snprintf(nameAndDescription+l, sizeof(nameAndDescription)-l,g_settings.channellist_epgtext_align_right ? "  ":" - ");
 			unsigned int ch_name_len = g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST]->getRenderWidth(nameAndDescription);
 			unsigned int ch_desc_len = g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->getRenderWidth(p_event->description);
 
 			int max_desc_len = width - numwidth - prg_offset - ch_name_len - 15 - 20; // 15 = scrollbar, 20 = spaces
-			if (chan->scrambled || (g_settings.channellist_extended ||g_settings.channellist_epgtext_align_right))
+			if (chan->scrambled || g_settings.channellist_epgtext_align_right)
 				max_desc_len -= icon_space+g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->getWidth(); /* do we need space for the lock/rec icon? */
 
 			if (max_desc_len < 0)
@@ -2069,7 +2086,7 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			if ((int) ch_desc_len > max_desc_len)
 				ch_desc_len = max_desc_len;
 
-			if(g_settings.channellist_extended) {
+			if(g_settings.channellist_progressbar_design != CProgressBar::PB_OFF) {
 				if(displayNext)
 				{
 					struct		tm *pStartZeit = localtime(&p_event->startTime);
@@ -2093,11 +2110,6 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 						if (runningPercent > pb_max)	// this would lead to negative value in paintBoxRel
 							runningPercent = pb_max;	// later on which can be fatal...
 					}
-
-					if (liststart + pos != selected)
-						pb.setPassiveColor(COL_MENUCONTENT_PLUS_3);
-					else
-						pb.setPassiveColor(COL_MENUCONTENTSELECTED_PLUS_2);
 					pb.setValues(runningPercent, pb_max);
 					pb.paint();
 				}
@@ -2114,14 +2126,10 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			}
 		}
 		else {
-			if(g_settings.channellist_extended) {
-				if (liststart + pos != selected)
-					pb.setPassiveColor(COL_MENUCONTENT_PLUS_1);
-				else
-					pb.setPassiveColor(COL_MENUCONTENTSELECTED_PLUS_2);
+			if(g_settings.channellist_progressbar_design != CProgressBar::PB_OFF) {
 				pb.setValues(0, pb_max);
-				pb.setZeroLine();
- 				pb.paint();
+				//pb.setZeroLine();
+				pb.paint();
 			}
 			//name
 			g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST]->RenderString(x+ 5+ numwidth+ 10+prg_offset, ypos+ fheight, width- numwidth- 40- 15-prg_offset, nameAndDescription, color);

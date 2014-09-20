@@ -1221,7 +1221,6 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 	CLuaMenuItem *b = &m->items.back();
 
 	tableLookup(L, "name", b->name);
-	std::string icon;	tableLookup(L, "icon", icon);
 	std::string type;	tableLookup(L, "type", type);
 	if (type == "back") {
 		m->m->addItem(GenericMenuBack);
@@ -1238,13 +1237,30 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 		} else
 			m->m->addItem(GenericMenuSeparatorLine);
 	} else {
-		std::string right_icon;	tableLookup(L, "right_icon", right_icon);
+		std::string right_icon_str;	tableLookup(L, "right_icon", right_icon_str);
 		std::string action;	tableLookup(L, "action", action);
 		std::string value;	tableLookup(L, "value", value);
 		std::string hint;	tableLookup(L, "hint", hint);
-		std::string hint_icon;	tableLookup(L, "hint_icon", hint_icon);
+		std::string hint_icon_str;	tableLookup(L, "hint_icon", hint_icon_str);
+		std::string icon_str;	tableLookup(L, "icon", icon_str);
 		std::string id;		tableLookup(L, "id", id);
 		std::string tmp;
+                char *right_icon = NULL;
+                if (!right_icon_str.empty()) {
+                        right_icon = strdup(right_icon_str.c_str());
+                        m->tofree.push_back(right_icon);
+                }
+                char *hint_icon = NULL;
+                if (!hint_icon_str.empty()) {
+                        hint_icon = strdup(hint_icon_str.c_str());
+                        m->tofree.push_back(hint_icon);
+                }
+                char *icon = NULL;
+                if (!icon_str.empty()) {
+                        icon = strdup(icon_str.c_str());
+                        m->tofree.push_back(icon);
+                }
+
 		int directkey = CRCInput::RC_nokey; tableLookup(L, "directkey", directkey);
 		int pulldown = false; 	tableLookup(L, "pulldown", pulldown);
 
@@ -1266,8 +1282,8 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 		if (type == "forwarder") {
 			b->str_val = value;
 			CLuaMenuForwarder *forwarder = new CLuaMenuForwarder(L, action, id);
-			mi = new CMenuForwarder(b->name, enabled, b->str_val, forwarder, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
-			if (!hint.empty() || !hint_icon.empty())
+			mi = new CMenuForwarder(b->name, enabled, b->str_val, forwarder, NULL/*ActionKey*/, directkey, icon, right_icon);
+			if (!hint.empty() || hint_icon)
 				mi->setHint(hint_icon, hint);
 			m->targets.push_back(forwarder);
 		} else if (type == "chooser") {
@@ -1305,22 +1321,22 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 					j++;
 				}
 			lua_pop(L, 1);
-			mi = new CMenuOptionChooser(b->name.c_str(), &b->int_val, kext, options_count, enabled, m->observ, directkey, icon.c_str(), pulldown);
+			mi = new CMenuOptionChooser(b->name.c_str(), &b->int_val, kext, options_count, enabled, m->observ, directkey, icon, pulldown);
 		} else if (type == "numeric") {
 			b->int_val = range_from;
 			sscanf(value.c_str(), "%d", &b->int_val);
 			mi = new CMenuOptionNumberChooser(b->name, &b->int_val, enabled, range_from, range_to, m->observ, 0, 0, NONEXISTANT_LOCALE, pulldown);
 		} else if (type == "string") {
 			b->str_val = value;
-			mi = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, icon.c_str(), pulldown);
+			mi = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, icon, pulldown);
 		} else if (type == "stringinput") {
 			b->str_val = value;
 			std::string valid_chars = "abcdefghijklmnopqrstuvwxyz0123456789!\"§$%&/()=?-. ";
 			tableLookup(L, "valid_chars", valid_chars);
 			int sms = 0;	tableLookup(L, "sms", sms);
 			int size = 30;	tableLookup(L, "size", size);
-			CLuaMenuStringinput *stringinput = new CLuaMenuStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, icon.c_str(), sms);
-			mi = new CMenuForwarder(b->name, enabled, b->str_val, stringinput, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
+			CLuaMenuStringinput *stringinput = new CLuaMenuStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, icon, sms);
+			mi = new CMenuForwarder(b->name, enabled, b->str_val, stringinput, NULL/*ActionKey*/, directkey, icon, right_icon);
 			m->targets.push_back(stringinput);
 		} else if (type == "filebrowser") {
 			b->str_val = value;
@@ -1336,12 +1352,12 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 				}
 			lua_pop(L, 1);
 
-			mi = new CMenuForwarder(b->name, enabled, b->str_val, filebrowser, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
+			mi = new CMenuForwarder(b->name, enabled, b->str_val, filebrowser, NULL/*ActionKey*/, directkey, icon, right_icon);
 			m->targets.push_back(filebrowser);
 		}
 		if (mi) {
 			mi->setLua(L, action, id);
-			if (!hint.empty() || !hint_icon.empty())
+			if (!hint.empty() || hint_icon)
 				mi->setHint(hint_icon, hint);
 			m->m->addItem(mi);
 		}

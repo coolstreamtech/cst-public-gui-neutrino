@@ -123,7 +123,7 @@ int CWebTVSetup::Show()
 			g_Zapit->reinitChannels();
 			changed = false;
 	}
-	
+
 	delete m;
 
 	return res;

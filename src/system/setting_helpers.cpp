@@ -357,30 +357,17 @@ int CNVODChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 	return menu_return::RETURN_EXIT;
 }
 
-int CStreamFeaturesChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
+int CPluginsExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {
-	//printf("CStreamFeaturesChangeExec exec: %s\n", actionKey.c_str());
+	//printf("CPluginsExec exec: %s\n", actionKey.c_str());
 	int sel= atoi(actionKey.c_str());
 
 	if(parent != NULL)
 		parent->hide();
-	// -- obsolete (rasc 2004-06-10)
-	// if (sel==-1)
-	// {
-	// 	CStreamInfo StreamInfo;
-	//	StreamInfo.exec(NULL, "");
-	// } else
+
 	if(actionKey == "teletext") {
 		g_RCInput->postMsg(CRCInput::RC_timeout, 0);
 		g_RCInput->postMsg(CRCInput::RC_text, 0);
-#if 0
-		g_RCInput->clearRCMsg();
-		tuxtx_main(g_RCInput->getFileHandle(), frameBuffer->getFrameBufferPointer(), g_RemoteControl->current_PIDs.PIDs.vtxtpid);
-		frameBuffer->paintBackground();
-		if(!g_settings.cacheTXT)
-			tuxtxt_stop();
-		g_RCInput->clearRCMsg();
-#endif
 	}
 	else if (sel>=0)
 	{
@@ -397,16 +384,6 @@ int CMoviePluginChangeExec::exec(CMenuTarget* parent, const std::string & action
 	if (sel>=0)
 	{
 			g_settings.movieplayer_plugin=g_PluginList->getName(sel);
-	}
-	return menu_return::RETURN_EXIT;
-}
-int COnekeyPluginChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
-{
-	int sel= atoi(actionKey.c_str());
-	parent->hide();
-	if (sel>=0)
-	{
-			g_settings.onekey_plugin=g_PluginList->getName(sel);
 	}
 	return menu_return::RETURN_EXIT;
 }

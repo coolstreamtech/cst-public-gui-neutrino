@@ -1382,13 +1382,13 @@ bool CRecordManager::ShowMenu(void)
 
 	//record item
 	iteml = new CMenuForwarder(LOCALE_RECORDINGMENU_MULTIMENU_REC_AKT, true /*!status_rec*/, NULL,
-			this, "Record", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+			this, "Record", CRCInput::RC_red);
 	//if no recordings are running, set the focus to the record menu item
 	menu.addItem(iteml, rec_count == 0 ? true: false);
 
 	//timeshift item
 	iteml = new CMenuForwarder(LOCALE_RECORDINGMENU_MULTIMENU_TIMESHIFT, !status_ts, NULL,
-			this, "Timeshift", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+			this, "Timeshift", CRCInput::RC_yellow);
 	menu.addItem(iteml, false);
 
 	if(rec_count > 0)
@@ -1414,7 +1414,7 @@ bool CRecordManager::ShowMenu(void)
 			sprintf(cnt, "%d", i);
 			//define stop key if only one record is running, otherwise define shortcuts
 			neutrino_msg_t rc_key = CRCInput::convertDigitToKey(shortcut++);
-			std::string btn_icon = NEUTRINO_ICON_BUTTON_OKAY;
+			const char * btn_icon = NEUTRINO_ICON_BUTTON_OKAY;
 			if (rec_count == 1){
 				rc_key = CRCInput::RC_stop;
 				btn_icon = NEUTRINO_ICON_BUTTON_STOP;

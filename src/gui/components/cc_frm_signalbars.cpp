@@ -124,9 +124,11 @@ void CSignalBar::initSBarScale()
 {
 	//create scale object if required
 	if (sb_scale == NULL){
-		sb_scale = new CProgressBar();
+ 		sb_scale = new CProgressBar();
+#if 0
 		//we want colored scale!
 		sb_scale->setBlink();
+#endif
 	}
 
 	//move and set dimensions
