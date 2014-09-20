@@ -1103,7 +1103,8 @@ void CMenuWidget::paint()
 	int h_body = height - hheight + RADIUS_LARGE;
 
 	// paint head
-	CComponentsHeader header(x, y, w_body, hheight, nameString, iconfile);
+	CComponentsHeader header(x, y, width + sb_width, hheight, getName(), iconfile);
+	header.setPaintGradient(true);
 	header.setShadowOnOff(CC_SHADOW_ON);
 	header.setOffset(10);
 	header.paint(CC_SAVE_SCREEN_NO);
