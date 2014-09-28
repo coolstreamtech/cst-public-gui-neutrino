@@ -957,30 +957,6 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 	return retval;
 }
 
-void CMenuWidget::integratePlugins(void *pluginsExec, CPlugins::i_type_t integration)
-{
-	CPluginsExec *_pluginsExec = static_cast<CPluginsExec*>(pluginsExec);
-	bool separatorline = false;
-	char id_plugin[5];
-	unsigned int number_of_plugins = (unsigned int) g_PluginList->getNumberOfPlugins();
-	for (unsigned int count = 0; count < number_of_plugins; count++)
-	{
-		if (g_PluginList->getIntegration(count) == integration)
-		{
-			if (!separatorline)
-			{
-				addItem(GenericMenuSeparatorLine);
-				separatorline = true;
-			}
-			printf("[neutrino] integratePlugins: add %s\n", g_PluginList->getName(count));
-			sprintf(id_plugin, "%d", count);
-			CMenuForwarder *fw_plugin = new CMenuForwarder(g_PluginList->getName(count), true, NULL, _pluginsExec, id_plugin);
-			fw_plugin->setHint("", g_PluginList->getDescription(count));
-			addItem(fw_plugin);
-		}
-	}
-}
-
 void CMenuWidget::hide()
 {
 	if(savescreen && background)
